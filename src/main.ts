@@ -37,6 +37,7 @@ import {
   animateConqStep, centerOnNextNodes,
   resetMap, setupResizeHandler,
   waitForMapThenCinematic,
+  getNewHistMarkersForAct, runHistMarkerCinematic,
 } from './screens/MapScreen.js'
 
 // ── UI ────────────────────────────────────────────────
@@ -293,6 +294,11 @@ function onDecision(decisionIndex: number): void {
   const decision = ev.decisions[decisionIndex]
   if (!decision) return
 
+  // Guardar el acto actual ANTES de aplicar la decisión (para detectar cambio de acto)
+  const prevAct = gs.history.length > 0
+    ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
+    : 1
+
   // Aplicar la decisión al estado
   const result = applyDecision(gs, decision)
   gs = result.state
@@ -341,17 +347,30 @@ function onDecision(decisionIndex: number): void {
   saveGame(gs)
   flashSaveIndicator()
 
+  // Detectar si hubo cambio de acto → marcadores históricos nuevos
+  const newAct = gs.history.length > 0
+    ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
+    : 1
+  const newMarkers = newAct > prevAct ? getNewHistMarkersForAct(newAct) : []
+
+  // Callback final: después del conquistador, mostrar cinemáticas históricas si hay
+  const afterConq = () => {
+    if (newMarkers.length > 0) {
+      runHistMarkerCinematic(newMarkers, gs, _selectNodeFn, () => {
+        centerOnNextNodes(gs)
+      })
+    } else {
+      centerOnNextNodes(gs)
+    }
+  }
+
   // Animar el movimiento del conquistador (visual únicamente)
   if (gs.conq.caught) {
-    // Captura: animar el salto y luego disparar el evento dramático
     animateConqStep(preConqGs, gs, conqResult.reorg, () => {
       setTimeout(() => triggerConqCatch(), 400)
     }, _selectNodeFn)
   } else {
-    // Movimiento normal: animar y luego centrar cámara en próximos nodos
-    animateConqStep(preConqGs, gs, conqResult.reorg, () => {
-      centerOnNextNodes(gs)
-    }, _selectNodeFn)
+    animateConqStep(preConqGs, gs, conqResult.reorg, afterConq, _selectNodeFn)
   }
 }
 

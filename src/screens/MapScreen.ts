@@ -34,18 +34,47 @@ const ACT_NAMES: Record<number, string> = {
 
 // ── Marcadores históricos ─────────────────────────────
 
-const HIST_MARKERS = [
+interface HistMarker {
+  id:    string
+  lon:   number
+  lat:   number
+  act:   number
+  icon:  string
+  label: string
+  tip:   string
+  year:  string
+  narr:  string
+}
+
+const HIST_MARKERS: HistMarker[] = [
   { id: 'hm_cajamarca', lon: -78.5, lat: -7.2,  act: 2, icon: '⚔️', label: 'Cajamarca',
-    tip: '1532 — Pizarro captura al Inca Atahualpa con 168 hombres contra 80.000 guerreros.' },
+    year: '1532',
+    tip:  '1532 — Pizarro captura al Inca Atahualpa con 168 hombres contra 80.000 guerreros.',
+    narr: 'Francisco Pizarro captura al Inca Atahualpa. Con 168 hombres, caballos y cañones derrota a 80.000 guerreros. El Imperio Inca, el más grande de América, colapsa en una tarde.' },
   { id: 'hm_cusco',     lon: -72.0, lat: -13.5, act: 2, icon: '🏛️', label: 'Cusco',
-    tip: '1533 — Pizarro ejecuta a Atahualpa y entra a Cusco. El Tawantinsuyu se desintegra.' },
+    year: '1533',
+    tip:  '1533 — Pizarro ejecuta a Atahualpa y entra a Cusco. El Tawantinsuyu se desintegra.',
+    narr: 'Pizarro ejecuta a Atahualpa y entra a Cusco, la ciudad sagrada del Sol. El Tawantinsuyu — 2 millones de km², 12 millones de personas — se desintegra sin su cabeza.' },
   { id: 'hm_panama',    lon: -80.2, lat: 8.2,   act: 2, icon: '⚓', label: 'Panamá',
-    tip: '1519 — Fundación de Panamá. Base de operaciones de Pizarro hacia Sudamérica.' },
+    year: '1519',
+    tip:  '1519 — Fundación de Panamá. Base de operaciones de Pizarro hacia Sudamérica.',
+    narr: 'Pedrarias Dávila funda la Ciudad de Panamá. Desde aquí parten las expediciones que conquistarán el sur. La máquina colonial se extiende.' },
   { id: 'hm_potosi',    lon: -65.7, lat: -19.6, act: 3, icon: '⛏️', label: 'Potosí',
-    tip: '1545 — El Cerro Rico: 40.000 toneladas de plata extraídas. Millones muertos en la mita.' },
+    year: '1545',
+    tip:  '1545 — El Cerro Rico: 40.000 toneladas de plata extraídas. Millones muertos en la mita.',
+    narr: 'Descubrimiento del Cerro Rico de Potosí. La mina de plata más grande del mundo colonial. En tres siglos extraerán 40.000 toneladas. El precio: millones de muertos indígenas en la mita.' },
+  { id: 'hm_tucuman',   lon: -65.2, lat: -26.8, act: 3, icon: '🏰', label: 'Tucumán',
+    year: '1553',
+    tip:  '1553 — Primera ciudad permanente en el Cono Sur. La expansión colonial llega al sur.',
+    narr: 'Diego de Villaroel funda Santiago del Estero, primera ciudad permanente del actual territorio argentino. La expansión colonial alcanza el Cono Sur. No queda tierra sin mano de España.' },
   { id: 'hm_arauco',    lon: -73.0, lat: -37.5, act: 4, icon: '🦅', label: 'Guerra de Arauco',
-    tip: '1550–1810 — Los mapuches resisten 260 años. El Biobío: frontera que España nunca cruzó.' },
+    year: '1550–1810',
+    tip:  '1550–1810 — Los mapuches resisten 260 años. El Biobío: frontera que España nunca cruzó.',
+    narr: 'Los mapuches inician 260 años de guerra continua. El único pueblo que España nunca pudo conquistar. El río Biobío se convierte en frontera permanente — tierra que el Imperio nunca cruzó.' },
 ]
+
+// ── Registro de marcadores ya mostrados (para cinemática única) ───────────
+let _shownHistMarkers = new Set<string>()
 
 // ── Helpers ───────────────────────────────────────────
 
@@ -749,8 +778,9 @@ function _renderFallback(lineF: (d: [number, number][]) => string | null, gs: Ga
 // ── Resize ────────────────────────────────────────────
 
 export function resetMap(): void {
-  _mapInitialized = false
-  _conqAnimating  = false
+  _mapInitialized    = false
+  _conqAnimating     = false
+  _shownHistMarkers  = new Set<string>()
 }
 
 // ══════════════════════════════════════════════════════
@@ -1113,6 +1143,151 @@ function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void): vo
       drawConquistador(gs)
       // Listo — el jugador puede interactuar
     })
+}
+
+// ══════════════════════════════════════════════════════
+// CINEMÁTICA DE MARCADORES HISTÓRICOS
+// Cuando un nuevo acto se alcanza, algunos marcadores
+// históricos se vuelven visibles. Para cada marcador nuevo
+// se dispara una mini-cinemática: pan → texto → pan de vuelta.
+// ══════════════════════════════════════════════════════
+
+/**
+ * Devuelve los marcadores del acto `newAct` que no se han mostrado aún.
+ * Registra los devueltos para no repetirlos.
+ */
+export function getNewHistMarkersForAct(newAct: number): HistMarker[] {
+  const fresh = HIST_MARKERS.filter(m => m.act === newAct && !_shownHistMarkers.has(m.id))
+  fresh.forEach(m => _shownHistMarkers.add(m.id))
+  return fresh
+}
+
+/**
+ * Ejecuta la cinemática encadenada para una lista de marcadores históricos.
+ * Al terminar todos llama onDone().
+ */
+export function runHistMarkerCinematic(
+  markers:      HistMarker[],
+  gs:           GameState,
+  onSelectNode: ((id: string) => void) | undefined,
+  onDone:       () => void,
+): void {
+  if (markers.length === 0) { onDone(); return }
+  const [first, ...rest] = markers
+  _showOneHistCinematic(first, gs, () => {
+    // Encadenar el siguiente marcador o terminar
+    runHistMarkerCinematic(rest, gs, onSelectNode, onDone)
+  })
+}
+
+function _showOneHistCinematic(
+  marker: HistMarker,
+  gs:     GameState,
+  onDone: () => void,
+): void {
+  if (!mapSvg || !mapProj || !mapZoom) { onDone(); return }
+  const wrap = document.getElementById('map-canvas-wrap')
+  if (!wrap) { onDone(); return }
+  const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
+  const scale = 3.8
+
+  // ── Panel de texto histórico ─────────────────────────
+  function _showHistCard(cb: () => void): void {
+    const existing = document.getElementById('hist-cinematic-card')
+    if (existing) existing.remove()
+    const card = document.createElement('div')
+    card.id = 'hist-cinematic-card'
+    card.style.cssText = [
+      'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);',
+      'z-index:9999;pointer-events:none;text-align:center;',
+      "font-family:'Cinzel',serif;",
+      'padding:1.4rem 2rem;border-radius:4px;',
+      'background:rgba(2,4,2,.9);border:1px solid rgba(80,140,50,.5);',
+      'box-shadow:0 0 40px rgba(30,80,20,.4);',
+      'max-width:min(90vw,540px);opacity:0;transition:opacity .9s ease;',
+    ].join('')
+    card.innerHTML = `
+      <div style="color:rgba(150,210,80,.8);font-size:clamp(.7rem,2vw,.9rem);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">${marker.year}</div>
+      <div style="color:#c8e890;font-size:clamp(1rem,3vw,1.4rem);margin-bottom:.7rem">${marker.icon} ${marker.label}</div>
+      <div style="color:rgba(200,230,160,.72);font-size:clamp(.7rem,2vw,.88rem);font-family:'Crimson Text',serif;font-style:italic;line-height:1.6">${marker.narr}</div>`
+    document.body.appendChild(card)
+    requestAnimationFrame(() => requestAnimationFrame(() => { card.style.opacity = '1' }))
+    setTimeout(() => {
+      card.style.opacity = '0'
+      setTimeout(() => { card.remove(); cb() }, 800)
+    }, 4200)
+  }
+
+  // ── Marcador SVG con pulso ────────────────────────────
+  function _addMarkerEffect(): void {
+    if (!mapG || !mapProj) return
+    const [mx, my] = mapProj([marker.lon, marker.lat]) as [number, number]
+    mapG.selectAll(`.hist-cinematic-${marker.id}`).remove()
+    const mg = mapG.append('g')
+      .attr('class', `hist-marker hist-cinematic-${marker.id}`)
+      .attr('transform', `translate(${mx},${my})`)
+      .attr('pointer-events', 'none')
+      .attr('opacity', 0)
+
+    // Halo exterior pulsante
+    const halo = mg.append('circle').attr('r', 18).attr('fill', 'none')
+      .attr('stroke', 'rgba(100,200,60,.5)').attr('stroke-width', 1.5)
+    halo.append('animate').attr('attributeName', 'r').attr('values', '18;28;18')
+      .attr('dur', '2s').attr('repeatCount', 'indefinite')
+    halo.append('animate').attr('attributeName', 'opacity').attr('values', '.5;.15;.5')
+      .attr('dur', '2s').attr('repeatCount', 'indefinite')
+
+    // Círculo relleno
+    mg.append('circle').attr('r', 10).attr('fill', 'rgba(30,60,10,.8)')
+      .attr('stroke', 'rgba(120,200,60,.8)').attr('stroke-width', 1.5)
+    // Ícono
+    mg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', '11px').text(marker.icon)
+    // Label
+    mg.append('rect').attr('x', -26).attr('y', 12).attr('width', 52).attr('height', 10)
+      .attr('fill', 'rgba(2,4,2,.82)').attr('rx', 2)
+    mg.append('text').attr('text-anchor', 'middle').attr('y', 19)
+      .attr('font-size', '5.5px').attr('font-family', 'Cinzel,serif')
+      .attr('fill', 'rgba(150,210,70,.9)').attr('letter-spacing', '.1em')
+      .text(marker.label.toUpperCase())
+
+    mg.transition().duration(900).ease(d3Lib.easeCubicOut).attr('opacity', 1)
+  }
+
+  // ── Secuencia ─────────────────────────────────────────
+  const [px, py] = mapProj([marker.lon, marker.lat]) as [number, number]
+  const tx = W / 2 - scale * px, ty = H / 2 - scale * py
+
+  // PASO 1: Pan al marcador histórico
+  mapSvg.transition().duration(1800).ease(d3Lib.easeCubicInOut)
+    .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
+    .on('end', () => {
+      // PASO 2: Marcador aparece
+      _addMarkerEffect()
+      setTimeout(() => {
+        // PASO 3: Card con contexto histórico
+        _showHistCard(() => {
+          // PASO 4: Pan de vuelta al jugador
+          _panBackToPlayer(gs, onDone)
+        })
+      }, 600)
+    })
+}
+
+/** Pan de vuelta a la zona del jugador después de una cinemática histórica */
+function _panBackToPlayer(gs: GameState, onDone: () => void): void {
+  if (!mapSvg || !mapProj || !mapZoom) { onDone(); return }
+  const wrap = document.getElementById('map-canvas-wrap')
+  const W = wrap?.clientWidth ?? 900, H = wrap?.clientHeight ?? 580
+  const last = lastCompleted(gs)
+  const nd = last ? gs.nodes[last] : null
+  if (!nd) { onDone(); return }
+  const scale = 2.6
+  const [px, py] = mapProj([nd.lon, nd.lat]) as [number, number]
+  const tx = W / 2 - scale * px, ty = H / 2 - scale * py
+  mapSvg.transition().duration(1600).ease(d3Lib.easeCubicInOut)
+    .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
+    .on('end', onDone)
 }
 
 export function setupResizeHandler(getGs: () => GameState, getSelectNodeFn: () => ((id: string) => void) | undefined): void {
