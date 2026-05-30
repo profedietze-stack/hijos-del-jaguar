@@ -48,7 +48,12 @@ import {
 } from './ui/dom.js'
 
 // ── Audio ─────────────────────────────────────────────
-import { playTrack, sfxClick }                          from './ui/audio.js'
+import {
+  playTrack, sfxClick, toggleMute,
+  sfxNodeSelect, sfxDecision,
+  sfxPositive, sfxNegative,
+  sfxConqAdvance, sfxConqCatch,
+} from './ui/audio.js'
 
 // ── Modo Clase ────────────────────────────────────────
 import { initClaseMode }                                from './ui/claseMode.js'
@@ -105,6 +110,7 @@ function _registerServiceWorker(): void {
 
 function wireAllButtons(): void {
   // ── Menú ─────────────────────────────────────────────
+  on('btn-mute',     () => { toggleMute() })
   on('btn-nueva',    () => { sfxClick(); mountIntro() })
   on('btn-continue', () => { sfxClick(); continueGame() })
   on('btn-history',  () => { sfxClick(); mountHistoryScreen() })
@@ -273,6 +279,7 @@ function continueGame(): void {
 // ══════════════════════════════════════════════════════
 
 function onSelectNode(nodeId: string): void {
+  sfxNodeSelect()
   gs = engineSelectNode(gs, nodeId)
   saveGame(gs)
   flashSaveIndicator()
@@ -299,9 +306,17 @@ function onDecision(decisionIndex: number): void {
     ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
     : 1
 
+  // SFX de decisión
+  sfxDecision()
+
   // Aplicar la decisión al estado
   const result = applyDecision(gs, decision)
   gs = result.state
+  // SFX según resultado (notificaciones de pérdida o ganancia)
+  const hasLoss = result.notifs.some(n => n.kind === 'loss')
+  const hasGain = result.notifs.some(n => n.kind === 'gain' || n.kind === 'info')
+  if (hasLoss) setTimeout(sfxNegative, 180)
+  else if (hasGain) setTimeout(sfxPositive, 180)
   showNotifs(result.notifs)
   updateStatsBar(gs)
 
@@ -364,11 +379,15 @@ function onDecision(decisionIndex: number): void {
     }
   }
 
-  // Animar el movimiento del conquistador (visual únicamente)
+  // Animar el movimiento del conquistador (visual + SFX)
   if (gs.conq.caught) {
+    sfxConqCatch()
     animateConqStep(preConqGs, gs, conqResult.reorg, () => {
       setTimeout(() => triggerConqCatch(), 400)
     }, _selectNodeFn)
+  } else if (!conqResult.reorg) {
+    sfxConqAdvance()
+    animateConqStep(preConqGs, gs, conqResult.reorg, afterConq, _selectNodeFn)
   } else {
     animateConqStep(preConqGs, gs, conqResult.reorg, afterConq, _selectNodeFn)
   }

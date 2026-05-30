@@ -22,7 +22,19 @@ async function _ensureStarted(): Promise<boolean> {
   } catch { return false }
 }
 
-// ── SFX: toc de madera ───────────────────────────────
+// ── Helpers SFX ──────────────────────────────────────
+
+/** Crea un reverb pequeño y lo conecta al destino. Devuelve un dispose fn. */
+function _sfxRev(decay = 1.2, wet = 0.25): [Tone.Reverb, () => void] {
+  const r = new Tone.Reverb({ decay, wet }).toDestination()
+  return [r, () => { try { r.dispose() } catch { /* noop */ } }]
+}
+
+function _sfxDispose(nodes: Tone.ToneAudioNode[], delay = 600): void {
+  setTimeout(() => nodes.forEach(n => { try { n.dispose() } catch { /* noop */ } }), delay)
+}
+
+// ── SFX: toc de madera (botones genéricos) ───────────
 
 export function sfxClick(): void {
   if (!_started) return
@@ -39,7 +51,199 @@ export function sfxClick(): void {
     }).toDestination()
     mem.triggerAttackRelease('C2', '16n')
     noise.triggerAttackRelease('16n')
-    setTimeout(() => { try { mem.dispose(); noise.dispose() } catch { /* noop */ } }, 400)
+    _sfxDispose([mem, noise])
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: seleccionar nodo en el mapa ─────────────────
+// Nota suave de quena + shimmer de metal
+
+export function sfxNodeSelect(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(2.2, 0.38)
+    const vib = new Tone.Vibrato({ frequency: 4, depth: 0.1 }).connect(rev)
+    const flute = new Tone.Synth({
+      oscillator: { type: 'sine' as const },
+      envelope: { attack: 0.06, decay: 0.25, sustain: 0.45, release: 0.7 },
+      volume: -12,
+    }).connect(vib)
+    const shimmer = new Tone.MetalSynth({
+      envelope: { attack: 0.001, decay: 0.18, release: 0.12 },
+      harmonicity: 3.1, modulationIndex: 16, resonance: 3200, octaves: 0.8,
+      volume: -22,
+    } as never).connect(rev)
+    // Acorde pentatónico suave: tónica + quinta
+    flute.triggerAttackRelease('E4', '4n')
+    shimmer.triggerAttackRelease('8n', '+0.04')
+    flute.triggerAttackRelease('B4', '4n', '+0.18')
+    _sfxDispose([flute, vib, shimmer, rev], 1200)
+    setTimeout(dispRev, 1200)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: hover sobre nodo ─────────────────────────────
+// Toc muy suave, casi inaudible
+
+export function sfxNodeHover(): void {
+  if (!_started) return
+  try {
+    const mem = new Tone.MembraneSynth({
+      pitchDecay: 0.02, octaves: 2,
+      envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.03 },
+      volume: -22,
+    }).toDestination()
+    mem.triggerAttackRelease('G2', '32n')
+    _sfxDispose([mem], 300)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: tomar una decisión en evento ────────────────
+// Dos golpes de tambor + nota grave de resolución
+
+export function sfxDecision(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(1.8, 0.3)
+    const bombo = new Tone.MembraneSynth({
+      pitchDecay: 0.07, octaves: 4,
+      envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.15 },
+      volume: -4,
+    }).connect(rev)
+    const mid = new Tone.MembraneSynth({
+      pitchDecay: 0.04, octaves: 3,
+      envelope: { attack: 0.001, decay: 0.14, sustain: 0, release: 0.08 },
+      volume: -9,
+    }).connect(rev)
+    const tone = new Tone.Synth({
+      oscillator: { type: 'triangle' as const },
+      envelope: { attack: 0.04, decay: 0.5, sustain: 0.1, release: 0.8 },
+      volume: -16,
+    }).connect(rev)
+    bombo.triggerAttackRelease('C1', '8n')
+    mid.triggerAttackRelease('G1', '8n', '+0.12')
+    tone.triggerAttackRelease('A2', '2n', '+0.08')
+    _sfxDispose([bombo, mid, tone, rev], 1600)
+    setTimeout(dispRev, 1600)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: notificación positiva (alianza, logro) ───────
+// Arpegio ascendente pentatónico
+
+export function sfxPositive(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(2.5, 0.42)
+    const vib = new Tone.Vibrato({ frequency: 5, depth: 0.08 }).connect(rev)
+    const fl  = new Tone.Synth({
+      oscillator: { type: 'sine' as const },
+      envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.6 },
+      volume: -11,
+    }).connect(vib)
+    const notes = ['A3','C4','E4','A4']
+    notes.forEach((n, i) => fl.triggerAttackRelease(n, '8n', `+${i * 0.13}`))
+    _sfxDispose([fl, vib, rev], 1800)
+    setTimeout(dispRev, 1800)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: notificación negativa (pérdida, peligro) ─────
+// Descenso cromático + ruido grave
+
+export function sfxNegative(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(1.5, 0.25)
+    const syn = new Tone.Synth({
+      oscillator: { type: 'sawtooth' as const },
+      envelope: { attack: 0.02, decay: 0.35, sustain: 0.05, release: 0.4 },
+      volume: -13,
+    }).connect(rev)
+    const noise = new Tone.NoiseSynth({
+      noise: { type: 'brown' as const },
+      envelope: { attack: 0.02, decay: 0.3, sustain: 0, release: 0.2 },
+      volume: -20,
+    }).connect(rev)
+    syn.triggerAttackRelease('E3', '8n')
+    syn.triggerAttackRelease('Eb3', '8n', '+0.15')
+    syn.triggerAttackRelease('D3', '8n', '+0.3')
+    noise.triggerAttackRelease('4n', '+0.05')
+    _sfxDispose([syn, noise, rev], 1400)
+    setTimeout(dispRev, 1400)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: avance del conquistador ──────────────────────
+// Tambor de guerra amenazante + metal
+
+export function sfxConqAdvance(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(1.2, 0.2)
+    const drum = new Tone.MembraneSynth({
+      pitchDecay: 0.09, octaves: 5,
+      envelope: { attack: 0.001, decay: 0.4, sustain: 0, release: 0.2 },
+      volume: -3,
+    }).connect(rev)
+    const metal = new Tone.MetalSynth({
+      envelope: { attack: 0.001, decay: 0.22, release: 0.15 },
+      harmonicity: 4.2, modulationIndex: 28, resonance: 2800, octaves: 1.2,
+      volume: -16,
+    } as never).connect(rev)
+    drum.triggerAttackRelease('C1', '4n')
+    drum.triggerAttackRelease('C1', '4n', '+0.22')
+    metal.triggerAttackRelease('16n', '+0.1')
+    _sfxDispose([drum, metal, rev], 1200)
+    setTimeout(dispRev, 1200)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: conquistador te alcanza (alerta máxima) ──────
+// Tres golpes + nota de terror
+
+export function sfxConqCatch(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(2.0, 0.35)
+    const drum = new Tone.MembraneSynth({
+      pitchDecay: 0.12, octaves: 6,
+      envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.3 },
+      volume: 0,
+    }).connect(rev)
+    const danger = new Tone.Synth({
+      oscillator: { type: 'sawtooth' as const },
+      envelope: { attack: 0.01, decay: 0.8, sustain: 0.2, release: 1.2 },
+      volume: -10,
+    }).connect(rev)
+    ;[0, 0.18, 0.36].forEach(t => drum.triggerAttackRelease('C1', '8n', `+${t}`))
+    danger.triggerAttackRelease('A1', '2n', '+0.2')
+    _sfxDispose([drum, danger, rev], 2500)
+    setTimeout(dispRev, 2500)
+  } catch { /* silencioso */ }
+}
+
+// ── SFX: cinemática / transición de acto ─────────────
+// Campana grave + reverb largo
+
+export function sfxCinematic(): void {
+  if (!_started) return
+  try {
+    const [rev, dispRev] = _sfxRev(5.0, 0.6)
+    const bell = new Tone.MetalSynth({
+      envelope: { attack: 0.001, decay: 1.8, release: 2.0 },
+      harmonicity: 2.0, modulationIndex: 8, resonance: 800, octaves: 0.5,
+      volume: -14,
+    } as never).connect(rev)
+    const sub = new Tone.Synth({
+      oscillator: { type: 'sine' as const },
+      envelope: { attack: 0.3, decay: 1.5, sustain: 0, release: 2.0 },
+      volume: -18,
+    }).connect(rev)
+    bell.triggerAttackRelease('2n', '+0')
+    sub.triggerAttackRelease('A1', '1n', '+0.1')
+    _sfxDispose([bell, sub, rev], 5000)
+    setTimeout(dispRev, 5000)
   } catch { /* silencioso */ }
 }
 
@@ -232,4 +436,23 @@ export async function playTrack(track: TrackName): Promise<void> {
 
 export function stopAudio(): void {
   _stopCurrent()
+}
+
+// ── Toggle mute ───────────────────────────────────────
+
+let _muted = false
+
+export function isMuted(): boolean { return _muted }
+
+export function toggleMute(): void {
+  _muted = !_muted
+  try {
+    Tone.getDestination().mute = _muted
+  } catch { /* silencioso */ }
+  // Actualizar ícono del botón si existe en el DOM
+  const btn = document.getElementById('btn-mute')
+  if (btn) {
+    btn.textContent = _muted ? '🔇' : '🔊'
+    btn.style.opacity = _muted ? '0.9' : '0.55'
+  }
 }

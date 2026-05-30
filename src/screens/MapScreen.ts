@@ -1,6 +1,7 @@
 import type { GameState } from '../core/GameState.js'
 import { NODES_DEF, EDGES, CONQ_BRIDGE } from '../data/nodes.js'
 import { showNotif } from '../ui/dom.js'
+import { sfxCinematic, sfxNodeHover } from '../ui/audio.js'
 import * as d3Lib from 'd3'
 import * as topojson from 'topojson-client'
 
@@ -210,17 +211,92 @@ function drawHistMarkers(gs: GameState): void {
 export function drawConquistador(gs: GameState): void {
   if (!mapG || !mapProj) return
   mapG.selectAll('.conq-layer').remove()
+
+  // ── 1. Ruta punteada: Tenochtitlán → cb1 → cb2 → cb3 → n00 ──────────────
+  const routePoints: [number, number][] = []
+  CONQ_BRIDGE.forEach(cb => {
+    routePoints.push(mapProj!([cb.lon, cb.lat]) as [number, number])
+  })
+  // Conectar hasta n00 (Guatemala, primer nodo del jugador)
+  const n00 = gs.nodes['n00']
+  if (n00) routePoints.push(mapProj!([n00.lon, n00.lat]) as [number, number])
+
+  for (let i = 0; i < routePoints.length - 1; i++) {
+    const [x1, y1] = routePoints[i]
+    const [x2, y2] = routePoints[i + 1]
+    mapG.append('line').attr('class', 'conq-layer')
+      .attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
+      .attr('stroke', 'rgba(180,50,30,.35)').attr('stroke-width', 1.4)
+      .attr('stroke-dasharray', '5,4').attr('pointer-events', 'none')
+  }
+
+  // ── 2. Tenochtitlán — marcador permanente (cb0) ──────────────────────────
+  const [tx, ty] = routePoints[0]
+  const tg = mapG.append('g').attr('class', 'conq-layer')
+    .attr('transform', `translate(${tx},${ty})`).attr('cursor', 'help')
+
+  // Base pirámide simplificada
+  tg.append('rect').attr('x', -7).attr('y', 2).attr('width', 14).attr('height', 3)
+    .attr('fill', 'rgba(160,110,40,.85)').attr('rx', .4).attr('pointer-events', 'none')
+  tg.append('rect').attr('x', -5).attr('y', -1).attr('width', 10).attr('height', 4)
+    .attr('fill', 'rgba(170,120,45,.85)').attr('rx', .4).attr('pointer-events', 'none')
+  tg.append('rect').attr('x', -3).attr('y', -4).attr('width', 6).attr('height', 4)
+    .attr('fill', 'rgba(180,130,50,.85)').attr('rx', .4).attr('pointer-events', 'none')
+  // Llama pequeña encima
+  tg.append('text').attr('text-anchor', 'middle').attr('y', -5)
+    .attr('font-size', '7px').attr('pointer-events', 'none').text('🔥')
+  // Label
+  tg.append('rect').attr('x', -22).attr('y', 6).attr('width', 44).attr('height', 9)
+    .attr('fill', 'rgba(4,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
+  tg.append('text').attr('text-anchor', 'middle').attr('y', 13)
+    .attr('font-size', '5px').attr('font-family', 'Cinzel,serif')
+    .attr('fill', 'rgba(220,150,50,.9)').attr('letter-spacing', '.1em')
+    .attr('pointer-events', 'none').text('TENOCHTITLÁN')
+  tg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev,
+    '<strong style="color:#d4a017">🔥 Tenochtitlán — 1521</strong><br>Hernán Cortés derriba la capital azteca. La conquista avanza hacia el sur.'))
+    .on('mouseleave', hideGeoTip)
+
+  // ── 3. Waypoints intermedios (cb1, cb2, cb3) ─────────────────────────────
+  CONQ_BRIDGE.slice(1).forEach((cb, i) => {
+    const [wx, wy] = routePoints[i + 1]
+    const wg = mapG!.append('g').attr('class', 'conq-layer')
+      .attr('transform', `translate(${wx},${wy})`).attr('cursor', 'help')
+    wg.append('circle').attr('r', 5).attr('fill', 'rgba(80,10,5,.7)')
+      .attr('stroke', 'rgba(180,60,40,.55)').attr('stroke-width', 1)
+    wg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', '5px').attr('pointer-events', 'none').text('👑')
+    wg.append('rect').attr('x', -18).attr('y', 7).attr('width', 36).attr('height', 8)
+      .attr('fill', 'rgba(4,2,2,.75)').attr('rx', 2).attr('pointer-events', 'none')
+    wg.append('text').attr('text-anchor', 'middle').attr('y', 13)
+      .attr('font-size', '4.5px').attr('font-family', 'Cinzel,serif')
+      .attr('fill', 'rgba(200,90,70,.85)').attr('pointer-events', 'none')
+      .text(cb.name.toUpperCase())
+    wg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev,
+      `<strong style="color:#e07070">👑 ${cb.name}</strong><br>Ruta de avance de los conquistadores.`))
+      .on('mouseleave', hideGeoTip)
+  })
+
+  // ── 4. Token del conquistador en su posición actual ───────────────────────
   const wp = conqCurrentNode(gs)
-  if (!wp) return
+  if (!wp) { drawHistMarkers(gs); return }
   const [cx, cy] = mapProj([wp.lon, wp.lat]) as [number, number]
-  const cg = mapG.append('g').attr('class', 'conq-layer').attr('transform', `translate(${cx + 18},${cy - 10})`).attr('cursor', 'help')
-  const pulse = cg.append('circle').attr('r', 14).attr('fill', 'none').attr('stroke', 'rgba(192,57,43,.6)').attr('stroke-width', 1.5)
-  pulse.append('animate').attr('attributeName', 'r').attr('values', '14;20;14').attr('dur', '1.8s').attr('repeatCount', 'indefinite')
-  cg.append('circle').attr('r', 14).attr('fill', 'rgba(139,26,26,.1)').attr('stroke', 'rgba(192,57,43,.15)').attr('stroke-width', 8)
-  cg.append('circle').attr('r', 11).attr('fill', 'rgba(100,15,15,.85)').attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 2)
-  cg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central').attr('font-size', '13px').attr('pointer-events', 'none').text('👑')
-  cg.append('rect').attr('x', -32).attr('y', 14).attr('width', 64).attr('height', 11).attr('fill', 'rgba(6,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
-  cg.append('text').attr('text-anchor', 'middle').attr('y', 22).attr('font-size', '7px').attr('font-family', 'Cinzel,serif').attr('fill', 'rgba(220,100,80,.95)').attr('pointer-events', 'none').text('CONQUISTADORES')
+  const cg = mapG.append('g').attr('class', 'conq-layer')
+    .attr('transform', `translate(${cx + 18},${cy - 10})`).attr('cursor', 'help')
+  const pulse = cg.append('circle').attr('r', 14).attr('fill', 'none')
+    .attr('stroke', 'rgba(192,57,43,.6)').attr('stroke-width', 1.5)
+  pulse.append('animate').attr('attributeName', 'r').attr('values', '14;20;14')
+    .attr('dur', '1.8s').attr('repeatCount', 'indefinite')
+  cg.append('circle').attr('r', 14).attr('fill', 'rgba(139,26,26,.1)')
+    .attr('stroke', 'rgba(192,57,43,.15)').attr('stroke-width', 8)
+  cg.append('circle').attr('r', 11).attr('fill', 'rgba(100,15,15,.85)')
+    .attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 2)
+  cg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+    .attr('font-size', '13px').attr('pointer-events', 'none').text('👑')
+  cg.append('rect').attr('x', -32).attr('y', 14).attr('width', 64).attr('height', 11)
+    .attr('fill', 'rgba(6,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
+  cg.append('text').attr('text-anchor', 'middle').attr('y', 22)
+    .attr('font-size', '7px').attr('font-family', 'Cinzel,serif')
+    .attr('fill', 'rgba(220,100,80,.95)').attr('pointer-events', 'none').text('CONQUISTADORES')
   const ri = gs.conq.routeIdx
   const playerPos = CONQ_BRIDGE.length + gs.history.length - 1
   const dist = playerPos - ri
@@ -228,8 +304,10 @@ export function drawConquistador(gs: GameState): void {
     : dist === 1 ? '<span style="color:#e07070">⚠️ A UN NODO de distancia</span>'
     : dist === 2 ? '<span style="color:#d4a017">⚠ Dos nodos detrás</span>'
     : '<span style="color:#6db84a">Varios nodos de ventaja</span>'
-  cg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev, `<strong style="color:#e07070">👑 Conquistadores</strong><br>${distTxt}`))
+  cg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev,
+    `<strong style="color:#e07070">👑 Conquistadores — ${wp.name ?? ''}</strong><br>${distTxt}`))
     .on('mouseleave', hideGeoTip)
+
   drawHistMarkers(gs)
 }
 
@@ -568,7 +646,7 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
         tt.style.left = `${Math.min((ev.clientX ?? 0) - wr.left + 14, wr.width - 220)}px`
         tt.style.top  = `${Math.max((ev.clientY ?? 0) - wr.top  - 60, 8)}px`
       }
-      g.on('mouseenter', showNdTip)
+      g.on('mouseenter', (ev: MouseEvent) => { sfxNodeHover(); showNdTip(ev) })
         .on('mouseleave', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none' })
         .on('click', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none'; onSelectNode(nd.id) })
       g.on('touchend', (ev: TouchEvent) => {
@@ -813,6 +891,8 @@ export function runOpeningCinematic(
   onGsUpdate:   (newGs: GameState) => void,
 ): void {
   if (!mapSvg || !mapProj || !mapZoom || !mapG) return
+
+  sfxCinematic()
 
   const TENOCHTITLAN = CONQ_BRIDGE[0]  // lon:-99.1, lat:19.4
   const wrap = document.getElementById('map-canvas-wrap')
@@ -1190,6 +1270,8 @@ function _showOneHistCinematic(
   if (!wrap) { onDone(); return }
   const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
   const scale = 3.8
+
+  sfxCinematic()
 
   // ── Panel de texto histórico ─────────────────────────
   function _showHistCard(cb: () => void): void {
