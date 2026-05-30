@@ -1,0 +1,29 @@
+{
+  "name": "hijos-del-jaguar",
+  "version": "0.1.0",
+  "description": "Hijos del Jaguar — La Gran Huida. Juego narrativo de supervivencia histórica.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/topojson-client": "^3.1.4",
+    "@vitest/coverage-v8": "^4.1.7",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "tone": "^14.7.77",
+    "topojson-client": "^3.1.0"
+  }
+}

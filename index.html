@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#080604">
+  <meta name="description" content="Hijos del Jaguar — La Gran Huida. Lidera tu tribu desde Guatemala hasta la Patagonia huyendo de la conquista española.">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <meta name="application-name" content="Hijos del Jaguar">
+  <meta name="apple-mobile-web-app-title" content="Hijos del Jaguar">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/icons/icon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Hijos del Jaguar — La Gran Huida">
+  <meta property="og:description" content="Juego narrativo de supervivencia histórica. Lidera tu tribu en la Gran Huida.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/icons/icon.svg">
+
+  <title>Hijos del Jaguar — La Gran Huida</title>
+
+  <!-- Preload fuentes críticas (self-hosted en /fonts/) -->
+  <link rel="preload" href="/fonts/cinzel-decorative-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/crimson-text-400.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Fallback Google Fonts mientras no tenemos self-hosted -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════
+       HUD — BARRA DE STATS (visible durante el juego)
+  ══════════════════════════════════════════════════ -->
+  <div id="stats-bar">
+    <div class="sb-tribe">
+      <div>
+        <div class="sb-total" id="sb-total">50</div>
+        <div class="sb-tlabel">PUEBLO</div>
+      </div>
+      <div class="sb-breakdown" id="sb-breakdown">
+        <div>⚔️ <span id="sb-w">20</span></div>
+        <div>🌀 <span id="sb-s">8</span></div>
+        <div>👤 <span id="sb-c">22</span></div>
+      </div>
+    </div>
+    <div class="sb-stats">
+      <div class="sb-stat">
+        <div class="sb-stat-row">
+          <span class="sb-sname">ALIM</span>
+          <span class="sb-sval" id="sv-food">70</span>
+        </div>
+        <div class="sb-bar-bg"><div class="sb-bar bar-food" id="bar-food" style="width:70%"></div></div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-row">
+          <span class="sb-sname">MORAL</span>
+          <span class="sb-sval" id="sv-moral">65</span>
+        </div>
+        <div class="sb-bar-bg"><div class="sb-bar bar-moral" id="bar-moral" style="width:65%"></div></div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-row">
+          <span class="sb-sname">SALUD</span>
+          <span class="sb-sval" id="sv-salud">80</span>
+        </div>
+        <div class="sb-bar-bg"><div class="sb-bar bar-salud" id="bar-salud" style="width:80%"></div></div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-row">
+          <span class="sb-sname">UNIÓN</span>
+          <span class="sb-sval" id="sv-union">75</span>
+        </div>
+        <div class="sb-bar-bg"><div class="sb-bar bar-union" id="bar-union" style="width:75%"></div></div>
+      </div>
+    </div>
+    <div class="sb-act" id="sb-act-label">Acto I · Huida</div>
+    <div id="sb-save-indicator" style="font-family:'Cinzel',serif;font-size:.55rem;color:var(--jade3);opacity:0;transition:opacity .4s;margin-left:.5rem;letter-spacing:.1em;">✓ guardado</div>
+    <div id="sb-diff-badge" style="margin-left:.6rem;"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: MENÚ PRINCIPAL
+  ══════════════════════════════════════════════════ -->
+  <div id="menu-screen" class="screen active">
+    <div class="menu-bg"></div>
+    <div class="menu-content">
+      <div class="menu-eyebrow">Una historia de resistencia</div>
+      <h1 class="menu-title">Hijos del Jaguar</h1>
+      <div class="menu-sub">La Gran Huida</div>
+      <div class="menu-div"></div>
+      <button class="btn" id="btn-nueva">Nueva Partida</button>
+      <button class="btn" id="btn-continue" disabled>Continuar</button>
+      <button class="btn" id="btn-history">Logros e Historia</button>
+      <button class="btn btn-sec" id="btn-info-didactica" style="opacity:.7;font-size:.78rem;margin-top:.2rem;">📖 Info Didáctica</button>
+      <div class="menu-credits">Creado por ProfeD · v3.0</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: INTRO / SELECCIÓN DE DIFICULTAD
+  ══════════════════════════════════════════════════ -->
+  <div id="intro-screen" class="screen">
+    <div class="intro-bg"></div>
+    <div id="intro-scroll">
+      <div class="intro-wrap">
+        <div class="intro-chapter">Prólogo</div>
+
+        <div class="intro-panel">
+          <img class="intro-img"
+            src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=1200&q=80"
+            alt="Selva tropical — el inicio de la huida">
+          <div class="intro-overlay"></div>
+          <div class="intro-body">
+            <h2 class="intro-hl">América, 1524. La conquista avanza.</h2>
+            <div class="intro-grid">
+              <div>
+                <div class="intro-sec-title">El contexto</div>
+                <p class="intro-p">Hernán Cortés destruyó Tenochtitlán en 1521. Ahora sus capitanes avanzan hacia el sur. Tu aldea, en las tierras altas de <strong>Guatemala</strong>, fue el último punto de resistencia. Ya no existe.</p>
+              </div>
+              <div>
+                <div class="intro-sec-title">Tu misión</div>
+                <p class="intro-p">Eres el <strong>cacique</strong> de los sobrevivientes. Cincuenta personas te rodean en el claro. El sur es el único camino posible. Cada decisión que tomes cambiará el destino de tu pueblo.</p>
+              </div>
+            </div>
+            <div class="intro-foot">El juego mezcla eventos históricos reales con decisiones de supervivencia. Los textos marcados en dorado son datos históricos verificables.</div>
+          </div>
+        </div>
+
+        <!-- Cómo se juega -->
+        <div class="intro-howto">
+          <div class="intro-howto-title">Cómo se juega</div>
+          <div class="intro-howto-grid">
+            <div class="intro-howto-card">
+              <div class="intro-howto-icon">🗺️</div>
+              <div class="intro-howto-name">El Mapa</div>
+              <div class="intro-howto-desc">Elegí el camino de tu tribu entre los <strong>nodos disponibles</strong>. Cada ruta tiene su propio evento.</div>
+            </div>
+            <div class="intro-howto-card">
+              <div class="intro-howto-icon">📖</div>
+              <div class="intro-howto-name">Los Eventos</div>
+              <div class="intro-howto-desc">Leé la situación y elegí una de las opciones. Cada decisión afecta los <strong>recursos y el pueblo</strong>.</div>
+            </div>
+            <div class="intro-howto-card">
+              <div class="intro-howto-icon">📊</div>
+              <div class="intro-howto-name">Los Stats</div>
+              <div class="intro-howto-desc">Mantené <strong>Alimentos, Moral, Salud y Unión</strong> por encima del umbral crítico o el pueblo perece.</div>
+            </div>
+            <div class="intro-howto-card">
+              <div class="intro-howto-icon">🤝</div>
+              <div class="intro-howto-name">Las Alianzas</div>
+              <div class="intro-howto-desc">Forjá alianzas con pueblos del camino. En dificultad Histórico, <strong>son vitales para sobrevivir</strong>.</div>
+            </div>
+            <div class="intro-howto-card">
+              <div class="intro-howto-icon">👑</div>
+              <div class="intro-howto-name">El Perseguidor</div>
+              <div class="intro-howto-desc">Los <strong>conquistadores</strong> avanzan por el mapa. Si te alcanzan, hay consecuencias graves.</div>
+            </div>
+            <div class="intro-howto-card">
+              <div class="intro-howto-icon">🌟</div>
+              <div class="intro-howto-name">El Destino</div>
+              <div class="intro-howto-desc">Hay <strong>3 destinos finales</strong> posibles y múltiples finales según tus decisiones.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="intro-tips">
+          <div class="intro-tips-title">Consejos del camino</div>
+          <div class="intro-tips-list">
+            <div class="intro-tip-item"><span class="intro-tip-ico">🌽</span>Los alimentos decaen con cada nodo. Buscá alianzas que los repongan.</div>
+            <div class="intro-tip-item"><span class="intro-tip-ico">🤝</span>En modo Histórico, sin alianzas en los Actos finales, el camino es brutal.</div>
+            <div class="intro-tip-item"><span class="intro-tip-ico">📖</span>Los textos subrayados en dorado tienen datos históricos reales — hacé clic para leerlos.</div>
+            <div class="intro-tip-item"><span class="intro-tip-ico">💾</span>La partida se guarda automáticamente. Podés cerrar y continuar después.</div>
+          </div>
+        </div>
+
+        <!-- Selector de dificultad -->
+        <div class="intro-diff-wrap">
+          <div class="intro-diff-label">Elegí tu modo de juego</div>
+          <div class="diff-wrap">
+            <button class="diff-btn" id="diff-edu" onclick="window.game?.setDifficulty('educativo')">
+              📖 Educativo <span class="diff-badge educativo">Recomendado</span>
+            </button>
+            <button class="diff-btn" id="diff-his" onclick="window.game?.setDifficulty('historico')">
+              ⚔️ Histórico <span class="diff-badge historico">Desafiante</span>
+            </button>
+          </div>
+          <div class="diff-desc" id="diff-desc">Elegí un modo para continuar.</div>
+          <div class="diff-detail" id="diff-detail"></div>
+          <div class="intro-cta">
+            <button class="btn btn-sec" id="btn-back-intro" style="opacity:.6;margin-bottom:.5rem;">← Volver al menú</button>
+            <button class="btn" id="btn-comenzar" disabled onclick="window.game?.startNewGame()">
+              Comenzar la Gran Huida
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: NOMBRE DEL CACIQUE
+  ══════════════════════════════════════════════════ -->
+  <div id="name-screen" class="screen">
+    <div class="name-wrap">
+      <div class="name-chapter">Antes de partir</div>
+      <div class="name-panel">
+        <div class="name-icon">🐆</div>
+        <h2 class="name-title">¿Cómo te llaman?</h2>
+        <p class="name-subtitle">El pueblo necesita saber el nombre de quien los guiará al sur.</p>
+        <div class="name-input-wrap">
+          <input type="text" id="cacique-name-input" class="name-input"
+            placeholder="Nombre del cacique" maxlength="24" autocomplete="off" autocorrect="off">
+          <button class="name-random-btn" id="btn-name-random" title="Nombre aleatorio">🎲</button>
+        </div>
+        <div class="name-suggestions-label">Nombres sugeridos</div>
+        <div class="name-suggestions" id="name-suggestions"></div>
+      </div>
+      <div class="name-cta">
+        <button class="btn btn-sec" id="btn-back-name" style="opacity:.6;margin-bottom:.5rem;">← Cambiar dificultad</button>
+        <button class="btn" id="btn-name-confirm" disabled>Liderar la Huida →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: MAPA
+  ══════════════════════════════════════════════════ -->
+  <div id="map-screen" class="screen">
+    <div id="map-ui">
+      <div id="map-header">
+        <span class="mh-title" id="map-act-title">Acto I — La Huida</span>
+        <span class="mh-hint" id="map-hint">Elegí el próximo destino de tu pueblo</span>
+        <div id="map-progress"></div>
+        <button class="btn btn-sec map-menu-btn-inline" id="map-ped-btn" style="padding:.3rem .75rem;font-size:.65rem;opacity:.5;margin-left:auto;">📚</button>
+        <button class="btn btn-sec map-menu-btn-inline" id="map-menu-btn" style="padding:.3rem .75rem;font-size:.65rem;opacity:.5;margin-left:.3rem;">☰ Menú</button>
+      </div>
+      <div id="map-canvas-wrap">
+        <svg id="map-svg"></svg>
+        <div id="map-node-tt"><strong id="map-tt-name"></strong><span id="map-tt-desc"></span></div>
+        <div id="map-legend">
+          <div class="leg-title">Referencias</div>
+          <div class="leg-item"><span class="leg-sym">🟢</span> Nodo disponible</div>
+          <div class="leg-item"><span class="leg-sym">✅</span> Visitado</div>
+          <div class="leg-item"><span class="leg-sym">⭐</span> Nodo especial</div>
+          <div class="leg-item"><span class="leg-sym">👑</span> Conquistadores</div>
+          <div class="leg-hint">Hacé clic en un nodo disponible para avanzar</div>
+        </div>
+      </div>
+    </div>
+    <div id="geo-tip"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: EVENTO
+  ══════════════════════════════════════════════════ -->
+  <div id="event-screen" class="screen">
+    <button class="btn btn-sec ev-menu-btn-inline" id="ev-ped-btn" style="position:absolute;top:.6rem;right:4.8rem;z-index:10;padding:.3rem .75rem;font-size:.65rem;opacity:.45;">📚</button>
+    <button class="btn btn-sec ev-menu-btn-inline" id="ev-menu-btn" style="position:absolute;top:.6rem;right:.6rem;z-index:10;padding:.3rem .75rem;font-size:.65rem;opacity:.45;">☰ Menú</button>
+    <div id="event-layout">
+      <div id="ev-img-wrap">
+        <img id="ev-img" src="" alt="">
+        <div class="ev-img-cap" id="ev-img-cap"></div>
+        <div class="ev-title-over">
+          <div class="ev-act-badge" id="ev-act-badge"></div>
+          <h2 class="ev-title" id="ev-title"></h2>
+        </div>
+      </div>
+      <div id="ev-body">
+        <div id="ev-narr-wrap">
+          <div id="ev-narr"></div>
+        </div>
+        <div id="dec-panel">
+          <div class="dec-label">¿Qué decidís?</div>
+          <div id="dec-buttons"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: ENDING / CERTIFICADO FINAL
+  ══════════════════════════════════════════════════ -->
+  <div id="ending-screen" class="screen">
+    <div id="end-doc">
+
+      <div id="end-top-seal">
+        <div id="end-top-eyebrow">HIJOS DEL JAGUAR · LA GRAN HUIDA</div>
+        <div id="end-glyph-wrap">
+          <div id="end-glyph">🌟</div>
+          <div id="end-glyph-ring"></div>
+        </div>
+        <div id="end-badge">DESTINO</div>
+        <h1 id="end-title">El Fin del Camino</h1>
+        <div id="end-title-divider">✦ ✦ ✦</div>
+      </div>
+
+      <div id="end-leader-wrap">
+        <div id="end-leader-label">Tu título como líder</div>
+        <div id="end-leader-title">El Guía</div>
+        <div id="end-leader-why"></div>
+      </div>
+
+      <div id="end-narr-wrap">
+        <div id="end-narr"></div>
+      </div>
+
+      <div id="end-map-section">
+        <div class="end-section-title">El camino recorrido</div>
+        <div id="end-route-wrap">
+          <svg id="end-route-svg"></svg>
+          <div id="end-route-legend">
+            <div class="erl-item">👣 Ruta de la tribu</div>
+            <div class="erl-item">👑 Conquistadores</div>
+            <div class="erl-km" id="end-km-label"></div>
+          </div>
+        </div>
+        <div id="end-hitos-wrap"><div id="end-hitos"></div></div>
+      </div>
+
+      <div id="end-stats-section">
+        <div class="end-section-title">Estadísticas finales</div>
+        <div id="end-stats-grid"></div>
+        <div id="end-score-wrap">
+          <div id="end-score-label">PUNTUACIÓN FINAL</div>
+          <div id="end-score-value">0</div>
+          <div id="end-score-breakdown"></div>
+        </div>
+      </div>
+
+      <div id="end-analysis-section">
+        <div class="end-section-title">Perfil de liderazgo</div>
+        <div id="end-radar-wrap">
+          <svg id="end-radar-svg"></svg>
+          <div id="end-radar-labels"></div>
+        </div>
+        <div class="end-section-title" style="margin-top:1rem">Alianzas forjadas</div>
+        <div id="end-alliances-list"></div>
+        <div class="end-section-title" style="margin-top:1rem">Logros desbloqueados</div>
+        <div id="logros-grid"></div>
+      </div>
+
+      <div id="end-refl-section">
+        <div class="end-section-title">Para reflexionar</div>
+        <div id="end-refl"></div>
+        <div id="end-refl-preguntas"></div>
+      </div>
+
+      <div id="end-footer">
+        <div id="end-footer-meta">
+          <span id="end-footer-date"></span>
+          <span>Hijos del Jaguar · Creado por ProfeD</span>
+        </div>
+        <div id="end-actions">
+          <button class="btn end-btn-main" id="btn-end-capture">📸 Guardar resultado</button>
+          <button class="btn end-btn-sec" id="btn-end-share">📋 Ver tarjeta</button>
+          <button class="btn end-btn-main" id="btn-end-newgame">▶ Nueva partida</button>
+          <button class="btn end-btn-sec" id="btn-end-menu">Menú principal</button>
+        </div>
+        <div id="end-capture-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: HISTORIAL Y LOGROS
+  ══════════════════════════════════════════════════ -->
+  <div id="history-screen" class="screen">
+    <div id="hs-wrap">
+      <div id="hs-header">
+        <div>
+          <div id="hs-eyebrow">Memoria del pueblo</div>
+          <h2 id="hs-title">Historial & Logros</h2>
+        </div>
+        <button class="btn" id="hs-back-btn">← Volver</button>
+      </div>
+      <div id="hs-tabs">
+        <button class="hs-tab active" data-tab="stats">Estadísticas</button>
+        <button class="hs-tab" data-tab="logros">Logros</button>
+        <button class="hs-tab" data-tab="partidas">Partidas</button>
+        <button class="hs-tab" data-tab="docente">Nota docente</button>
+      </div>
+      <div id="hs-body">
+        <!-- panel: estadísticas -->
+        <div class="hs-panel active" id="hs-panel-stats">
+          <div class="hs-section-title">Estadísticas generales</div>
+          <div id="hs-stats-grid" class="hs-stat-grid"></div>
+          <div class="hs-section-title" style="margin-top:1.2rem">Promedios por partida</div>
+          <div id="hs-avg-grid" class="hs-stat-grid"></div>
+          <div class="hs-section-title" style="margin-top:1.2rem">Destinos alcanzados</div>
+          <div id="hs-dest-bars"></div>
+          <div class="hs-section-title" style="margin-top:1.2rem">Mejor partida</div>
+          <div id="hs-best-card"></div>
+        </div>
+        <!-- panel: logros -->
+        <div class="hs-panel" id="hs-panel-logros">
+          <div class="hs-section-title">Modo Educativo</div>
+          <div id="hs-logros-edu" class="hs-logros-grid"></div>
+          <div class="hs-section-title" style="margin-top:1rem">Modo Histórico</div>
+          <div id="hs-logros-his" class="hs-logros-grid"></div>
+          <div style="display:flex;align-items:center;gap:.6rem;margin-top:1rem">
+            <div id="hs-logros-bar-wrap" style="flex:1;min-width:120px;height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden">
+              <div id="hs-logros-bar-fill" style="height:100%;border-radius:3px;background:linear-gradient(90deg,var(--jade),var(--jade3));transition:width .6s ease"></div>
+            </div>
+            <div id="hs-logros-bar-label" style="font-family:'Cinzel',serif;font-size:.62rem;color:var(--parch2);opacity:.55;white-space:nowrap"></div>
+          </div>
+        </div>
+        <!-- panel: partidas -->
+        <div class="hs-panel" id="hs-panel-partidas">
+          <div id="hs-partidas-list"></div>
+        </div>
+        <!-- panel: nota docente -->
+        <div class="hs-panel" id="hs-panel-docente">
+          <div class="hs-section-title">Nota docente</div>
+          <div id="hs-docente-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       OVERLAY: CAPTURA MANUAL (screenshot share card)
+  ══════════════════════════════════════════════════ -->
+  <div id="captura-overlay">
+    <div id="captura-card">
+      <div id="captura-eyebrow">HIJOS DEL JAGUAR</div>
+      <div id="captura-glyph">🌟</div>
+      <div id="captura-badge"></div>
+      <div id="captura-title"></div>
+      <div id="captura-leader"></div>
+      <div id="captura-divider"></div>
+      <div id="captura-stats"></div>
+      <div id="captura-score-label">PUNTUACIÓN</div>
+      <div id="captura-score"></div>
+      <div id="captura-logros"></div>
+      <div id="captura-footer"></div>
+    </div>
+    <div id="captura-instruccion">
+      Usá <strong>Impr Pant</strong> (Windows) o <strong>Cmd+Shift+4</strong> (Mac) para capturar esta pantalla y compartirla.
+    </div>
+    <button id="btn-cerrar-captura">✕ Cerrar</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       OVERLAYS GLOBALES
+  ══════════════════════════════════════════════════ -->
+  <div id="tooltip"></div>
+  <div id="notif-area"></div>
+
+  <!-- Modal de contenido (tooltips expandidos) -->
+  <div id="modal-overlay">
+    <div id="modal-box">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+        <div id="modal-title"></div>
+        <button id="modal-close" style="background:none;border:none;color:var(--parch2);font-size:1.1rem;cursor:pointer;opacity:.55;padding:.25rem">✕</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación -->
+  <div id="confirm-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:600;display:none;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(135deg,rgba(10,7,3,.99),rgba(18,12,4,.99));border:1px solid var(--ocre);padding:1.6rem 2rem;max-width:400px;width:90%;box-shadow:0 0 60px rgba(196,136,42,.25);">
+      <div id="confirm-title" style="font-family:'Cinzel',serif;font-size:.95rem;color:var(--ocre2);margin-bottom:.7rem;border-bottom:1px solid var(--border);padding-bottom:.45rem;"></div>
+      <div id="confirm-body" style="font-size:.9rem;line-height:1.7;color:var(--parch2);margin-bottom:1.2rem;"></div>
+      <div style="display:flex;gap:.6rem;justify-content:flex-end;">
+        <button class="btn" id="confirm-cancel" style="width:auto;padding:.55rem 1rem;font-size:.75rem;opacity:.6">Cancelar</button>
+        <button class="btn" id="confirm-ok" style="width:auto;padding:.55rem 1.2rem;">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODO CLASE — Ficha Didáctica (overlay)
+       Visible cuando body.clase-mode y el evento tiene datos.
+  ══════════════════════════════════════════════════ -->
+  <div id="clase-ficha" role="dialog" aria-modal="true" aria-labelledby="cf-title">
+    <div class="cf-box">
+      <div class="cf-badge">📚 Contexto Histórico</div>
+      <div class="cf-title" id="cf-title"></div>
+      <div class="cf-contexto" id="cf-contexto"></div>
+      <div class="cf-pregunta-wrap">
+        <div class="cf-pregunta-label">💬 Para reflexionar en clase</div>
+        <div class="cf-pregunta" id="cf-pregunta"></div>
+      </div>
+      <button class="btn cf-btn" id="cf-continuar">Ver decisiones →</button>
+    </div>
+  </div>
+
+  <!-- Overlay pedagógico (info histórica expandida) -->
+  <div id="ped-overlay">
+    <div id="ped-box">
+      <div id="ped-header">
+        <div>
+          <div id="ped-eyebrow">Contexto Histórico</div>
+          <div id="ped-title">Información</div>
+        </div>
+        <button id="ped-close">✕</button>
+      </div>
+      <div id="ped-tabs"></div>
+      <div id="ped-content"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       OVERLAY: INFO DIDÁCTICA (guía pedagógica para docentes)
+  ══════════════════════════════════════════════════ -->
+  <div id="didactica-overlay" role="dialog" aria-modal="true" aria-labelledby="did-overlay-title">
+    <div id="did-box">
+      <div id="did-header">
+        <div>
+          <div id="did-eyebrow">Para el docente</div>
+          <div id="did-overlay-title">Información Didáctica</div>
+        </div>
+        <button id="did-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div id="did-tabs"></div>
+      <div id="did-body">
+        <div id="did-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

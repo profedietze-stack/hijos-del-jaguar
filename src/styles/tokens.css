@@ -1,0 +1,60 @@
+/* ══════════════════════════════════════════════════════
+   DESIGN TOKENS — Variables globales del sistema visual
+   Todo color, sombra o radio se define aquí.
+══════════════════════════════════════════════════════ */
+:root {
+  /* Paleta principal */
+  --ink:    #080604;
+  --parch:  #f0e2c0;
+  --parch2: #e0ceaa;
+
+  /* Ocres / dorado */
+  --ocre:   #c4882a;
+  --ocre2:  #e8a93a;
+  --ocre3:  #f5c85a;
+
+  /* Rojo sangre */
+  --blood:  #8b1a1a;
+  --blood2: #c0392b;
+
+  /* Verde jade */
+  --jade:   #2d5a1e;
+  --jade2:  #4a8c30;
+  --jade3:  #6db84a;
+
+  /* Azul cielo */
+  --sky:    #1a3a5c;
+  --sky2:   #2a6090;
+
+  /* Bordes */
+  --border:  rgba(196,136,42,0.35);
+  --border2: rgba(196,136,42,0.7);
+
+  /* Sombras */
+  --shadow:     0 8px 40px rgba(0,0,0,0.8);
+  --shadow-sm:  0 4px 20px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 24px rgba(196,136,42,0.35);
+
+  /* Radio de borde */
+  --r: 3px;
+  --r-md: 6px;
+
+  /* Tipografía */
+  --font-title:   'Cinzel Decorative', serif;
+  --font-heading: 'Cinzel', serif;
+  --font-body:    'Crimson Text', Georgia, serif;
+  --font-alt:     'Lora', Georgia, serif;
+
+  /* Transiciones */
+  --t-fast:   0.15s ease;
+  --t-normal: 0.25s ease;
+  --t-slow:   0.4s ease;
+
+  /* Z-index layers */
+  --z-hud:     200;
+  --z-notif:   300;
+  --z-geo-tip: 400;
+  --z-modal:   500;
+  --z-ped:     600;
+  --z-capture: 99999;
+}

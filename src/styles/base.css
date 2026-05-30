@@ -1,0 +1,161 @@
+/* ══════════════════════════════════════════════════════
+   BASE — Reset, tipografía, layout raíz, animaciones
+══════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--ink);
+  color: var(--parch);
+  font-family: var(--font-body);
+  font-size: 16px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Pantallas ── */
+.screen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  inset: 0;
+}
+.screen.active {
+  display: flex;
+}
+
+/* ── Transición entre pantallas ── */
+.screen-enter {
+  animation: screenFadeIn 0.35s ease forwards;
+}
+.screen-exit {
+  animation: screenFadeOut 0.25s ease forwards;
+}
+
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes screenFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Utilidades de animación ── */
+.fade { animation: fadeIn 0.5s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseRing {
+  0%, 100% { transform: scale(1); opacity: .3; }
+  50%       { transform: scale(1.08); opacity: .7; }
+}
+
+@keyframes dangerPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .5; }
+}
+
+/* ── Scrollbar personalizado ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(196,136,42,.3);
+  border-radius: 3px;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196,136,42,.3) transparent;
+}
+
+/* ── Tooltip global ── */
+#tooltip {
+  position: fixed;
+  background: rgba(8,6,4,.97);
+  border: 1px solid var(--ocre);
+  padding: .5rem .8rem;
+  font-size: .8rem;
+  max-width: 260px;
+  pointer-events: none;
+  z-index: var(--z-modal);
+  display: none;
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  line-height: 1.5;
+  color: var(--parch2);
+}
+
+/* ── Geo tooltip ── */
+#geo-tip {
+  position: fixed;
+  background: rgba(6,4,2,.97);
+  border: 1px solid rgba(196,136,42,.5);
+  padding: .65rem .95rem;
+  font-size: .8rem;
+  max-width: 280px;
+  pointer-events: none;
+  z-index: var(--z-geo-tip);
+  display: none;
+  border-radius: var(--r);
+  box-shadow: 0 6px 30px rgba(0,0,0,.8);
+  line-height: 1.55;
+  color: var(--parch2);
+}
+#geo-tip strong {
+  display: block;
+  margin-bottom: .3rem;
+  font-family: var(--font-heading);
+  font-size: .75rem;
+}
+
+/* ── Área de notificaciones ── */
+#notif-area {
+  position: fixed;
+  top: 58px;
+  right: 1rem;
+  z-index: var(--z-notif);
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  pointer-events: none;
+}
+
+.notif {
+  padding: .4rem .85rem;
+  font-family: var(--font-heading);
+  font-size: .7rem;
+  letter-spacing: .05em;
+  border-radius: var(--r);
+  animation: nfI .25s ease, nfO .4s ease 2.6s forwards;
+  max-width: 230px;
+  background: rgba(8,6,4,.96);
+  border: 1px solid;
+}
+.notif.loss  { border-color: #c0392b; color: #e07070; }
+.notif.gain  { border-color: #4a8c30; color: #6db84a; }
+.notif.info  { border-color: var(--ocre); color: var(--ocre2); }
+
+@keyframes nfI {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes nfO {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}

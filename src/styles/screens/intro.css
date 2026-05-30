@@ -1,0 +1,381 @@
+/* ── INTRO ── */
+#intro-screen {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  background: var(--ink);
+  overflow: hidden;
+}
+.intro-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 10% 50%, rgba(45,90,30,.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 90% 30%, rgba(139,26,26,.1) 0%, transparent 60%);
+}
+#intro-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5vh 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+.intro-wrap {
+  max-width: 760px;
+  width: 90%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.intro-chapter {
+  font-family: var(--font-heading);
+  font-size: .68rem;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .7;
+  margin-bottom: .2rem;
+  text-align: center;
+}
+.intro-panel {
+  background: rgba(8,6,4,.75);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+.intro-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  object-position: center 35%;
+  display: block;
+  filter: sepia(.4) brightness(.5);
+}
+.intro-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 160px;
+  background: linear-gradient(180deg, rgba(8,6,4,.2), rgba(8,6,4,.92));
+}
+.intro-body {
+  padding: 1.2rem 1.8rem 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+.intro-hl {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  color: var(--ocre2);
+  margin-bottom: .9rem;
+  text-align: center;
+  text-shadow: 0 0 30px rgba(196,136,42,.3);
+}
+.intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.6rem;
+  margin-bottom: 1.2rem;
+}
+.intro-sec-title {
+  font-family: var(--font-heading);
+  font-size: .64rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  margin-bottom: .35rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.intro-sec-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.intro-p {
+  font-size: .88rem;
+  line-height: 1.6;
+  color: var(--parch2);
+  font-style: italic;
+}
+.intro-p strong { color: var(--ocre2); font-style: normal; font-weight: 600; }
+.intro-foot {
+  border-top: 1px solid var(--border);
+  padding-top: .9rem;
+  font-size: .8rem;
+  color: var(--parch2);
+  opacity: .55;
+  text-align: center;
+  font-style: italic;
+}
+.intro-cta { text-align: center; margin-top: .4rem; }
+
+/* Cómo se juega */
+.intro-howto {
+  background: rgba(8,6,4,.6);
+  border: 1px solid var(--border);
+  padding: 1.1rem 1.4rem 1.3rem;
+}
+.intro-howto-title {
+  font-family: var(--font-heading);
+  font-size: .68rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ocre2);
+  opacity: .9;
+  margin-bottom: .9rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+}
+.intro-howto-title::before,
+.intro-howto-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.intro-howto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: .65rem;
+}
+.intro-howto-card {
+  background: rgba(196,136,42,.04);
+  border: 1px solid rgba(196,136,42,.18);
+  padding: .75rem .8rem;
+  border-radius: 3px;
+}
+.intro-howto-icon { font-size: 1.3rem; margin-bottom: .3rem; line-height: 1; }
+.intro-howto-name {
+  font-family: var(--font-heading);
+  font-size: .6rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ocre2);
+  margin-bottom: .3rem;
+}
+.intro-howto-desc { font-size: .78rem; line-height: 1.55; color: var(--parch2); opacity: .75; }
+.intro-howto-desc strong { color: var(--ocre2); font-weight: 600; }
+
+/* Consejos */
+.intro-tips {
+  background: rgba(45,90,30,.06);
+  border: 1px solid rgba(74,140,48,.25);
+  padding: 1.1rem 1.4rem 1.2rem;
+}
+.intro-tips-title {
+  font-family: var(--font-heading);
+  font-size: .68rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--jade3);
+  opacity: .9;
+  margin-bottom: .85rem;
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+}
+.intro-tips-title::before,
+.intro-tips-title::after { content: ''; flex: 1; height: 1px; background: rgba(74,140,48,.25); }
+.intro-tips-list { display: flex; flex-direction: column; gap: .5rem; }
+.intro-tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  font-size: .82rem;
+  line-height: 1.6;
+  color: var(--parch2);
+  opacity: .82;
+  padding: .4rem .5rem;
+  border-left: 2px solid rgba(74,140,48,.35);
+}
+.intro-tip-ico { font-size: 1rem; flex-shrink: 0; line-height: 1.4; }
+
+/* Selector de dificultad */
+.diff-wrap { display: flex; gap: .5rem; margin: .2rem 0 .4rem; }
+.diff-desc {
+  font-size: .72rem;
+  color: var(--parch2);
+  opacity: .5;
+  font-style: italic;
+  font-family: var(--font-body);
+  min-height: 1.1rem;
+  text-align: center;
+  max-width: 280px;
+}
+.diff-detail {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: .25rem;
+  margin-bottom: .1rem;
+}
+.dd-item {
+  font-family: var(--font-heading);
+  font-size: .6rem;
+  letter-spacing: .05em;
+  color: var(--parch2);
+  opacity: .55;
+  background: rgba(196,136,42,.07);
+  border: 1px solid var(--border);
+  padding: .12rem .4rem;
+  border-radius: 2px;
+}
+.dd-item.dd-neg { color: #e07070; opacity: .6; border-color: rgba(192,57,43,.3); background: rgba(139,26,26,.1); }
+
+.intro-diff-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 1.1rem;
+  padding: 1rem 1.5rem .9rem;
+  background: rgba(8,6,4,.55);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-width: 520px;
+  width: 100%;
+}
+.intro-diff-label {
+  font-family: var(--font-heading);
+  font-size: .68rem;
+  letter-spacing: .12em;
+  color: var(--ocre2);
+  text-transform: uppercase;
+  opacity: .8;
+  text-align: center;
+}
+
+/* Pantalla de nombre */
+#name-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  overflow: hidden;
+}
+.name-wrap {
+  max-width: 520px;
+  width: 90%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+.name-chapter {
+  font-family: var(--font-heading);
+  font-size: .65rem;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .7;
+  text-align: center;
+}
+.name-panel {
+  background: rgba(8,6,4,.78);
+  border: 1px solid var(--border);
+  padding: 2rem 2.2rem 1.8rem;
+  width: 100%;
+  text-align: center;
+}
+.name-icon { font-size: 2.2rem; margin-bottom: .6rem; line-height: 1; }
+.name-title {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  color: var(--ocre2);
+  margin-bottom: .5rem;
+}
+.name-subtitle {
+  font-size: .82rem;
+  color: var(--parch2);
+  opacity: .65;
+  font-style: italic;
+  margin-bottom: 1.4rem;
+}
+.name-input-wrap { display: flex; gap: .5rem; margin-bottom: 1.1rem; }
+.name-input {
+  flex: 1;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--border);
+  color: var(--parch);
+  font-family: var(--font-alt);
+  font-size: 1.1rem;
+  padding: .6rem .9rem;
+  outline: none;
+  transition: border-color var(--t-fast);
+  letter-spacing: .04em;
+}
+.name-input:focus { border-color: var(--ocre); }
+.name-input::placeholder { color: rgba(232,209,176,.3); font-size: .9rem; }
+.name-random-btn {
+  background: rgba(196,136,42,.12);
+  border: 1px solid var(--border);
+  color: var(--ocre2);
+  font-size: 1.2rem;
+  padding: .5rem .75rem;
+  cursor: pointer;
+  transition: background var(--t-fast);
+  flex-shrink: 0;
+}
+.name-random-btn:hover { background: rgba(196,136,42,.25); }
+.name-suggestions-label {
+  font-family: var(--font-heading);
+  font-size: .58rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .6;
+  margin-bottom: .55rem;
+}
+.name-suggestions { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; }
+.name-sug {
+  background: rgba(196,136,42,.08);
+  border: 1px solid rgba(196,136,42,.25);
+  color: var(--parch2);
+  font-size: .82rem;
+  padding: .3rem .7rem;
+  cursor: pointer;
+  font-family: var(--font-alt);
+  transition: all var(--t-fast);
+}
+.name-sug:hover {
+  background: rgba(196,136,42,.22);
+  color: var(--ocre2);
+  border-color: var(--ocre);
+}
+.name-cta { text-align: center; }
+
+@media (max-width: 600px) {
+  .intro-grid { grid-template-columns: 1fr; }
+  .intro-wrap { width: 95%; }
+  .intro-body { padding: .9rem 1rem 1.1rem; }
+  .intro-howto-grid { grid-template-columns: 1fr 1fr; }
+  .intro-howto-card { padding: .6rem .65rem; }
+  .intro-howto-desc { font-size: .73rem; }
+  .intro-tips { padding: .9rem 1rem 1rem; }
+  .intro-tip-item { font-size: .78rem; }
+}
+@media (min-width: 769px) {
+  #intro-scroll { padding: 3vh 0 2rem; }
+  .intro-wrap { max-width: 900px; width: 88%; gap: 1.4rem; }
+  .intro-img { height: 210px; }
+  .intro-overlay { height: 210px; }
+  .intro-hl { font-size: 1.65rem; }
+  .intro-p { font-size: .95rem; line-height: 1.65; }
+  .intro-body { padding: 1.5rem 2.4rem 1.8rem; }
+  .intro-grid { gap: 1.2rem 2.2rem; }
+  .intro-foot { font-size: .86rem; }
+  .intro-howto { padding: 1.3rem 1.8rem 1.5rem; }
+  .intro-howto-grid { gap: .8rem; }
+  .intro-howto-desc { font-size: .82rem; }
+  .intro-tips { padding: 1.2rem 1.8rem 1.4rem; }
+  .intro-tip-item { font-size: .85rem; }
+}

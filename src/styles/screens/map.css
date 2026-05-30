@@ -1,0 +1,122 @@
+/* ── MAPA ── */
+#map-screen {
+  flex-direction: column;
+  background: var(--ink);
+  padding-top: 52px;
+}
+#map-ui {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#map-header {
+  padding: .55rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,6,4,.65);
+  flex-shrink: 0;
+}
+.mh-title {
+  font-family: var(--font-heading);
+  font-size: .7rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .8;
+}
+.mh-hint {
+  font-size: .8rem;
+  color: var(--parch2);
+  opacity: .5;
+  font-style: italic;
+}
+#map-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #071d2e;
+  touch-action: none;
+}
+#map-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+}
+#map-node-tt {
+  position: absolute;
+  background: rgba(8,6,4,.97);
+  border: 1px solid var(--ocre);
+  padding: .55rem .85rem;
+  font-size: .8rem;
+  max-width: 210px;
+  pointer-events: none;
+  display: none;
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  z-index: 50;
+  color: var(--parch2);
+  line-height: 1.5;
+}
+#map-node-tt strong {
+  font-family: var(--font-heading);
+  font-size: .72rem;
+  color: var(--ocre2);
+  display: block;
+  margin-bottom: .2rem;
+}
+
+/* Leyenda del mapa */
+#map-legend {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(6,4,2,.88);
+  border: 1px solid var(--border);
+  padding: .65rem .85rem;
+  font-family: var(--font-heading);
+  font-size: .62rem;
+  color: var(--parch2);
+  z-index: 10;
+  border-radius: var(--r);
+  min-width: 170px;
+  backdrop-filter: blur(4px);
+}
+.leg-title {
+  color: var(--ocre);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-size: .6rem;
+  margin-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .3rem;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin-bottom: .28rem;
+  opacity: .8;
+}
+.leg-sym { font-size: .85rem; min-width: 16px; }
+.leg-hint {
+  margin-top: .5rem;
+  font-size: .58rem;
+  color: var(--ocre);
+  opacity: .55;
+  line-height: 1.4;
+  border-top: 1px solid var(--border);
+  padding-top: .35rem;
+  font-family: var(--font-body);
+  font-style: italic;
+}
+
+@media (min-width: 769px) {
+  #map-header { padding: .7rem 2rem; }
+  .mh-title { font-size: .78rem; }
+  .mh-hint { font-size: .85rem; }
+}

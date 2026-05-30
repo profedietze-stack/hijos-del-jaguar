@@ -1,0 +1,127 @@
+/* ── Botón principal ── */
+.btn {
+  display: block;
+  width: 240px;
+  padding: .8rem 1.5rem;
+  background: rgba(196,136,42,.08);
+  border: 1px solid var(--border);
+  color: var(--ocre2);
+  font-family: var(--font-heading);
+  font-size: .85rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t-normal);
+  clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px),
+             calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+}
+.btn:hover:not(:disabled) {
+  background: rgba(196,136,42,.25);
+  border-color: var(--ocre2);
+  color: var(--parch);
+  box-shadow: var(--shadow-glow);
+}
+.btn:disabled {
+  opacity: .28;
+  cursor: not-allowed;
+}
+
+/* ── Botones de dificultad ── */
+.diff-btn {
+  padding: .55rem 1.1rem;
+  border: 1px solid var(--border);
+  background: rgba(196,136,42,.06);
+  color: var(--parch2);
+  font-family: var(--font-heading);
+  font-size: .72rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  clip-path: polygon(5px 0%, calc(100% - 5px) 0%, 100% 5px, 100% calc(100% - 5px),
+             calc(100% - 5px) 100%, 5px 100%, 0% calc(100% - 5px), 0% 5px);
+}
+.diff-btn:hover {
+  background: rgba(196,136,42,.18);
+  border-color: var(--ocre2);
+  color: var(--parch);
+}
+.diff-btn.selected {
+  border-color: var(--ocre2);
+  color: var(--ocre2);
+  background: rgba(196,136,42,.22);
+  box-shadow: 0 0 18px rgba(196,136,42,.3);
+}
+
+/* ── Badges de dificultad ── */
+.diff-badge {
+  font-family: var(--font-heading);
+  font-size: .52rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: .15rem .45rem;
+  border-radius: 2px;
+  margin-left: .5rem;
+  vertical-align: middle;
+}
+.diff-badge.historico  { background: rgba(139,26,26,.35); color: #e07070; border: 1px solid rgba(192,57,43,.4); }
+.diff-badge.educativo  { background: rgba(45,90,30,.35);  color: #6db84a; border: 1px solid rgba(74,140,48,.4); }
+.diff-badge.realista   { background: rgba(60,0,60,.5);    color: #c060e0; border: 1px solid rgba(160,40,200,.5); }
+
+/* ── Botón de decisión (en evento) ── */
+.dec-btn {
+  display: block;
+  width: 100%;
+  padding: .65rem 1rem .65rem 1.6rem;
+  margin-bottom: .38rem;
+  background: rgba(196,136,42,.05);
+  border: 1px solid rgba(196,136,42,.2);
+  color: var(--parch2);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--r);
+  line-height: 1.4;
+  transition: all var(--t-fast);
+  position: relative;
+}
+.dec-btn::before {
+  content: '▸';
+  position: absolute;
+  left: .6rem;
+  color: var(--ocre);
+  opacity: .4;
+  transition: opacity var(--t-fast);
+}
+.dec-btn:hover:not(:disabled) {
+  background: rgba(196,136,42,.18);
+  border-color: var(--ocre);
+  color: var(--parch);
+  padding-left: 1.9rem;
+}
+.dec-btn:hover::before { opacity: 1; }
+.dec-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.dec-text { display: block; }
+.dec-hint {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: .6rem;
+  letter-spacing: .08em;
+  color: var(--ocre);
+  opacity: .45;
+  margin-top: .25rem;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .btn { width: 100%; max-width: 260px; }
+  .dec-btn { font-size: .9rem; padding: .6rem .9rem .6rem 1.5rem; }
+  .dec-btn:hover:not(:disabled) { padding-left: 1.5rem; }
+  .dec-btn:active:not(:disabled) {
+    background: rgba(196,136,42,.25);
+    border-color: var(--ocre);
+    color: var(--parch);
+  }
+}

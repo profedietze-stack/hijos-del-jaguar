@@ -1,0 +1,762 @@
+import type { GameState } from '../core/GameState.js'
+import { NODES_DEF, EDGES, CONQ_BRIDGE } from '../data/nodes.js'
+import { showNotif } from '../ui/dom.js'
+import * as d3Lib from 'd3'
+import * as topojson from 'topojson-client'
+
+// ══════════════════════════════════════════════════════
+// MAP SCREEN — renderizado D3 del mapa interactivo
+// ══════════════════════════════════════════════════════
+
+type D3Lib = typeof d3Lib
+
+// ── Estado del mapa ───────────────────────────────────
+
+let mapSvg:  ReturnType<D3Lib['select']> | null = null
+let mapG:    ReturnType<D3Lib['select']> | null = null
+let mapProj: ReturnType<D3Lib['geoMercator']> | null = null
+let mapZoom: ReturnType<D3Lib['zoom']> | null = null
+let _mapInitialized = false
+let _topoCache: unknown = null
+let _topoFetchPromise: Promise<unknown> | null = null
+let _conqAnimating = false
+
+const TOPO_STORAGE_KEY = 'jaguar_topo_v1'
+
+// ── Nombres de actos ──────────────────────────────────
+
+const ACT_NAMES: Record<number, string> = {
+  1: 'Acto I · Huida',
+  2: 'Acto II · Travesía',
+  3: 'Acto III · El Sur',
+  4: 'Acto IV · El Destino',
+}
+
+// ── Marcadores históricos ─────────────────────────────
+
+const HIST_MARKERS = [
+  { id: 'hm_cajamarca', lon: -78.5, lat: -7.2,  act: 2, icon: '⚔️', label: 'Cajamarca',
+    tip: '1532 — Pizarro captura al Inca Atahualpa con 168 hombres contra 80.000 guerreros.' },
+  { id: 'hm_cusco',     lon: -72.0, lat: -13.5, act: 2, icon: '🏛️', label: 'Cusco',
+    tip: '1533 — Pizarro ejecuta a Atahualpa y entra a Cusco. El Tawantinsuyu se desintegra.' },
+  { id: 'hm_panama',    lon: -80.2, lat: 8.2,   act: 2, icon: '⚓', label: 'Panamá',
+    tip: '1519 — Fundación de Panamá. Base de operaciones de Pizarro hacia Sudamérica.' },
+  { id: 'hm_potosi',    lon: -65.7, lat: -19.6, act: 3, icon: '⛏️', label: 'Potosí',
+    tip: '1545 — El Cerro Rico: 40.000 toneladas de plata extraídas. Millones muertos en la mita.' },
+  { id: 'hm_arauco',    lon: -73.0, lat: -37.5, act: 4, icon: '🦅', label: 'Guerra de Arauco',
+    tip: '1550–1810 — Los mapuches resisten 260 años. El Biobío: frontera que España nunca cruzó.' },
+]
+
+// ── Helpers ───────────────────────────────────────────
+
+/** Último nodo completado del historial */
+function lastCompleted(gs: GameState): string | null {
+  return gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
+}
+
+/** Nodo (bridge o jugador) donde está el conquistador */
+function conqCurrentNode(gs: GameState): { lon: number; lat: number; name?: string } | null {
+  const ri = gs.conq.routeIdx
+  if (ri < CONQ_BRIDGE.length) return CONQ_BRIDGE[ri]
+  const nodeId = gs.history[ri - CONQ_BRIDGE.length]
+  return nodeId ? gs.nodes[nodeId] : null
+}
+
+// ── Geo-tip ───────────────────────────────────────────
+
+function showGeoTip(ev: MouseEvent, html: string): void {
+  const tip = document.getElementById('geo-tip')
+  if (!tip) return
+  tip.innerHTML = html
+  tip.style.display = 'block'
+  const PAD = 14
+  tip.style.left = `${Math.min(ev.clientX + PAD, window.innerWidth  - tip.offsetWidth  - PAD)}px`
+  tip.style.top  = `${Math.min(ev.clientY + PAD, window.innerHeight - tip.offsetHeight - PAD)}px`
+}
+
+function hideGeoTip(): void {
+  const tip = document.getElementById('geo-tip')
+  if (tip) tip.style.display = 'none'
+}
+
+// ── Camino de la tribu ────────────────────────────────
+
+const TRIBE_TRAIL_COLOR     = 'rgba(107,184,74,.75)'
+const TRIBE_TRAIL_GLOW      = 'rgba(45,90,30,.35)'
+const TRIBE_FOOTPRINT_COLOR = 'rgba(196,136,42,.55)'
+
+function _footprintPositions(x1: number, y1: number, x2: number, y2: number, count: number) {
+  const dx = x2 - x1, dy = y2 - y1
+  const len = Math.sqrt(dx * dx + dy * dy)
+  if (len < 1) return []
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+  const pts: { x: number; y: number; angle: number }[] = []
+  for (let i = 0; i < count; i++) {
+    const t = (i + 1) / (count + 1)
+    const side = i % 2 === 0 ? 1 : -1
+    const perpRad = (angle + 90) * (Math.PI / 180)
+    pts.push({ x: x1 + dx * t + side * 2.5 * Math.cos(perpRad), y: y1 + dy * t + side * 2.5 * Math.sin(perpRad), angle })
+  }
+  return pts
+}
+
+function _drawStaticFootprints(g: ReturnType<D3Lib['select']>, x1: number, y1: number, x2: number, y2: number): void {
+  _footprintPositions(x1, y1, x2, y2, 5).forEach(p => {
+    g.append('g').attr('transform', `translate(${p.x},${p.y}) rotate(${p.angle})`).attr('pointer-events', 'none')
+      .append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', '7px').attr('opacity', '.55').attr('fill', TRIBE_FOOTPRINT_COLOR)
+      .attr('pointer-events', 'none').text('👣')
+  })
+}
+
+export function drawTribePath(gs: GameState): void {
+  if (!mapG || !mapProj) return
+  mapG.selectAll('.tribe-trail').remove()
+  const tg = mapG.insert('g', '.ng').attr('class', 'tribe-trail').attr('pointer-events', 'none')
+  const hist = gs.history.filter(id => id !== '_conq_catch_node')
+  if (hist.length < 2) return
+  for (let i = 0; i < hist.length - 1; i++) {
+    const a = gs.nodes[hist[i]], b = gs.nodes[hist[i + 1]]
+    if (!a || !b) continue
+    const [ax, ay] = mapProj([a.lon, a.lat]) as [number, number]
+    const [bx, by] = mapProj([b.lon, b.lat]) as [number, number]
+    tg.append('line').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by)
+      .attr('stroke', TRIBE_TRAIL_GLOW).attr('stroke-width', 5).attr('stroke-linecap', 'round')
+    tg.append('line').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by)
+      .attr('stroke', TRIBE_TRAIL_COLOR).attr('stroke-width', 1.6)
+      .attr('stroke-dasharray', '7,4').attr('stroke-linecap', 'round')
+    _drawStaticFootprints(tg as unknown as ReturnType<D3Lib['select']>, ax, ay, bx, by)
+  }
+}
+
+export function animateTribeStep(gs: GameState, fromNd: { lon: number; lat: number }, toNd: { lon: number; lat: number }): void {
+  if (!mapG || !mapProj) return
+  const [ax, ay] = mapProj([fromNd.lon, fromNd.lat]) as [number, number]
+  const [bx, by] = mapProj([toNd.lon,  toNd.lat])   as [number, number]
+  let tg = mapG.select('.tribe-trail')
+  if (tg.empty()) tg = mapG.insert('g', '.ng').attr('class', 'tribe-trail').attr('pointer-events', 'none') as unknown as ReturnType<D3Lib['select']>
+  tg.append('line').attr('x1', ax).attr('y1', ay).attr('x2', ax).attr('y2', ay)
+    .attr('stroke', TRIBE_TRAIL_GLOW).attr('stroke-width', 5).attr('stroke-linecap', 'round')
+    .transition().duration(1100).ease(d3Lib.easeCubicOut).attr('x2', bx).attr('y2', by)
+  tg.append('line').attr('x1', ax).attr('y1', ay).attr('x2', ax).attr('y2', ay)
+    .attr('stroke', TRIBE_TRAIL_COLOR).attr('stroke-width', 1.6)
+    .attr('stroke-dasharray', '7,4').attr('stroke-linecap', 'round')
+    .transition().duration(1100).ease(d3Lib.easeCubicOut).attr('x2', bx).attr('y2', by)
+  _footprintPositions(ax, ay, bx, by, 5).forEach((p, i) => {
+    const fg = (tg as ReturnType<D3Lib['select']>).append('g')
+      .attr('transform', `translate(${p.x},${p.y}) rotate(${p.angle})`).attr('pointer-events', 'none').attr('opacity', 0)
+    fg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', '7px').attr('fill', TRIBE_FOOTPRINT_COLOR).attr('pointer-events', 'none').text('👣')
+    fg.transition().delay(500 + i * 180).duration(450).ease(d3Lib.easeCubicOut).attr('opacity', .55)
+  })
+  // suppress unused warning
+  void gs
+}
+
+// ── Marcadores históricos ─────────────────────────────
+
+function drawHistMarkers(gs: GameState): void {
+  if (!mapG || !mapProj || !gs.nodes) return
+  mapG.selectAll('.hist-marker').remove()
+  const currentAct = (() => {
+    const last = lastCompleted(gs)
+    return last && gs.nodes[last] ? gs.nodes[last].act : 1
+  })()
+  HIST_MARKERS.filter(m => m.act <= currentAct).forEach(m => {
+    const [mx, my] = mapProj!([m.lon, m.lat]) as [number, number]
+    const mg = mapG!.append('g').attr('class', 'hist-marker').attr('pointer-events', 'all')
+      .attr('cursor', 'help').attr('transform', `translate(${mx},${my})`).attr('opacity', 0)
+    mg.append('circle').attr('r', 9).attr('fill', 'rgba(60,20,5,.65)').attr('stroke', 'rgba(200,140,50,.7)').attr('stroke-width', 1.2)
+    mg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central').attr('font-size', '10px').attr('pointer-events', 'none').text(m.icon)
+    mg.append('rect').attr('x', -24).attr('y', 10).attr('width', 48).attr('height', 10).attr('fill', 'rgba(6,2,2,.75)').attr('rx', 2).attr('pointer-events', 'none')
+    mg.append('text').attr('text-anchor', 'middle').attr('y', 17).attr('font-size', '5.5px').attr('font-family', 'Cinzel,serif').attr('fill', 'rgba(200,160,60,.9)').attr('pointer-events', 'none').text(m.label.toUpperCase())
+    mg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev, `<strong style="color:#d4a017">${m.icon} ${m.label}</strong><br>${m.tip}`))
+      .on('mouseleave', hideGeoTip)
+    mg.transition().duration(800).ease(d3Lib.easeCubicOut).attr('opacity', 1)
+  })
+}
+
+// ── Conquistador ──────────────────────────────────────
+
+export function drawConquistador(gs: GameState): void {
+  if (!mapG || !mapProj) return
+  mapG.selectAll('.conq-layer').remove()
+  const wp = conqCurrentNode(gs)
+  if (!wp) return
+  const [cx, cy] = mapProj([wp.lon, wp.lat]) as [number, number]
+  const cg = mapG.append('g').attr('class', 'conq-layer').attr('transform', `translate(${cx + 18},${cy - 10})`).attr('cursor', 'help')
+  const pulse = cg.append('circle').attr('r', 14).attr('fill', 'none').attr('stroke', 'rgba(192,57,43,.6)').attr('stroke-width', 1.5)
+  pulse.append('animate').attr('attributeName', 'r').attr('values', '14;20;14').attr('dur', '1.8s').attr('repeatCount', 'indefinite')
+  cg.append('circle').attr('r', 14).attr('fill', 'rgba(139,26,26,.1)').attr('stroke', 'rgba(192,57,43,.15)').attr('stroke-width', 8)
+  cg.append('circle').attr('r', 11).attr('fill', 'rgba(100,15,15,.85)').attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 2)
+  cg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central').attr('font-size', '13px').attr('pointer-events', 'none').text('👑')
+  cg.append('rect').attr('x', -32).attr('y', 14).attr('width', 64).attr('height', 11).attr('fill', 'rgba(6,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
+  cg.append('text').attr('text-anchor', 'middle').attr('y', 22).attr('font-size', '7px').attr('font-family', 'Cinzel,serif').attr('fill', 'rgba(220,100,80,.95)').attr('pointer-events', 'none').text('CONQUISTADORES')
+  const ri = gs.conq.routeIdx
+  const playerPos = CONQ_BRIDGE.length + gs.history.length - 1
+  const dist = playerPos - ri
+  const distTxt = dist <= 0 ? '<span style="color:#e07070">⚠️ ¡Te han alcanzado!</span>'
+    : dist === 1 ? '<span style="color:#e07070">⚠️ A UN NODO de distancia</span>'
+    : dist === 2 ? '<span style="color:#d4a017">⚠ Dos nodos detrás</span>'
+    : '<span style="color:#6db84a">Varios nodos de ventaja</span>'
+  cg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev, `<strong style="color:#e07070">👑 Conquistadores</strong><br>${distTxt}`))
+    .on('mouseleave', hideGeoTip)
+  drawHistMarkers(gs)
+}
+
+// ── Animación del conquistador ────────────────────────
+
+function _showReorgCard(cb: () => void): void {
+  const msgs = [
+    'Los conquistadores se reagrupan…',
+    'Las huestes españolas reorganizan sus fuerzas.',
+    'Los soldados descansan. Por ahora.',
+    'El capitán español espera noticias de sus exploradores.',
+    'Los conquistadores pierden el rastro momentáneamente.',
+  ]
+  const msg = msgs[Math.floor(Math.random() * msgs.length)]
+  showNotif(`⚔️ ${msg}`, 'info')
+  const existing = document.getElementById('reorg-card')
+  if (existing) existing.remove()
+  const card = document.createElement('div')
+  card.id = 'reorg-card'
+  card.style.cssText = [
+    'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9998;pointer-events:none',
+    'text-align:center;font-family:"Cinzel",serif;font-size:clamp(.75rem,2vw,.95rem);letter-spacing:.12em;text-transform:uppercase',
+    'padding:1rem 1.6rem;border-radius:3px;background:rgba(20,6,6,.9)',
+    'border:1px solid rgba(192,57,43,.5);box-shadow:0 0 30px rgba(100,10,10,.5)',
+    'color:rgba(220,140,100,.9);opacity:0;transition:opacity .5s ease',
+  ].join(';')
+  card.innerHTML = `<div style="font-size:1.1em;margin-bottom:.4rem">⚔️</div>${msg}`
+  document.body.appendChild(card)
+  requestAnimationFrame(() => requestAnimationFrame(() => { card.style.opacity = '1' }))
+  setTimeout(() => {
+    card.style.opacity = '0'
+    setTimeout(() => { card.remove(); cb() }, 500)
+  }, 2000)
+}
+
+function _animateConqAdvance(
+  from:   { lon: number; lat: number },
+  to:     { lon: number; lat: number },
+  gs:     GameState,
+  onDone: () => void,
+): void {
+  if (!mapSvg || !mapProj || !mapZoom) { _conqAnimating = false; onDone(); return }
+  _conqAnimating = true
+  const wrap  = document.getElementById('map-canvas-wrap')
+  const W = wrap?.clientWidth ?? 900, H = wrap?.clientHeight ?? 580
+  const scale = 3.0, OX = 18, OY = -10
+
+  const isMapVisible = () => document.getElementById('map-screen')?.classList.contains('active')
+
+  function panTo(lon: number, lat: number, dur: number, delay: number, cb: () => void) {
+    const [px, py] = mapProj!([lon, lat]) as [number, number]
+    const tx = W / 2 - scale * px, ty = H / 2 - scale * py
+    setTimeout(() => {
+      if (!_conqAnimating) { cb(); return }
+      if (!isMapVisible()) { _conqAnimating = false; cb(); return }
+      mapSvg!.transition().duration(dur).ease(d3Lib.easeCubicInOut)
+        .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
+        .on('end', cb)
+    }, delay)
+  }
+
+  function slideToken(fromWp: typeof from, toWp: typeof to, dur: number, cb: () => void) {
+    if (!mapG || !mapProj) { cb(); return }
+    const [fx, fy] = mapProj([fromWp.lon, fromWp.lat]) as [number, number]
+    const [tx, ty] = mapProj([toWp.lon,   toWp.lat])   as [number, number]
+    const fxo = fx + OX, fyo = fy + OY, txo = tx + OX, tyo = ty + OY
+    mapG.selectAll('.conq-layer').remove()
+    const slideG = mapG.append('g').attr('class', 'conq-layer conq-token-anim').attr('transform', `translate(${fxo},${fyo})`).attr('pointer-events', 'none')
+    mapG.insert('line', 'g.conq-token-anim').attr('class', 'conq-layer').attr('x1', fxo).attr('y1', fyo).attr('x2', fxo).attr('y2', fyo)
+      .attr('stroke', 'rgba(220,60,40,.7)').attr('stroke-width', 2).attr('stroke-dasharray', '4,3').attr('pointer-events', 'none')
+      .transition().duration(dur).ease(d3Lib.easeCubicInOut).attr('x2', txo).attr('y2', tyo)
+    const halo = slideG.append('circle').attr('r', 14).attr('fill', 'none').attr('stroke', 'rgba(192,57,43,.6)').attr('stroke-width', 1.5)
+    halo.append('animate').attr('attributeName', 'r').attr('values', '14;20;14').attr('dur', '1.8s').attr('repeatCount', 'indefinite')
+    slideG.append('circle').attr('r', 14).attr('fill', 'rgba(139,26,26,.1)').attr('stroke', 'rgba(192,57,43,.15)').attr('stroke-width', 8)
+    slideG.append('circle').attr('r', 11).attr('fill', 'rgba(100,15,15,.85)').attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 2)
+    slideG.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central').attr('font-size', '13px').attr('pointer-events', 'none').text('👑')
+    slideG.append('rect').attr('x', -32).attr('y', 14).attr('width', 64).attr('height', 11).attr('fill', 'rgba(6,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
+    slideG.append('text').attr('text-anchor', 'middle').attr('y', 22).attr('font-size', '7px').attr('font-family', 'Cinzel,serif').attr('fill', 'rgba(220,100,80,.95)').attr('pointer-events', 'none').text('CONQUISTADORES')
+    slideG.transition().duration(dur).ease(d3Lib.easeCubicInOut).attr('transform', `translate(${txo},${tyo})`).on('end', cb)
+  }
+
+  const _wait = (attempt: number, fn: () => void) => {
+    if (attempt > 20) { _conqAnimating = false; return }
+    if (isMapVisible()) { fn(); return }
+    setTimeout(() => _wait(attempt + 1, fn), 100)
+  }
+
+  _wait(0, () => {
+    panTo(from.lon, from.lat, 650, 0, () => {
+      if (!_conqAnimating) return
+      setTimeout(() => {
+        if (!_conqAnimating) return
+        drawNodes(gs)
+        slideToken(from, to, 950, () => {
+          if (!_conqAnimating) return
+          drawNodes(gs); drawConquistador(gs)
+        })
+        panTo(to.lon, to.lat, 950, 0, () => {
+          if (!_conqAnimating) return
+          setTimeout(() => {
+            _conqAnimating = false
+            if (isMapVisible()) _centerOnNextNodes(gs)
+            onDone()
+          }, 800)
+        })
+      }, 500)
+    })
+  })
+}
+
+/**
+ * Versión animada para el UI del avance del conquistador.
+ * Llama al callback con (caught: boolean) cuando termina la animación.
+ */
+export function advanceConquistadorAnimated(gs: GameState, cb: (caught: boolean) => void): void {
+  if (gs.conq.caught) { cb(false); return }
+  if (gs.conq.reorgTurns > 0) {
+    _showReorgCard(() => cb(false))
+    return
+  }
+
+  const ri = gs.conq.routeIdx
+  const isEdu = gs.diff === 'educativo'
+  const lag = isEdu ? 2 : 1
+  const maxNormal = CONQ_BRIDGE.length + gs.history.length - lag
+  const playerPos = CONQ_BRIDGE.length + gs.history.length - 1
+  const jumpProb = isEdu ? 0.12 : 0.32
+  const doJump = Math.random() < jumpProb
+
+  let targetIdx: number
+  let isJump = false
+  if (doJump && ri < playerPos) { targetIdx = playerPos; isJump = true }
+  else if (ri < maxNormal)       { targetIdx = ri + 1 }
+  else                           { cb(false); return }
+
+  const fromWp = conqCurrentNode(gs)
+  // Note: gs is immutable — caller must update routeIdx/caught in the game state
+  // We just animate from current to target position
+  const gsCopy = { ...gs, conq: { ...gs.conq, routeIdx: targetIdx } }
+  const toWp   = conqCurrentNode(gsCopy)
+  if (!fromWp || !toWp) { cb(isJump); return }
+
+  const toName = (toWp as { name?: string }).name ?? ''
+  showNotif(`⚔️ Los conquistadores avanzan — ${toName}`, 'loss')
+  if (isJump) showNotif('⚔️ ¡Los conquistadores te han alcanzado!', 'loss')
+
+  _animateConqAdvance(fromWp, toWp, gs, () => cb(isJump))
+}
+
+/**
+ * Anima el avance del conquistador usando el resultado del motor (engine-first).
+ * Elimina el doble azar: la decisión ya fue tomada por el motor, aquí solo se anima.
+ */
+export function animateConqStep(
+  oldGs:  GameState,
+  newGs:  GameState,
+  reorg:  boolean,
+  cb:     () => void,
+): void {
+  if (reorg) { _showReorgCard(cb); return }
+  const fromWp = conqCurrentNode(oldGs)
+  const toWp   = conqCurrentNode(newGs)
+  if (!fromWp || !toWp) { cb(); return }
+  if (fromWp.lon === toWp.lon && fromWp.lat === toWp.lat) { cb(); return }
+  _animateConqAdvance(fromWp, toWp, newGs, cb)
+}
+
+// ── Cámara ────────────────────────────────────────────
+
+function centerMapOn(lon: number, lat: number, scale: number): void {
+  if (!mapSvg || !mapProj || !mapZoom) return
+  const wrap = document.getElementById('map-canvas-wrap')
+  const W = wrap?.clientWidth ?? 900, H = wrap?.clientHeight ?? 580
+  const [px, py] = mapProj([lon, lat]) as [number, number]
+  const tx = W / 2 - scale * px, ty = H / 2 - scale * py
+  mapSvg.transition().duration(700).ease(d3Lib.easeCubicInOut)
+    .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
+}
+
+export function centerOnNextNodes(gs: GameState): void {
+  _centerOnNextNodes(gs)
+}
+
+function _centerOnNextNodes(gs: GameState): void {
+  if (!mapProj || !mapSvg || !gs.nodes) return
+  const last = lastCompleted(gs)
+  if (!last) return
+  const lastNd = gs.nodes[last]
+  if (!lastNd) return
+  const nextNds = (lastNd.next ?? []).map(id => gs.nodes[id]).filter(n => n && n.unlocked && !n.completed)
+  let lon: number, lat: number, scale: number
+  if (nextNds.length === 0)      { lon = lastNd.lon;   lat = lastNd.lat;   scale = 2.8 }
+  else if (nextNds.length === 1) { lon = nextNds[0].lon; lat = nextNds[0].lat; scale = 2.6 }
+  else {
+    const lons = nextNds.map(n => n.lon), lats = nextNds.map(n => n.lat)
+    lon = lons.reduce((a, b) => a + b, 0) / lons.length
+    lat = lats.reduce((a, b) => a + b, 0) / lats.length
+    const span = Math.max(Math.max(...lons) - Math.min(...lons), Math.max(...lats) - Math.min(...lats))
+    scale = span < 5 ? 3.2 : span < 12 ? 2.4 : 1.8
+  }
+  const cWp = conqCurrentNode(gs)
+  if (cWp) {
+    const allLons = [lon, cWp.lon], allLats = [lat, cWp.lat]
+    const cLon = (Math.max(...allLons) + Math.min(...allLons)) / 2
+    const cLat = (Math.max(...allLats) + Math.min(...allLats)) / 2
+    const span = Math.max(Math.max(...allLons) - Math.min(...allLons), Math.max(...allLats) - Math.min(...allLats))
+    if (span < 30) { lon = cLon; lat = cLat; scale = span < 4 ? 2.8 : span < 10 ? 2.0 : span < 20 ? 1.5 : 1.2 }
+  }
+  setTimeout(() => centerMapOn(lon, lat, scale), 180)
+}
+
+// ── Nodos ─────────────────────────────────────────────
+
+const LABEL_OFFSET: Record<string, [number, number]> = {
+  n00: [0, 22], n01a: [-24, 16], n01b: [24, 16],
+  n02a: [-24, 16], n02b: [24, 16], n02c: [24, 16], n02d: [24, 14],
+  n03: [0, 22],
+  n04a: [-28, 14], n04b: [28, 14], n04c: [28, 14],
+  n05a: [-28, 14], n05b: [0, 22], n05c: [28, 14], n05d: [28, 14], n05e: [28, 14],
+  n06a: [-28, 14], n06b: [28, 14],
+  n07a: [-28, 14], n07b: [28, 14], n07c: [28, 14],
+  n08a: [-28, 14], n08b: [0, 22], n08c: [28, 14],
+  n09: [0, 22],
+  n10a: [-28, 14], n10b: [0, 22], n10c: [28, 14],
+  n10a2: [-28, 14], n10b2: [28, 14], n10c2: [28, 14],
+  n11a: [-28, 14], n11b: [0, 22], n11c: [28, 14],
+}
+
+export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void): void {
+  if (!mapG || !mapProj) return
+  mapG.selectAll('.ng,.el,.conq-layer').remove()
+  drawTribePath(gs)
+
+  const nodes = gs.nodes
+  const visitedCount = gs.history.length
+  const totalNodes   = Object.keys(NODES_DEF).length
+  const act = visitedCount > 0 ? (gs.nodes[gs.history[visitedCount - 1]]?.act ?? 1) : 1
+  const progEl = document.getElementById('map-progress')
+  if (progEl) {
+    progEl.innerHTML = `<div style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ocre);opacity:.7;">${ACT_NAMES[act] ?? 'Acto I'}</div><div style="font-family:'Cinzel',serif;font-size:.58rem;color:var(--parch2);opacity:.4;margin-top:.15rem;">${visitedCount} de ${totalNodes} lugares</div>`
+  }
+
+  // Actualizar título del acto y pista del mapa
+  const actTitleEl = document.getElementById('map-act-title')
+  if (actTitleEl) actTitleEl.textContent = ACT_NAMES[act] ?? 'Acto I · Huida'
+
+  const last = lastCompleted(gs)
+  const mapHintEl = document.getElementById('map-hint')
+  if (mapHintEl) {
+    const reachable = Object.values(gs.nodes).filter(n =>
+      n.unlocked && !n.completed &&
+      (last === null ? n.id === 'n00' : n.unlockedFrom === last)
+    ).length
+    mapHintEl.textContent = reachable > 1
+      ? `${reachable} caminos posibles — elegí uno`
+      : reachable === 1
+        ? 'Elegí el próximo destino de tu pueblo'
+        : visitedCount === 0 ? 'Elegí el primer destino' : 'Explorando…'
+  }
+
+  // Aristas
+  EDGES.forEach(([aId, bId]) => {
+    const a = nodes[aId], b = nodes[bId]
+    if (!a || !b) return
+    const [ax, ay] = mapProj!([a.lon, a.lat]) as [number, number]
+    const [bx, by] = mapProj!([b.lon, b.lat]) as [number, number]
+    const done = a.completed && b.completed
+    const pivot = last ?? 'n00'
+    const active = !done && ((aId === pivot && b.unlocked && !b.completed && b.unlockedFrom === last) ||
+      (aId === 'n00' && last === null && b.unlocked && !b.completed))
+    if (done) {
+      mapG!.append('line').attr('class', 'el').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by).attr('stroke', 'rgba(196,136,42,.18)').attr('stroke-width', 5).attr('stroke-dasharray', '6,5')
+      mapG!.append('line').attr('class', 'el').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by).attr('stroke', 'rgba(232,169,58,.85)').attr('stroke-width', 1.8).attr('stroke-dasharray', '6,5')
+    } else if (active) {
+      mapG!.append('line').attr('class', 'el').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by).attr('stroke', 'rgba(196,136,42,.35)').attr('stroke-width', 1.2).attr('stroke-dasharray', '5,4')
+    } else {
+      mapG!.append('line').attr('class', 'el').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by).attr('stroke', 'rgba(255,255,255,.06)').attr('stroke-width', .7).attr('stroke-dasharray', '3,5')
+    }
+  })
+
+  // Nodos
+  Object.values(nodes).forEach(nd => {
+    if (nd.id === '_conq_catch_node') return
+    const [x, y] = mapProj!([nd.lon, nd.lat]) as [number, number]
+    const reachable = nd.unlocked && !nd.completed && ((last === null && nd.id === 'n00') || nd.unlockedFrom === last)
+    const done = nd.completed
+    const locked = !nd.unlocked
+    const unlockedOtherPath = nd.unlocked && !nd.completed && nd.unlockedFrom !== last
+    const g = mapG!.append('g').attr('class', 'ng').attr('transform', `translate(${x},${y})`)
+    if (reachable) {
+      const pulse = g.append('circle').attr('r', 16).attr('fill', 'none').attr('stroke', 'rgba(196,136,42,.55)').attr('stroke-width', 1.5)
+      pulse.append('animate').attr('attributeName', 'r').attr('values', '16;22;16').attr('dur', '2s').attr('repeatCount', 'indefinite')
+      g.append('circle').attr('r', 16).attr('fill', 'none').attr('stroke', 'rgba(196,136,42,.1)').attr('stroke-width', 9)
+    }
+    const r = 11
+    g.append('circle').attr('r', r)
+      .attr('fill', done ? 'rgba(196,136,42,.3)' : reachable ? 'rgba(196,136,42,.15)' : 'rgba(8,6,4,.8)')
+      .attr('stroke', done ? 'rgba(196,136,42,.9)' : reachable ? 'rgba(232,169,58,1)' : 'rgba(255,255,255,.12)')
+      .attr('stroke-width', reachable ? 2 : 1)
+    g.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', locked && !unlockedOtherPath ? '8px' : '12px')
+      .attr('opacity', locked && !unlockedOtherPath ? .2 : done ? 1 : reachable ? 1 : .35)
+      .text(locked && !unlockedOtherPath ? '🔒' : nd.icon)
+    const [lx, ly] = LABEL_OFFSET[nd.id] ?? [0, 20]
+    const label = nd.name.split('–')[0].trim()
+    const lcolor = done ? 'rgba(196,136,42,.8)' : reachable ? 'rgba(235,218,185,.95)' : unlockedOtherPath ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.22)'
+    const estW = Math.max(label.length * 5.2 + 8, 30)
+    g.append('rect').attr('x', lx - estW / 2).attr('y', ly - 8).attr('width', estW).attr('height', 11).attr('fill', 'rgba(6,4,2,.75)').attr('rx', 2).attr('opacity', locked && !unlockedOtherPath ? 0.3 : 1)
+    g.append('text').attr('text-anchor', 'middle').attr('x', lx).attr('y', ly).attr('font-size', '7.5px').attr('font-family', 'Cinzel,serif').attr('fill', lcolor).attr('pointer-events', 'none').text(label)
+
+    if (reachable && onSelectNode) {
+      g.style('cursor', 'pointer')
+      g.append('circle').attr('r', 26).attr('fill', 'transparent').attr('pointer-events', 'all')
+      const showNdTip = (ev: MouseEvent) => {
+        const tt = document.getElementById('map-node-tt')
+        if (!tt) return
+        tt.innerHTML = `<strong>${nd.icon} ${nd.name}</strong><span style="display:block;margin-top:.15rem">${nd.desc}</span>`
+        tt.style.display = 'block'
+        const wr = document.getElementById('map-canvas-wrap')?.getBoundingClientRect()
+        if (!wr) return
+        tt.style.left = `${Math.min((ev.clientX ?? 0) - wr.left + 14, wr.width - 220)}px`
+        tt.style.top  = `${Math.max((ev.clientY ?? 0) - wr.top  - 60, 8)}px`
+      }
+      g.on('mouseenter', showNdTip)
+        .on('mouseleave', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none' })
+        .on('click', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none'; onSelectNode(nd.id) })
+      g.on('touchend', (ev: TouchEvent) => {
+        ev.preventDefault()
+        const tt = document.getElementById('map-node-tt')
+        if (!tt) return
+        if (tt.style.display === 'block') { tt.style.display = 'none'; onSelectNode(nd.id) }
+        else {
+          showNdTip(ev.changedTouches[0] as unknown as MouseEvent)
+          setTimeout(() => { tt.style.display = 'none'; onSelectNode(nd.id) }, 700)
+        }
+      })
+    } else if (unlockedOtherPath) {
+      g.style('cursor', 'not-allowed')
+      g.append('circle').attr('r', 26).attr('fill', 'transparent').attr('pointer-events', 'all')
+      g.on('mouseenter', (ev: MouseEvent) => {
+        const from = gs.nodes[nd.unlockedFrom ?? '']
+        const tt = document.getElementById('map-node-tt')
+        if (!tt) return
+        tt.innerHTML = `<strong>${nd.icon} ${nd.name}</strong><span style="display:block;margin-top:.15rem;color:rgba(192,57,43,.9)">🔒 Solo accesible desde ${from ? from.name : 'otro camino'}</span>`
+        tt.style.display = 'block'
+        const wr = document.getElementById('map-canvas-wrap')?.getBoundingClientRect()
+        if (!wr) return
+        tt.style.left = `${Math.min(ev.clientX - wr.left + 14, wr.width - 220)}px`
+        tt.style.top  = `${Math.max(ev.clientY  - wr.top  - 60, 8)}px`
+      }).on('mouseleave', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none' })
+    }
+  })
+
+  drawConquistador(gs)
+}
+
+// ── Overlays geográficos (ríos, Andes, biomas) ────────
+
+function renderOverlays(gs: GameState, lineF: (d: [number, number][]) => string | null, onSelectNode?: (nodeId: string) => void): void {
+  if (!mapG || !mapProj) return
+
+  const polyPath = (pts: [number, number][]) => {
+    const px = pts.map(p => mapProj!(p) as [number, number])
+    return 'M' + px.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L') + 'Z'
+  }
+
+  // Cuenca amazónica
+  mapG.append('path').attr('d', polyPath([[-78,2],[-76,0],[-75,-2],[-73,-4],[-72,-6],[-70,-6],[-68,-4],[-65,-4],[-63,-3],[-60,-3],[-58,-2],[-55,-1],[-52,0],[-50,-1],[-48,-2],[-49,-5],[-51,-7],[-53,-9],[-56,-10],[-58,-10],[-60,-12],[-63,-12],[-65,-14],[-68,-12],[-70,-10],[-72,-8],[-74,-8],[-76,-6],[-78,-4],[-78,2]])).attr('fill','rgba(30,80,20,.28)').attr('stroke','rgba(40,120,30,.4)').attr('stroke-width',.6).attr('pointer-events','none')
+
+  // Desierto de Atacama
+  mapG.append('path').attr('d', polyPath([[-69,-18],[-70,-20],[-70,-24],[-69,-27],[-68,-26],[-67,-24],[-67,-20],[-68,-18],[-69,-18]])).attr('fill','rgba(180,140,60,.22)').attr('stroke','rgba(200,160,70,.3)').attr('stroke-width',.5).attr('pointer-events','none')
+
+  // Pampa
+  mapG.append('path').attr('d', polyPath([[-62,-30],[-60,-28],[-58,-28],[-56,-30],[-57,-34],[-60,-36],[-62,-34],[-63,-32],[-62,-30]])).attr('fill','rgba(80,120,30,.15)').attr('stroke','rgba(100,140,40,.2)').attr('stroke-width',.4).attr('pointer-events','none')
+
+  // Andes (cadena de triángulos)
+  const andesPts: [number,number][] = [
+    [-77,1.5],[-77.2,0.5],[-77.8,-0.5],[-78.2,-1.5],[-78,-2.5],[-77.5,-3.5],[-77.8,-4.5],[-77.2,-5.5],[-77,-6.5],[-76.5,-7.5],
+    [-76.8,-8.5],[-76.2,-9.5],[-76,-10.5],[-75.8,-11.5],[-75.5,-12.5],[-75.2,-13.5],[-75,-14.5],[-74.8,-15.5],[-74.5,-16.5],[-69.5,-17],
+    [-68.5,-18],[-68.2,-19],[-68.8,-20],[-69.2,-21],[-69.5,-22],[-69.8,-23],[-70,-24],[-70.3,-25],[-70.5,-26],[-70.5,-27],
+    [-70.8,-28],[-71,-29],[-71,-30],[-71.2,-31],[-71.2,-32],[-71.3,-33],[-71.5,-34],[-71.5,-35],[-71.8,-36],[-72,-37],
+    [-72,-38],[-72.2,-39],[-72.5,-40],[-72.5,-41],[-72.8,-42],[-73,-43],[-73,-44],[-73.2,-45],[-73.5,-46],[-73.5,-47],
+    [-73.8,-48],[-74,-49],[-74,-50],[-74.2,-51],[-74.5,-52],[-74.8,-53],[-75,-54],[-75.2,-54.8],
+  ]
+  const triG = mapG.append('g').attr('class', 'andes-tris')
+  andesPts.forEach((pt, i) => {
+    const [px, py] = mapProj!(pt) as [number, number]
+    const h = i % 3 === 0 ? 9 : i % 3 === 1 ? 7 : 8, w = 7
+    triG.append('path').attr('d', `M${px},${py - h} L${px + w/2},${py + 2} L${px - w/2},${py + 2}Z`)
+      .attr('fill', 'rgba(200,185,150,.45)').attr('stroke', 'rgba(230,215,175,.65)').attr('stroke-width', .6).attr('stroke-linejoin', 'round').attr('pointer-events', 'none')
+    if (i % 4 === 0) {
+      const sh = h * .4
+      triG.append('path').attr('d', `M${px},${py - h} L${px + w*sh/(2*h)},${py - h + sh} L${px - w*sh/(2*h)},${py - h + sh}Z`)
+        .attr('fill', 'rgba(240,238,235,.55)').attr('stroke', 'none').attr('pointer-events', 'none')
+    }
+  })
+  const [lax, lay] = mapProj([-74.5, -14]) as [number, number]
+  mapG.append('text').attr('x', lax - 14).attr('y', lay).attr('font-size', '7px').attr('fill', 'rgba(230,215,165,.6)').attr('font-family', 'Cinzel,serif').attr('letter-spacing', '.18em').attr('transform', `rotate(-80,${lax-14},${lay})`).attr('pointer-events', 'none').text('ANDES')
+
+  // Ríos principales
+  const RIOS: { pts: [number,number][]; w: number; color: string; label: string; lpos: [number,number]; tip: string }[] = [
+    { pts: [[-74,0],[-72,-2],[-70,-3],[-68,-3],[-65,-3],[-62,-3],[-58,-2],[-54,-1],[-50,-1],[-48,-1.5]], w: 3, color: 'rgba(40,110,200,.75)', label: 'Amazonas', lpos: [-61,-3], tip: 'El río más caudaloso del planeta: 20% del agua dulce del mundo. Red de 1.100 afluentes.' },
+    { pts: [[-58,-14],[-57,-18],[-57,-20],[-57,-24],[-58,-28],[-58,-34]], w: 2, color: 'rgba(35,95,180,.65)', label: 'Paraná', lpos: [-57.5,-24], tip: 'El segundo río más largo de Sudamérica. Los guaraníes habitaban sus orillas.' },
+    { pts: [[-76,2],[-75,4],[-74.5,6],[-74.5,9],[-74.8,11]], w: 1.5, color: 'rgba(40,100,190,.6)', label: 'Magdalena', lpos: [-74.5,6], tip: 'Río principal de Colombia. Los españoles lo usaron como vía de acceso al interior.' },
+    { pts: [[-74,-6],[-72,-7],[-70,-8],[-68,-9],[-66,-10],[-64,-10],[-62,-9],[-60,-8],[-58,-6],[-55,-4],[-52,-3],[-50,-2],[-48,-1.5]], w: 2, color: 'rgba(40,105,192,.62)', label: 'Ucayali', lpos: [-66,-8], tip: 'Afluente sur del Amazonas. Los shipibo-conibo viven en sus orillas desde hace milenios.' },
+    { pts: [[-70,-36],[-68,-37],[-66,-38],[-63,-38],[-60,-38],[-58,-38]], w: 1.2, color: 'rgba(35,90,175,.5)', label: 'Río Colorado', lpos: [-65,-38], tip: 'Límite sur del dominio colonial español. Al sur vivían tehuelches y mapuches.' },
+  ]
+  RIOS.forEach(r => {
+    mapG!.append('path').datum(r.pts).attr('d', lineF as never).attr('fill', 'none').attr('stroke', r.color).attr('stroke-width', r.w).attr('stroke-linecap', 'round').attr('pointer-events', 'none')
+    const [rx, ry] = mapProj!(r.lpos) as [number, number]
+    mapG!.append('text').attr('x', rx).attr('y', ry - 5).attr('font-size', r.w > 2 ? '8px' : '6.5px').attr('fill', 'rgba(80,160,230,.8)').attr('font-family', 'Crimson Text,serif').attr('font-style', 'italic').attr('text-anchor', 'middle').attr('pointer-events', 'none').text(r.label)
+    mapG!.append('circle').attr('cx', rx).attr('cy', ry - 5).attr('r', 12).attr('fill', 'transparent').attr('cursor', 'help')
+      .on('mouseenter', (ev: MouseEvent) => showGeoTip(ev, `<strong style="color:#5ab0ff">🌊 ${r.label}</strong><br>${r.tip}`))
+      .on('mouseleave', hideGeoTip)
+  })
+
+  _mapInitialized = true
+  drawNodes(gs, onSelectNode)
+}
+
+// ── buildMap (punto de entrada) ───────────────────────
+
+export function buildMap(gs: GameState, onSelectNode?: (nodeId: string) => void): void {
+  const wrap = document.getElementById('map-canvas-wrap')
+  if (!wrap) return
+  const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
+  if (_mapInitialized && mapG && mapProj) { drawNodes(gs, onSelectNode); return }
+  _buildMapFull(wrap, W, H, gs, onSelectNode)
+}
+
+function _buildMapFull(wrap: HTMLElement, W: number, H: number, gs: GameState, onSelectNode?: (nodeId: string) => void): void {
+  d3Lib.select('#map-svg').selectAll('*').remove()
+  mapSvg = d3Lib.select('#map-svg').attr('viewBox', `0 0 ${W} ${H}`) as unknown as ReturnType<D3Lib['select']>
+  d3Lib.select('#map-svg').style('overflow', 'hidden')
+
+  mapProj = d3Lib.geoMercator().center([-72, -6]).scale(W * 1.32).translate([W / 2, H / 2])
+  const path  = d3Lib.geoPath().projection(mapProj)
+  const lineF = d3Lib.line<[number,number]>().x(dp => (mapProj!(dp) as [number,number])[0]).y(dp => (mapProj!(dp) as [number,number])[1]).curve(d3Lib.curveCatmullRom.alpha(.5))
+
+  mapG   = mapSvg!.append('g') as unknown as ReturnType<D3Lib['select']>
+  mapZoom = d3Lib.zoom<SVGSVGElement, unknown>().scaleExtent([.4, 12]).on('zoom', (e: { transform: unknown }) => mapG!.attr('transform', e.transform as string)) as unknown as ReturnType<D3Lib['zoom']>
+  mapSvg!.call(mapZoom as never)
+
+  const svgEl = document.getElementById('map-svg') as unknown as SVGElement
+  svgEl.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault() }, { passive: false })
+  svgEl.addEventListener('touchmove',  e => { if (e.touches.length > 1) e.preventDefault() }, { passive: false })
+
+  // Graticule
+  const grat = d3Lib.geoGraticule().step([10, 10])
+  const gratG = mapG!.append('g').attr('pointer-events', 'none')
+  grat.lines().forEach((line: Parameters<typeof path>[0]) => {
+    gratG.append('path').datum(line).attr('d', path).attr('fill', 'none').attr('stroke', 'rgba(60,140,200,.08)').attr('stroke-width', .3)
+  })
+
+  // Spinner de carga
+  const spinner = document.createElement('div')
+  spinner.id = 'map-loading'
+  spinner.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(196,136,42,.5);font-family:Cinzel,serif;font-size:.75rem;letter-spacing:.2em;pointer-events:none;z-index:5'
+  spinner.textContent = 'Cargando mapa…'
+  wrap.appendChild(spinner)
+
+  if (!_topoFetchPromise) {
+    // Intentar cargar desde sessionStorage antes de hacer fetch
+    if (!_topoCache) {
+      try {
+        const raw = sessionStorage.getItem(TOPO_STORAGE_KEY)
+        if (raw) _topoCache = JSON.parse(raw)
+      } catch (_) { /* sessionStorage no disponible */ }
+    }
+    _topoFetchPromise = _topoCache
+      ? Promise.resolve(_topoCache)
+      : fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+          .then(r => r.json())
+          .then((w: unknown) => {
+            _topoCache = w
+            try { sessionStorage.setItem(TOPO_STORAGE_KEY, JSON.stringify(w)) } catch (_) { /* sin storage */ }
+            return w
+          })
+          .catch(() => { _topoFetchPromise = null; return null })
+  }
+
+  _topoFetchPromise.then(world => {
+    document.getElementById('map-loading')?.remove()
+    if (!world) { _renderFallback(lineF, gs, onSelectNode); return }
+    type TopoWorld = import('topojson-specification').Topology
+    const topo = world as unknown as TopoWorld
+    const countries = topojson.feature(topo, (topo.objects as Record<string, import('topojson-specification').GeometryCollection>)[Object.keys(topo.objects)[0]]) as { features: unknown[] }
+    const inRegion = (f: unknown) => {
+      try {
+        const c = path.centroid(f as Parameters<typeof path.centroid>[0])
+        if (!c || isNaN(c[0])) return false
+        const [lon, lat] = mapProj!.invert!(c) as [number, number]
+        return lon > -118 && lon < -33 && lat > -57 && lat < 30
+      } catch { return false }
+    }
+    const regional = countries.features.filter(inRegion)
+    const landColor = (f: unknown) => {
+      try {
+        const [, lat] = mapProj!.invert!(path.centroid(f as Parameters<typeof path.centroid>[0])) as [number, number]
+        if (lat > 22) return '#1e2e12'
+        if (lat > 14) return '#1a2f10'
+        if (lat > -5) return '#1c3212'
+        if (lat > -25) return '#182d0f'
+        return '#13260c'
+      } catch { return '#162210' }
+    }
+    mapG!.append('g').attr('pointer-events', 'none').selectAll('path').data(regional).enter().append('path')
+      .attr('d', path as never).attr('fill', landColor as never).attr('stroke', '#3a6828').attr('stroke-width', .8).attr('stroke-linejoin', 'round')
+    const regionIds = new Set(regional.map((f: unknown) => String((f as { id: unknown }).id)))
+    const borders = topojson.mesh(topo, (topo.objects as Record<string, import('topojson-specification').GeometryCollection>)[Object.keys(topo.objects)[0]], (a, b) => a !== b && regionIds.has(String((a as { id: unknown }).id)) && regionIds.has(String((b as { id: unknown }).id)))
+    mapG!.append('path').datum(borders as Parameters<typeof path>[0]).attr('d', path).attr('fill', 'none').attr('stroke', '#4a7830').attr('stroke-width', .4).attr('pointer-events', 'none')
+    renderOverlays(gs, lineF as never, onSelectNode)
+  }).catch(() => { document.getElementById('map-loading')?.remove(); _renderFallback(lineF, gs, onSelectNode) })
+}
+
+function _renderFallback(lineF: (d: [number, number][]) => string | null, gs: GameState, onSelectNode?: (nodeId: string) => void): void {
+  if (!mapG || !mapProj) return
+  const pts: [number,number][] = [
+    [-117,28],[-110,24],[-105,20],[-97,19],[-92,18],[-90,18],[-88,16],[-83,10],[-77,8],[-75,11],[-70,12],
+    [-62,11],[-60,8],[-61,4],[-52,4],[-50,2],[-48,0],[-44,2],[-35,-8],[-35,-14],[-39,-18],[-40,-22],
+    [-44,-24],[-48,-28],[-52,-34],[-53,-34],[-58,-34],[-58,-38],[-62,-39],[-65,-46],[-65,-55],[-66,-56],
+    [-68,-54],[-72,-50],[-75,-46],[-72,-40],[-70,-38],[-71,-34],[-72,-30],[-70,-20],[-75,-14],[-76,-8],
+    [-78,-2],[-75,0],[-78,2],[-77,4],[-75,8],[-78,8],[-83,10],[-89,16],[-92,18],[-97,19],[-105,20],[-110,24],[-117,28]
+  ]
+  const px = pts.map(p => mapProj!(p) as [number, number])
+  const d  = 'M' + px.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L') + 'Z'
+  mapG.append('path').attr('d', d).attr('fill', '#162210').attr('stroke', '#3a6828').attr('stroke-width', .8).attr('pointer-events', 'none')
+  renderOverlays(gs, lineF, onSelectNode)
+}
+
+// ── Resize ────────────────────────────────────────────
+
+export function resetMap(): void {
+  _mapInitialized = false
+  _conqAnimating  = false
+}
+
+export function setupResizeHandler(getGs: () => GameState, getSelectNodeFn: () => ((id: string) => void) | undefined): void {
+  let _resizeTimer: ReturnType<typeof setTimeout>
+  window.addEventListener('resize', () => {
+    clearTimeout(_resizeTimer)
+    _resizeTimer = setTimeout(() => {
+      const active = document.querySelector('.screen.active')
+      if (active?.id === 'map-screen') {
+        resetMap()
+        buildMap(getGs(), getSelectNodeFn())
+      }
+    }, 300)
+  })
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      const active = document.querySelector('.screen.active')
+      if (active?.id === 'map-screen') {
+        resetMap()
+        buildMap(getGs(), getSelectNodeFn())
+      }
+    }, 500)
+  })
+}

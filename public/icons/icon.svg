@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background con bordes redondeados -->
+  <rect width="512" height="512" rx="96" fill="#080604"/>
+  <!-- Capa interior sutil -->
+  <rect x="16" y="16" width="480" height="480" rx="80" fill="url(#bg-grad)" opacity="0.6"/>
+
+  <defs>
+    <radialGradient id="bg-grad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%"   stop-color="#1c1005"/>
+      <stop offset="100%" stop-color="#080604"/>
+    </radialGradient>
+    <radialGradient id="paw-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#e8a830"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Huella de jaguar — almohadilla central (grande) -->
+  <ellipse cx="256" cy="322" rx="95" ry="72" fill="url(#paw-glow)"/>
+  <!-- Manchas del jaguar en la almohadilla central -->
+  <ellipse cx="220" cy="310" rx="16" ry="11" fill="#080604" opacity="0.5"/>
+  <ellipse cx="256" cy="340" rx="16" ry="11" fill="#080604" opacity="0.5"/>
+  <ellipse cx="292" cy="310" rx="16" ry="11" fill="#080604" opacity="0.5"/>
+
+  <!-- Dedo izquierdo exterior (girado ~-25°) -->
+  <g transform="rotate(-25,152,215)">
+    <ellipse cx="152" cy="215" rx="42" ry="56" fill="url(#paw-glow)"/>
+  </g>
+  <!-- Dedo izquierdo interior (girado ~-10°) -->
+  <g transform="rotate(-10,214,172)">
+    <ellipse cx="214" cy="172" rx="42" ry="56" fill="url(#paw-glow)"/>
+  </g>
+  <!-- Dedo derecho interior (girado ~+10°) -->
+  <g transform="rotate(10,298,172)">
+    <ellipse cx="298" cy="172" rx="42" ry="56" fill="url(#paw-glow)"/>
+  </g>
+  <!-- Dedo derecho exterior (girado ~+25°) -->
+  <g transform="rotate(25,360,215)">
+    <ellipse cx="360" cy="215" rx="42" ry="56" fill="url(#paw-glow)"/>
+  </g>
+
+  <!-- Brillo sutil en la almohadilla central -->
+  <ellipse cx="235" cy="298" rx="28" ry="18" fill="white" opacity="0.08"/>
+</svg>

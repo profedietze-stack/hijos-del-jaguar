@@ -1,0 +1,13 @@
+/* Orden de importación: tokens → base → componentes → pantallas */
+@import './tokens.css';
+@import './base.css';
+@import './components/buttons.css';
+@import './components/stats-bar.css';
+@import './components/modals.css';
+@import './components/clase.css';
+@import './screens/menu.css';
+@import './screens/intro.css';
+@import './screens/map.css';
+@import './screens/event.css';
+@import './screens/ending.css';
+@import './screens/history.css';

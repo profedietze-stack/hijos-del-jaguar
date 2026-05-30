@@ -1,0 +1,145 @@
+/* ── Modal de contenido ── */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.82);
+  z-index: var(--z-modal);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+#modal-overlay.open { display: flex; }
+
+#modal-box {
+  background: linear-gradient(135deg, rgba(10,7,3,.99), rgba(18,12,4,.99));
+  border: 1px solid var(--ocre);
+  padding: 1.4rem 1.9rem;
+  max-width: 480px;
+  width: 90%;
+  max-height: 72vh;
+  overflow-y: auto;
+  box-shadow: 0 0 60px rgba(196,136,42,.25);
+}
+#modal-title {
+  font-family: var(--font-heading);
+  font-size: .95rem;
+  color: var(--ocre2);
+  margin-bottom: .7rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .45rem;
+}
+#modal-body {
+  font-size: .9rem;
+  line-height: 1.7;
+  color: var(--parch2);
+}
+
+/* ── Overlay pedagógico ── */
+#ped-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.88);
+  z-index: var(--z-ped);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5vh 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#ped-overlay.open { display: flex; }
+
+#ped-box {
+  background: linear-gradient(160deg, rgba(12,8,3,.99), rgba(8,5,2,.99));
+  border: 1px solid var(--border2);
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 80px rgba(196,136,42,.2), 0 20px 60px rgba(0,0,0,.9);
+  border-radius: 4px;
+  min-height: min(90vh, 820px);
+  max-height: 96vh;
+  overflow: hidden;
+}
+#ped-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.6rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: rgba(196,136,42,.04);
+}
+#ped-eyebrow {
+  font-family: var(--font-heading);
+  font-size: .58rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .6;
+  margin-bottom: .25rem;
+}
+#ped-title {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  color: var(--ocre2);
+  text-shadow: 0 0 30px rgba(196,136,42,.3);
+}
+#ped-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--parch2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: .9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t-fast);
+  flex-shrink: 0;
+}
+#ped-close:hover {
+  border-color: var(--ocre2);
+  color: var(--ocre2);
+  background: rgba(196,136,42,.12);
+}
+
+#ped-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+#ped-tabs::-webkit-scrollbar { display: none; }
+
+.ped-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--parch2);
+  font-family: var(--font-heading);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: .8rem 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: .45;
+  transition: all var(--t-fast);
+}
+.ped-tab:hover { opacity: .75; background: rgba(196,136,42,.05); }
+.ped-tab.active {
+  color: var(--ocre2);
+  opacity: 1;
+  border-bottom-color: var(--ocre2);
+  background: rgba(196,136,42,.06);
+}
+
+@media (max-width: 600px) {
+  #modal-box { -webkit-overflow-scrolling: touch; max-height: 85vh; }
+}

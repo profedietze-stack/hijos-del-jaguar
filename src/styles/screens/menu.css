@@ -1,0 +1,76 @@
+/* ── MENÚ PRINCIPAL ── */
+#menu-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.menu-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8,6,4,.35) 0%, rgba(8,6,4,.1) 40%, rgba(8,6,4,.9) 100%),
+    url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_rainforest.jpg/1280px-Amazon_rainforest.jpg')
+    center / cover no-repeat;
+}
+.menu-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(8,6,4,.6) 100%);
+}
+.menu-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+}
+.menu-eyebrow {
+  font-family: var(--font-heading);
+  font-size: .72rem;
+  letter-spacing: .45em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .8;
+}
+.menu-title {
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  color: var(--ocre2);
+  text-shadow: 0 0 60px rgba(196,136,42,.6), 0 4px 12px rgba(0,0,0,.9);
+  line-height: 1;
+  letter-spacing: .02em;
+}
+.menu-sub {
+  font-family: var(--font-heading);
+  font-size: .88rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--parch2);
+  opacity: .65;
+  margin-bottom: 1rem;
+}
+.menu-div {
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ocre), transparent);
+  margin: .8rem 0;
+}
+.menu-credits {
+  margin-top: 1.5rem;
+  font-size: .72rem;
+  color: var(--ocre);
+  opacity: .4;
+  font-family: var(--font-heading);
+  letter-spacing: .1em;
+}
+
+@media (max-width: 600px) {
+  .menu-content { padding: 1.2rem 1rem; gap: .4rem; }
+  .menu-title { font-size: clamp(1.8rem, 9vw, 3rem); }
+}
