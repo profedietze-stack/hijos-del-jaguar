@@ -92,15 +92,13 @@ export const EDGES: [string, string][] = [
 ]
 
 // Ruta del conquistador (nodos geográficos, no del grafo del juego)
-export const CONQ_BRIDGE: { lon: number; lat: number; name?: string }[] = [
-  { lon:-99.1, lat:19.4,  name:'Tenochtitlán' },
-  { lon:-92.0, lat:17.0 },
-  { lon:-90.3, lat:15.5 },  // Guatemala
-  { lon:-88.9, lat:13.5 },  // El Salvador
-  { lon:-86.5, lat:14.8 },  // Honduras
-  { lon:-85.2, lat:12.8 },  // Nicaragua
-  { lon:-83.8, lat:9.9  },  // Costa Rica
-  { lon:-79.5, lat:8.9  },  // Panamá
+// Ruta pre-Guatemala del conquistador: Tenochtitlán → jugador (n00)
+// Después de cb3, el conquistador sigue la ruta histórica del jugador.
+export const CONQ_BRIDGE: { lon: number; lat: number; name: string }[] = [
+  { lon:-99.1, lat:19.4, name:'Tenochtitlán'       },
+  { lon:-96.7, lat:17.1, name:'Oaxaca'              },
+  { lon:-92.9, lat:16.7, name:'Chiapas'             },
+  { lon:-91.5, lat:15.9, name:'Frontera Guatemala'  },
 ]
 
 export const ACT_NAMES: Record<number, string> = {
