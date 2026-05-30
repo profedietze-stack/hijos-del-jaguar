@@ -162,13 +162,13 @@ describe('applyDecision', () => {
 // ══════════════════════════════════════════════════════
 
 describe('advanceConquistador', () => {
-  // CONQ_BRIDGE.length = 8
+  // CONQ_BRIDGE.length = 4 (Tenochtitlán, Oaxaca, Chiapas, Frontera Guatemala)
 
   it('avanza normalmente cuando doJump=false', () => {
     // random=0.99 > jumpProb (educativo=0.12) → no jump
     vi.spyOn(Math, 'random').mockReturnValue(0.99)
     const gs = freshState()  // routeIdx=0, histLen=0
-    // maxNormal = 8 + 0 - 2 = 6, ri=0 < 6 → targetIdx=1
+    // maxNormal = 4 + 0 - 2 = 2, ri=0 < 2 → targetIdx=1
     const { state, caught, reorg } = advanceConquistador(gs)
     expect(state.conq.routeIdx).toBe(1)
     expect(caught).toBe(false)
@@ -184,9 +184,9 @@ describe('advanceConquistador', () => {
       history: ['n00'],          // histLen=1
       conq: { routeIdx: 0, caught: false, reorgTurns: 0 },
     }
-    // playerPos = 8 + 1 - 1 = 8, ri=0 < playerPos → jump a 8
+    // playerPos = 4 + 1 - 1 = 4, ri=0 < playerPos → jump a 4
     const { state, caught } = advanceConquistador(gs)
-    expect(state.conq.routeIdx).toBe(8)
+    expect(state.conq.routeIdx).toBe(4)
     expect(caught).toBe(true)
     vi.restoreAllMocks()
   })
@@ -226,21 +226,21 @@ describe('advanceConquistador', () => {
 
 describe('normalizeConqState', () => {
   it('no cambia el estado cuando routeIdx ya es válido', () => {
-    // educativo, histLen=0: minIdx = max(0, 8+0-2-1) = max(0, 5) = 5
+    // educativo, histLen=0: minIdx = max(0, 4+0-2-1) = max(0, 1) = 1
     const gs = { ...freshState(), conq: { routeIdx: 6, caught: false, reorgTurns: 0 } }
     const result = normalizeConqState(gs)
     expect(result.conq.routeIdx).toBe(6)
   })
 
   it('corrige routeIdx muy bajo para save antiguo', () => {
-    // educativo, histLen=3: minIdx = max(0, 8+3-2-1) = max(0, 8) = 8
+    // educativo, histLen=3: minIdx = max(0, 4+3-2-1) = max(0, 4) = 4
     const gs = {
       ...freshState(),
       history: ['n00', 'n01', 'n02'],
       conq: { routeIdx: 0, caught: false, reorgTurns: 0 },
     }
     const result = normalizeConqState(gs)
-    expect(result.conq.routeIdx).toBe(8)
+    expect(result.conq.routeIdx).toBe(4)
   })
 
   it('no muta el estado original', () => {
