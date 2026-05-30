@@ -36,46 +36,55 @@ const ACT_NAMES: Record<number, string> = {
 // ── Marcadores históricos ─────────────────────────────
 
 interface HistMarker {
-  id:    string
-  lon:   number
-  lat:   number
-  act:   number
-  icon:  string
-  label: string
-  tip:   string
-  year:  string
-  narr:  string
+  id:        string
+  lon:       number
+  lat:       number
+  act:       number
+  icon:      string
+  label:     string
+  tip:       string
+  year:      string
+  narr:      string
+  conquered: boolean   // true → mostrar efecto de fuego + token conquistador
 }
 
 const HIST_MARKERS: HistMarker[] = [
   { id: 'hm_cajamarca', lon: -78.5, lat: -7.2,  act: 2, icon: '⚔️', label: 'Cajamarca',
+    conquered: true,
     year: '1532',
     tip:  '1532 — Pizarro captura al Inca Atahualpa con 168 hombres contra 80.000 guerreros.',
     narr: 'Francisco Pizarro captura al Inca Atahualpa. Con 168 hombres, caballos y cañones derrota a 80.000 guerreros. El Imperio Inca, el más grande de América, colapsa en una tarde.' },
   { id: 'hm_cusco',     lon: -72.0, lat: -13.5, act: 2, icon: '🏛️', label: 'Cusco',
+    conquered: true,
     year: '1533',
     tip:  '1533 — Pizarro ejecuta a Atahualpa y entra a Cusco. El Tawantinsuyu se desintegra.',
     narr: 'Pizarro ejecuta a Atahualpa y entra a Cusco, la ciudad sagrada del Sol. El Tawantinsuyu — 2 millones de km², 12 millones de personas — se desintegra sin su cabeza.' },
   { id: 'hm_panama',    lon: -80.2, lat: 8.2,   act: 2, icon: '⚓', label: 'Panamá',
+    conquered: true,
     year: '1519',
     tip:  '1519 — Fundación de Panamá. Base de operaciones de Pizarro hacia Sudamérica.',
     narr: 'Pedrarias Dávila funda la Ciudad de Panamá. Desde aquí parten las expediciones que conquistarán el sur. La máquina colonial se extiende.' },
   { id: 'hm_potosi',    lon: -65.7, lat: -19.6, act: 3, icon: '⛏️', label: 'Potosí',
+    conquered: true,
     year: '1545',
     tip:  '1545 — El Cerro Rico: 40.000 toneladas de plata extraídas. Millones muertos en la mita.',
     narr: 'Descubrimiento del Cerro Rico de Potosí. La mina de plata más grande del mundo colonial. En tres siglos extraerán 40.000 toneladas. El precio: millones de muertos indígenas en la mita.' },
   { id: 'hm_tucuman',   lon: -65.2, lat: -26.8, act: 3, icon: '🏰', label: 'Tucumán',
+    conquered: true,
     year: '1553',
     tip:  '1553 — Primera ciudad permanente en el Cono Sur. La expansión colonial llega al sur.',
     narr: 'Diego de Villaroel funda Santiago del Estero, primera ciudad permanente del actual territorio argentino. La expansión colonial alcanza el Cono Sur. No queda tierra sin mano de España.' },
   { id: 'hm_arauco',    lon: -73.0, lat: -37.5, act: 4, icon: '🦅', label: 'Guerra de Arauco',
+    conquered: false,
     year: '1550–1810',
     tip:  '1550–1810 — Los mapuches resisten 260 años. El Biobío: frontera que España nunca cruzó.',
     narr: 'Los mapuches inician 260 años de guerra continua. El único pueblo que España nunca pudo conquistar. El río Biobío se convierte en frontera permanente — tierra que el Imperio nunca cruzó.' },
 ]
 
 // ── Registro de marcadores ya mostrados (para cinemática única) ───────────
-let _shownHistMarkers = new Set<string>()
+let _shownHistMarkers  = new Set<string>()
+// ── Registro de marcadores que ya tienen token del conquistador ────────────
+let _conqueredMarkers  = new Set<string>()
 
 // ── Helpers ───────────────────────────────────────────
 
@@ -203,7 +212,49 @@ function drawHistMarkers(gs: GameState): void {
     mg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev, `<strong style="color:#d4a017">${m.icon} ${m.label}</strong><br>${m.tip}`))
       .on('mouseleave', hideGeoTip)
     mg.transition().duration(800).ease(d3Lib.easeCubicOut).attr('opacity', 1)
+
+    // Si ya fue mostrado en cinemática: token del conquistador fijo al lado
+    if (_conqueredMarkers.has(m.id)) {
+      _drawConqTokenAtPos(mx, my, m)
+    }
   })
+}
+
+/**
+ * Dibuja el token rojo del conquistador (corona + círculo rojo)
+ * en la posición SVG (px, py), desplazado a la derecha del marcador.
+ * Se inserta dentro del .hist-marker del marcador correspondiente.
+ */
+function _drawConqTokenAtPos(px: number, py: number, m: HistMarker): void {
+  if (!mapG) return
+  // offset: corona a la derecha del ícono del marcador
+  const ox = 18, oy = -8
+  const cg = mapG.append('g')
+    .attr('class', 'hist-marker hist-conq-token')
+    .attr('transform', `translate(${px + ox},${py + oy})`)
+    .attr('pointer-events', 'all').attr('cursor', 'help')
+
+  // Pulso exterior
+  const pulse = cg.append('circle').attr('r', 11).attr('fill', 'none')
+    .attr('stroke', 'rgba(192,57,43,.55)').attr('stroke-width', 1.2)
+  pulse.append('animate').attr('attributeName', 'r').attr('values', '11;16;11')
+    .attr('dur', '2.2s').attr('repeatCount', 'indefinite')
+
+  // Círculo rojo del conquistador
+  cg.append('circle').attr('r', 9).attr('fill', 'rgba(100,15,15,.88)')
+    .attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 1.8)
+  cg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+    .attr('font-size', '10px').attr('pointer-events', 'none').text('👑')
+
+  // Fuego pequeño si ciudad conquistada
+  if (m.conquered) {
+    cg.append('text').attr('text-anchor', 'middle').attr('y', -11)
+      .attr('font-size', '8px').attr('pointer-events', 'none').attr('opacity', '.85').text('🔥')
+  }
+
+  const tipHtml = `<strong style="color:#e07070">👑 Conquistado — ${m.year}</strong><br>${m.tip}`
+  cg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev, tipHtml))
+    .on('mouseleave', hideGeoTip)
 }
 
 // ── Conquistador ──────────────────────────────────────
@@ -859,6 +910,7 @@ export function resetMap(): void {
   _mapInitialized    = false
   _conqAnimating     = false
   _shownHistMarkers  = new Set<string>()
+  _conqueredMarkers  = new Set<string>()
 }
 
 // ══════════════════════════════════════════════════════
@@ -1273,87 +1325,147 @@ function _showOneHistCinematic(
 
   sfxCinematic()
 
-  // ── Panel de texto histórico ─────────────────────────
-  function _showHistCard(cb: () => void): void {
-    const existing = document.getElementById('hist-cinematic-card')
-    if (existing) existing.remove()
-    const card = document.createElement('div')
-    card.id = 'hist-cinematic-card'
-    card.style.cssText = [
-      'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);',
-      'z-index:9999;pointer-events:none;text-align:center;',
-      "font-family:'Cinzel',serif;",
-      'padding:1.4rem 2rem;border-radius:4px;',
-      'background:rgba(2,4,2,.9);border:1px solid rgba(80,140,50,.5);',
-      'box-shadow:0 0 40px rgba(30,80,20,.4);',
-      'max-width:min(90vw,540px);opacity:0;transition:opacity .9s ease;',
-    ].join('')
-    card.innerHTML = `
-      <div style="color:rgba(150,210,80,.8);font-size:clamp(.7rem,2vw,.9rem);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">${marker.year}</div>
-      <div style="color:#c8e890;font-size:clamp(1rem,3vw,1.4rem);margin-bottom:.7rem">${marker.icon} ${marker.label}</div>
-      <div style="color:rgba(200,230,160,.72);font-size:clamp(.7rem,2vw,.88rem);font-family:'Crimson Text',serif;font-style:italic;line-height:1.6">${marker.narr}</div>`
-    document.body.appendChild(card)
-    requestAnimationFrame(() => requestAnimationFrame(() => { card.style.opacity = '1' }))
-    setTimeout(() => {
-      card.style.opacity = '0'
-      setTimeout(() => { card.remove(); cb() }, 800)
-    }, 4200)
+  // ── Cámara robusta: usa 'end interrupt' + fallback timeout ──────────────
+  function _panTo(lon: number, lat: number, sc: number, dur: number, cb: () => void): void {
+    if (!mapSvg || !mapProj || !mapZoom) { cb(); return }
+    const [px2, py2] = mapProj([lon, lat]) as [number, number]
+    const tx = W / 2 - sc * px2, ty = H / 2 - sc * py2
+    let fired = false
+    const proceed = () => { if (fired) return; fired = true; cb() }
+    const t = mapSvg.transition().duration(dur).ease(d3Lib.easeCubicInOut)
+      .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(sc))
+    ;(t as unknown as { on: (ev: string, fn: () => void) => void }).on('end', proceed)
+    ;(t as unknown as { on: (ev: string, fn: () => void) => void }).on('interrupt', proceed)
+    setTimeout(proceed, dur + 400)   // fallback por si D3 no dispara el evento
   }
 
-  // ── Marcador SVG con pulso ────────────────────────────
-  function _addMarkerEffect(): void {
-    if (!mapG || !mapProj) return
-    const [mx, my] = mapProj([marker.lon, marker.lat]) as [number, number]
-    mapG.selectAll(`.hist-cinematic-${marker.id}`).remove()
-    const mg = mapG.append('g')
-      .attr('class', `hist-marker hist-cinematic-${marker.id}`)
-      .attr('transform', `translate(${mx},${my})`)
+  // ── Efecto de fuego sobre la ciudad conquistada ──────────────────────────
+  function _addFireEffect(mx: number, my: number): void {
+    if (!mapG) return
+    mapG.selectAll(`.hist-fire-${marker.id}`).remove()
+    const fires = ['🔥', '🔥', '🔥']
+    fires.forEach((f, i) => {
+      const offx = (i - 1) * 8
+      const fg = mapG!.append('g')
+        .attr('class', `hist-marker hist-fire-${marker.id}`)
+        .attr('transform', `translate(${mx + offx},${my - 16})`)
+        .attr('pointer-events', 'none')
+        .attr('opacity', 0)
+      fg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+        .attr('font-size', '10px').attr('pointer-events', 'none').text(f)
+      fg.append('animateTransform')
+        .attr('attributeName', 'transform').attr('type', 'translate')
+        .attr('values', `${mx + offx},${my - 16};${mx + offx},${my - 20};${mx + offx},${my - 16}`)
+        .attr('dur', `${1.2 + i * 0.25}s`).attr('repeatCount', 'indefinite')
+      fg.transition().delay(i * 150).duration(600).ease(d3Lib.easeCubicOut).attr('opacity', 1)
+    })
+  }
+
+  // ── Token del conquistador + halo (aparece en la cinemática) ────────────
+  function _addConqTokenEffect(mx: number, my: number): void {
+    if (!mapG) return
+    mapG.selectAll(`.hist-conq-cinematic-${marker.id}`).remove()
+    const ox = 18, oy = -8
+    const cg = mapG.append('g')
+      .attr('class', `hist-marker hist-conq-cinematic-${marker.id}`)
+      .attr('transform', `translate(${mx + ox},${my + oy})`)
       .attr('pointer-events', 'none')
       .attr('opacity', 0)
 
-    // Halo exterior pulsante
-    const halo = mg.append('circle').attr('r', 18).attr('fill', 'none')
-      .attr('stroke', 'rgba(100,200,60,.5)').attr('stroke-width', 1.5)
-    halo.append('animate').attr('attributeName', 'r').attr('values', '18;28;18')
-      .attr('dur', '2s').attr('repeatCount', 'indefinite')
-    halo.append('animate').attr('attributeName', 'opacity').attr('values', '.5;.15;.5')
-      .attr('dur', '2s').attr('repeatCount', 'indefinite')
+    // Gran halo rojo pulsante para la entrada
+    const bigHalo = cg.append('circle').attr('r', 22).attr('fill', 'none')
+      .attr('stroke', 'rgba(192,57,43,.45)').attr('stroke-width', 2)
+    bigHalo.append('animate').attr('attributeName', 'r').attr('values', '22;32;22')
+      .attr('dur', '1.6s').attr('repeatCount', 'indefinite')
 
-    // Círculo relleno
-    mg.append('circle').attr('r', 10).attr('fill', 'rgba(30,60,10,.8)')
-      .attr('stroke', 'rgba(120,200,60,.8)').attr('stroke-width', 1.5)
-    // Ícono
-    mg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
-      .attr('font-size', '11px').text(marker.icon)
-    // Label
-    mg.append('rect').attr('x', -26).attr('y', 12).attr('width', 52).attr('height', 10)
-      .attr('fill', 'rgba(2,4,2,.82)').attr('rx', 2)
-    mg.append('text').attr('text-anchor', 'middle').attr('y', 19)
-      .attr('font-size', '5.5px').attr('font-family', 'Cinzel,serif')
-      .attr('fill', 'rgba(150,210,70,.9)').attr('letter-spacing', '.1em')
-      .text(marker.label.toUpperCase())
+    cg.append('circle').attr('r', 9).attr('fill', 'rgba(100,15,15,.88)')
+      .attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 1.8)
+    cg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', '10px').text('👑')
 
-    mg.transition().duration(900).ease(d3Lib.easeCubicOut).attr('opacity', 1)
+    cg.transition().duration(700).ease(d3Lib.easeCubicOut).attr('opacity', 1)
   }
 
-  // ── Secuencia ─────────────────────────────────────────
-  const [px, py] = mapProj([marker.lon, marker.lat]) as [number, number]
-  const tx = W / 2 - scale * px, ty = H / 2 - scale * py
+  // ── Card histórica con botón "Continuar con la huida" ───────────────────
+  function _showHistCard(cb: () => void): void {
+    const existing = document.getElementById('hist-cinematic-card')
+    if (existing) existing.remove()
 
-  // PASO 1: Pan al marcador histórico
-  mapSvg.transition().duration(1800).ease(d3Lib.easeCubicInOut)
-    .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
-    .on('end', () => {
-      // PASO 2: Marcador aparece
-      _addMarkerEffect()
-      setTimeout(() => {
-        // PASO 3: Card con contexto histórico
-        _showHistCard(() => {
-          // PASO 4: Pan de vuelta al jugador
-          _panBackToPlayer(gs, onDone)
+    const card = document.createElement('div')
+    card.id = 'hist-cinematic-card'
+    const borderColor = marker.conquered ? 'rgba(192,57,43,.55)' : 'rgba(80,140,50,.5)'
+    const glowColor   = marker.conquered ? 'rgba(80,20,10,.5)'   : 'rgba(30,80,20,.4)'
+    card.style.cssText = [
+      'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);',
+      'z-index:9999;pointer-events:auto;text-align:center;',
+      "font-family:'Cinzel',serif;",
+      'padding:1.4rem 2rem 1rem;border-radius:4px;',
+      `background:rgba(2,4,2,.93);border:1px solid ${borderColor};`,
+      `box-shadow:0 0 40px ${glowColor};`,
+      'max-width:min(90vw,560px);opacity:0;transition:opacity .9s ease;',
+    ].join('')
+
+    const conqBadge = marker.conquered
+      ? `<div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(120,20,10,.5);border:1px solid rgba(192,57,43,.4);border-radius:3px;padding:.2rem .6rem;margin-bottom:.7rem;font-size:.65rem;letter-spacing:.12em;color:rgba(230,100,80,.9)">👑 CONQUISTADO POR ESPAÑA</div>`
+      : ''
+
+    card.innerHTML = `
+      ${conqBadge}
+      <div style="color:rgba(200,120,60,.85);font-size:clamp(.65rem,2vw,.85rem);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem">${marker.year}</div>
+      <div style="color:#f0d090;font-size:clamp(1rem,3vw,1.35rem);margin-bottom:.75rem">${marker.icon} ${marker.label}</div>
+      <div style="color:rgba(210,220,180,.78);font-size:clamp(.72rem,2vw,.9rem);font-family:'Crimson Text',serif;font-style:italic;line-height:1.65;margin-bottom:1.2rem">${marker.narr}</div>
+      <button id="hist-card-continue" style="
+        font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.1em;cursor:pointer;
+        background:rgba(50,20,10,.8);border:1px solid rgba(180,90,40,.6);color:rgba(230,170,80,.95);
+        padding:.45rem 1.2rem;border-radius:3px;transition:background .2s,border-color .2s;
+      ">Continuar con la huida →</button>`
+
+    document.body.appendChild(card)
+    requestAnimationFrame(() => requestAnimationFrame(() => { card.style.opacity = '1' }))
+
+    const btn = document.getElementById('hist-card-continue')
+    if (btn) {
+      btn.addEventListener('mouseenter', () => {
+        ;(btn as HTMLButtonElement).style.background = 'rgba(90,40,10,.9)'
+        ;(btn as HTMLButtonElement).style.borderColor = 'rgba(220,140,60,.8)'
+      })
+      btn.addEventListener('mouseleave', () => {
+        ;(btn as HTMLButtonElement).style.background = 'rgba(50,20,10,.8)'
+        ;(btn as HTMLButtonElement).style.borderColor = 'rgba(180,90,40,.6)'
+      })
+      btn.addEventListener('click', () => {
+        card.style.opacity = '0'
+        setTimeout(() => { card.remove(); cb() }, 700)
+      })
+    }
+  }
+
+  // ── Secuencia principal ───────────────────────────────────────────────────
+  // PASO 1: Pan al marcador histórico (con fallback)
+  _panTo(marker.lon, marker.lat, scale, 1800, () => {
+    const [mx, my] = mapProj!([marker.lon, marker.lat]) as [number, number]
+
+    // PASO 2: Token del conquistador + fuego (si conquista)
+    _addConqTokenEffect(mx, my)
+    if (marker.conquered) _addFireEffect(mx, my)
+
+    // PASO 3: Card con botón — no se cierra sola
+    setTimeout(() => {
+      _showHistCard(() => {
+        // PASO 4: Marcar como conquistado (para token persistente) y limpiar cinematic overlays
+        _conqueredMarkers.add(marker.id)
+        mapG?.selectAll(`.hist-conq-cinematic-${marker.id}`).remove()
+        mapG?.selectAll(`.hist-fire-${marker.id}`).remove()
+
+        // PASO 5: Pan de vuelta al jugador
+        _panBackToPlayer(gs, () => {
+          // Redibujar marcadores con el token persistente ya incluido
+          drawHistMarkers(gs)
+          onDone()
         })
-      }, 600)
-    })
+      })
+    }, 500)
+  })
 }
 
 /** Pan de vuelta a la zona del jugador después de una cinemática histórica */
@@ -1367,9 +1479,13 @@ function _panBackToPlayer(gs: GameState, onDone: () => void): void {
   const scale = 2.6
   const [px, py] = mapProj([nd.lon, nd.lat]) as [number, number]
   const tx = W / 2 - scale * px, ty = H / 2 - scale * py
-  mapSvg.transition().duration(1600).ease(d3Lib.easeCubicInOut)
+  let fired = false
+  const proceed = () => { if (fired) return; fired = true; onDone() }
+  const t = mapSvg.transition().duration(1600).ease(d3Lib.easeCubicInOut)
     .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
-    .on('end', onDone)
+  ;(t as unknown as { on: (ev: string, fn: () => void) => void }).on('end', proceed)
+  ;(t as unknown as { on: (ev: string, fn: () => void) => void }).on('interrupt', proceed)
+  setTimeout(proceed, 2200)
 }
 
 export function setupResizeHandler(getGs: () => GameState, getSelectNodeFn: () => ((id: string) => void) | undefined): void {
