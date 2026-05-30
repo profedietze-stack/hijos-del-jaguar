@@ -738,6 +738,360 @@ export function resetMap(): void {
   _conqAnimating  = false
 }
 
+// ══════════════════════════════════════════════════════
+// CINEMÁTICA DE APERTURA
+// Secuencia: pan a Tenochtitlán → llamas → cartel 1 →
+// cartel 2 → conquistador avanza → pan a Guatemala
+// ══════════════════════════════════════════════════════
+
+/** Espera a que buildMap termine y lanza la cinemática */
+export function waitForMapThenCinematic(gs: GameState, onSelectNode?: (id: string) => void): void {
+  const _wait = (attempts: number) => {
+    if (attempts > 60) { runOpeningCinematic(gs, onSelectNode); return }
+    if (_mapInitialized && mapSvg && mapProj && mapZoom) {
+      setTimeout(() => runOpeningCinematic(gs, onSelectNode), 200)
+    } else {
+      setTimeout(() => _wait(attempts + 1), 50)
+    }
+  }
+  _wait(0)
+}
+
+/** Lanza la secuencia cinemática de apertura */
+export function runOpeningCinematic(gs: GameState, onSelectNode?: (id: string) => void): void {
+  if (!mapSvg || !mapProj || !mapZoom || !mapG) return
+
+  const TENOCHTITLAN = CONQ_BRIDGE[0]  // lon:-99.1, lat:19.4
+  const wrap = document.getElementById('map-canvas-wrap')
+  if (!wrap) return
+  const W = wrap.clientWidth || 900
+  const H = wrap.clientHeight || 580
+
+  // ── Carteles narrativos ───────────────────────────────
+  function _showCard(html: string, duration: number, cb: () => void): void {
+    let card = document.getElementById('cinematic-card') as HTMLDivElement | null
+    if (!card) {
+      card = document.createElement('div')
+      card.id = 'cinematic-card'
+      card.style.cssText = [
+        'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);',
+        'z-index:9999;pointer-events:none;text-align:center;',
+        "font-family:'Cinzel Decorative',serif;",
+        'padding:1.4rem 2rem;border-radius:4px;',
+        'background:rgba(4,2,2,.88);border:1px solid rgba(192,57,43,.5);',
+        'box-shadow:0 0 40px rgba(139,26,26,.4);',
+        'max-width:min(90vw,520px);opacity:0;',
+        'transition:opacity 1s ease;',
+      ].join('')
+      document.body.appendChild(card)
+    }
+    card.innerHTML = html
+    card.style.opacity = '0'
+    requestAnimationFrame(() => requestAnimationFrame(() => { card!.style.opacity = '1' }))
+    setTimeout(() => {
+      card!.style.opacity = '0'
+      setTimeout(() => cb(), 700)
+    }, duration)
+  }
+
+  function _removeCard(): void {
+    const c = document.getElementById('cinematic-card')
+    if (c) { c.style.opacity = '0'; setTimeout(() => c.remove(), 700) }
+  }
+
+  // ── Templo Mayor + llamas de Tenochtitlán ────────────
+  function _addFireEffect(): void {
+    if (!mapG || !mapProj) return
+    const [fx, fy] = mapProj([TENOCHTITLAN.lon, TENOCHTITLAN.lat]) as [number, number]
+
+    mapG.selectAll('.tenochtitlan-layer').remove()
+    const fg = mapG.append('g')
+      .attr('class', 'tenochtitlan-layer')
+      .attr('transform', `translate(${fx},${fy})`)
+      .attr('pointer-events', 'all')
+      .attr('cursor', 'help')
+      .attr('opacity', 0)
+
+    // Halo ciudad ardiendo
+    fg.append('circle').attr('r', 22)
+      .attr('fill', 'rgba(90,12,4,.35)')
+      .attr('stroke', 'rgba(200,60,15,.4)').attr('stroke-width', 1.2)
+
+    // Templo Mayor — pirámide escalonada
+    fg.append('rect').attr('x', -12).attr('y', 4).attr('width', 24).attr('height', 4)
+      .attr('fill', 'rgba(180,130,60,.9)').attr('rx', .5)
+    fg.append('rect').attr('x', -9).attr('y', -1).attr('width', 18).attr('height', 6)
+      .attr('fill', 'rgba(190,140,65,.9)').attr('rx', .5)
+    fg.append('rect').attr('x', -6).attr('y', -6).attr('width', 12).attr('height', 6)
+      .attr('fill', 'rgba(200,150,70,.9)').attr('rx', .5)
+    // Torres gemelas (Huitzilopochtli + Tláloc)
+    fg.append('rect').attr('x', -6).attr('y', -11).attr('width', 4).attr('height', 5)
+      .attr('fill', 'rgba(210,160,75,.95)')
+    fg.append('rect').attr('x', 2).attr('y', -11).attr('width', 4).attr('height', 5)
+      .attr('fill', 'rgba(210,160,75,.95)')
+    // Sol azteca
+    const sunG = fg.append('g').attr('transform', 'translate(0,-15)')
+    sunG.append('circle').attr('r', 4)
+      .attr('fill', 'rgba(240,180,30,.95)')
+      .attr('stroke', 'rgba(255,210,50,.8)').attr('stroke-width', .8)
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2
+      const x1 = Math.cos(angle) * 5, y1 = Math.sin(angle) * 5
+      const x2 = Math.cos(angle) * 7.5, y2 = Math.sin(angle) * 7.5
+      sunG.append('line').attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
+        .attr('stroke', 'rgba(255,210,50,.7)').attr('stroke-width', .8)
+    }
+    sunG.append('circle').attr('r', 4).attr('fill', 'none')
+      .attr('stroke', 'rgba(255,220,60,.5)').attr('stroke-width', .6)
+      .append('animate')
+        .attr('attributeName', 'r').attr('values', '4;6.5;4')
+        .attr('dur', '2.4s').attr('repeatCount', 'indefinite')
+
+    // Label
+    fg.append('rect').attr('x', -28).attr('y', 10).attr('width', 56).attr('height', 10)
+      .attr('fill', 'rgba(4,2,2,.82)').attr('rx', 2)
+    fg.append('text').attr('text-anchor', 'middle').attr('y', 18)
+      .attr('font-size', '5.5px').attr('font-family', 'Cinzel,serif')
+      .attr('fill', 'rgba(220,160,50,.95)').attr('letter-spacing', '.14em')
+      .text('TENOCHTITLÁN')
+
+    // Tooltip
+    fg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev,
+      '<strong style="color:#d4a017">🗿 Tenochtitlán — 1521</strong><br>El Imperio Azteca colapsa. Hernán Cortés derriba la capital mexica con 80.000 aliados tlaxcaltecas. La máquina de la conquista se pone en marcha hacia el sur.'))
+      .on('mouseleave', hideGeoTip)
+
+    // Llamas, humo, brasas — arrancan después del fade-in
+    function _startFlames(): void {
+      // Resplandor base pulsante
+      const glowBase = fg.append('ellipse')
+        .attr('cx', 0).attr('cy', 4).attr('rx', 14).attr('ry', 5)
+        .attr('fill', 'rgba(220,60,10,.22)').attr('opacity', 0);
+      (function _pulseGlow() {
+        (glowBase as unknown as { interrupt: () => typeof glowBase }).interrupt()
+        glowBase.transition().duration(900).ease(d3Lib.easeSinInOut)
+          .attr('opacity', .45).attr('rx', 16)
+          .transition().duration(900).ease(d3Lib.easeSinInOut)
+          .attr('opacity', .18).attr('rx', 13)
+          .on('end', _pulseGlow)
+      })()
+
+      // Llamas principales
+      const flameColors = [
+        'rgba(255,55,5,.82)', 'rgba(255,120,10,.78)', 'rgba(255,175,25,.72)',
+        'rgba(210,40,8,.75)', 'rgba(255,95,5,.8)', 'rgba(255,215,45,.65)',
+        'rgba(240,65,12,.7)',
+      ]
+      const flameConfig: [number, number, number, number, number, number, number][] = [
+        [-10, 0, 0, 1500, 2.2, 3.2, -42], [-6, 280, 2, 1700, 2.8, 4.0, -46],
+        [-2, 100, 5, 1300, 2.0, 3.0, -38], [2, 450, 1, 1600, 2.6, 3.8, -44],
+        [6, 200, 4, 1400, 2.4, 3.5, -40],  [10, 600, 2, 1800, 2.0, 3.2, -43],
+        [-8, 750, 6, 1200, 1.8, 2.8, -36], [8, 350, 3, 1550, 2.2, 3.4, -41],
+        [0, 900, 0, 1650, 3.0, 4.2, -48],  [-4, 500, 4, 1350, 1.9, 2.9, -37],
+        [4, 150, 6, 1750, 2.5, 3.7, -45],
+      ]
+      flameConfig.forEach(([ox, delay, ci, dur, rxB, ryB, peak]) => {
+        const col = flameColors[ci % flameColors.length]
+        const puff = fg.append('ellipse').attr('cx', ox).attr('cy', -6)
+          .attr('rx', rxB).attr('ry', ryB).attr('fill', col).attr('opacity', 0)
+        function _animPuff() {
+          (puff as unknown as { interrupt: () => void }).interrupt()
+          const jitter = (Math.random() - .5) * 3
+          puff.attr('cy', -6).attr('opacity', .85 + Math.random() * .15)
+              .attr('rx', rxB).attr('ry', ryB)
+          puff.transition().duration(dur + Math.random() * 200 - 100)
+            .ease(d3Lib.easeCubicOut)
+            .attr('cy', peak + (Math.random() * 5 - 2.5))
+            .attr('cx', ox + jitter)
+            .attr('rx', rxB * 1.9 + Math.random() * 1.5)
+            .attr('ry', ryB * 2.4 + Math.random() * 2)
+            .attr('opacity', 0)
+            .on('end', _animPuff)
+        }
+        setTimeout(_animPuff, delay)
+      })
+
+      // Humo
+      const smokeColors = [
+        'rgba(60,50,45,.28)', 'rgba(80,65,55,.22)',
+        'rgba(45,38,35,.25)', 'rgba(70,58,50,.20)',
+      ]
+      const smokeConfig: [number, number, number, number, number, number][] = [
+        [-8, 400, 3200, 3, 11, -72], [5, 900, 3600, 4, 13, -80],
+        [-3, 1500, 2900, 3, 10, -65], [9, 200, 3400, 3, 12, -75],
+        [-6, 1100, 3100, 2.5, 9, -68], [2, 1800, 3800, 4, 14, -84],
+        [6, 650, 3000, 3, 11, -70],
+      ]
+      smokeConfig.forEach(([ox, delay, dur, r0, r1, py]) => {
+        const col = smokeColors[Math.floor(Math.random() * smokeColors.length)]
+        const smoke = fg.append('circle').attr('cx', ox).attr('cy', -20)
+          .attr('r', r0).attr('fill', col).attr('opacity', 0)
+        function _animSmoke() {
+          (smoke as unknown as { interrupt: () => void }).interrupt()
+          const driftX = (Math.random() - .5) * 8
+          smoke.attr('cy', -22).attr('cx', ox).attr('opacity', 0).attr('r', r0)
+          smoke.transition().duration(dur + Math.random() * 400)
+            .ease(d3Lib.easeLinear)
+            .attr('cy', py + (Math.random() * 8 - 4))
+            .attr('cx', ox + driftX)
+            .attr('r', r1 + Math.random() * 3)
+            .attr('opacity', col.includes('.28') ? .32 : .22)
+            .transition().duration(dur * 0.4)
+            .attr('opacity', 0)
+            .on('end', _animSmoke)
+        }
+        setTimeout(_animSmoke, delay)
+      })
+
+      // Brasas / chispas
+      const emberColors = ['rgba(255,230,80,.9)', 'rgba(255,180,40,.85)', 'rgba(255,100,20,.8)']
+      ;(function _emberLoop() {
+        const ex = (Math.random() - .5) * 18
+        const col = emberColors[Math.floor(Math.random() * emberColors.length)]
+        const em = fg.append('circle').attr('cx', ex).attr('cy', -8)
+          .attr('r', .8 + Math.random() * .7).attr('fill', col).attr('opacity', .9)
+        em.transition().duration(800 + Math.random() * 600)
+          .ease(d3Lib.easeCubicOut)
+          .attr('cy', -50 - Math.random() * 20)
+          .attr('cx', ex + (Math.random() - .5) * 10)
+          .attr('r', .3).attr('opacity', 0)
+          .on('end', () => em.remove())
+        if (Math.random() > .3) {
+          const ex2 = (Math.random() - .5) * 18
+          const em2 = fg.append('circle').attr('cx', ex2).attr('cy', -8)
+            .attr('r', .8 + Math.random() * .7).attr('fill', col).attr('opacity', .9)
+          em2.transition().duration(800 + Math.random() * 600)
+            .ease(d3Lib.easeCubicOut)
+            .attr('cy', -50 - Math.random() * 20)
+            .attr('cx', ex2 + (Math.random() - .5) * 10)
+            .attr('r', .3).attr('opacity', 0)
+            .on('end', () => em2.remove())
+        }
+        setTimeout(_emberLoop, 120 + Math.random() * 180)
+      })()
+    }
+
+    // Fade-in del grupo; llamas arrancan al completarse
+    fg.transition().duration(1100).ease(d3Lib.easeCubicOut).attr('opacity', 1)
+      .on('end', _startFlames)
+  }
+
+  // PASO 1: Pan a Tenochtitlán con zoom
+  const scale = 4.0
+  const [px, py] = mapProj([TENOCHTITLAN.lon, TENOCHTITLAN.lat]) as [number, number]
+  const tx = W / 2 - scale * px, ty = H / 2 - scale * py
+
+  mapSvg.transition().duration(2400).ease(d3Lib.easeCubicInOut)
+    .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
+    .on('end', () => {
+      // PASO 2: Llamas y humo
+      _addFireEffect()
+      setTimeout(() => {
+        // PASO 3: Dibujar nodos y conquistador
+        drawNodes(gs, onSelectNode)
+        drawConquistador(gs)
+        setTimeout(() => {
+          // PASO 4: Cartel — Caída de Tenochtitlán
+          _showCard(
+            `<div style="color:#e07070;font-size:clamp(.8rem,2.5vw,1.1rem);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">1521</div>
+             <div style="color:#f0c060;font-size:clamp(1rem,3vw,1.5rem);margin-bottom:.8rem">Tenochtitlán ha caído</div>
+             <div style="color:rgba(240,220,180,.75);font-size:clamp(.7rem,2vw,.9rem);font-family:'Crimson Text',serif;font-style:italic">El Imperio Azteca colapsa. La máquina de la conquista se pone en marcha.</div>`,
+            4500,
+            () => {
+              // PASO 5: Cartel — Huye
+              _showCard(
+                `<div style="color:#e07070;font-size:clamp(.8rem,2.5vw,1.1rem);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Los conquistadores avanzan</div>
+                 <div style="color:#f0c060;font-size:clamp(1rem,3vw,1.5rem);margin-bottom:.8rem">¡Huye hacia el sur!</div>
+                 <div style="color:rgba(240,220,180,.75);font-size:clamp(.7rem,2vw,.9rem);font-family:'Crimson Text',serif;font-style:italic">Tu pueblo espera en Guatemala. Guíalos.</div>`,
+                4000,
+                () => {
+                  _removeCard()
+                  // PASO 6: Conquistador avanza de cb0 → cb1 animado
+                  const fromWp = { ...CONQ_BRIDGE[gs.conq.routeIdx] }
+                  const newGs = { ...gs, conq: { ...gs.conq, routeIdx: 1 } }
+                  const toWp = CONQ_BRIDGE[1]
+                  showNotif(`⚔️ ${toWp.name ?? 'Avance'} — Los españoles avanzan`, 'loss')
+                  // Reutilizamos la animación interna via advanceConquistadorAnimated
+                  // pero controlando el estado manualmente para no mutar gs
+                  _animConqCinematic(fromWp, toWp, newGs, onSelectNode, () => {
+                    // PASO 7: Pan a Guatemala
+                    _panToGuatemala(newGs, onSelectNode)
+                  })
+                }
+              )
+            }
+          )
+        }, 2400)
+      }, 1800)
+    })
+}
+
+/** Animación del conquistador específicamente para la cinemática (sin mutar gs externo) */
+function _animConqCinematic(
+  from: { lon: number; lat: number },
+  to:   { lon: number; lat: number },
+  gs:   GameState,
+  onSelectNode: ((id: string) => void) | undefined,
+  onDone: () => void
+): void {
+  if (!mapSvg || !mapProj || !mapZoom || !mapG) { onDone(); return }
+  const wrap = document.getElementById('map-canvas-wrap')
+  if (!wrap) { onDone(); return }
+  const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
+  const scale = 4.0
+  const [fx, fy] = mapProj([from.lon, from.lat]) as [number, number]
+  const [tx, ty] = mapProj([to.lon,   to.lat])   as [number, number]
+  const fxo = fx + 18, fyo = fy - 10
+  const txo = tx + 18, tyo = ty - 10
+
+  mapG.selectAll('.conq-layer').remove()
+  const slideG = mapG.append('g').attr('class', 'conq-layer conq-token-anim')
+    .attr('transform', `translate(${fxo},${fyo})`).attr('pointer-events', 'none')
+  // Icono del conquistador
+  slideG.append('circle').attr('r', 10).attr('fill', 'rgba(180,30,20,.82)')
+    .attr('stroke', '#e87060').attr('stroke-width', 1.2)
+  slideG.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+    .attr('font-size', '11px').text('👑')
+
+  // Línea de ruta
+  mapG.insert('line', 'g.conq-token-anim').attr('class', 'conq-layer')
+    .attr('x1', fxo).attr('y1', fyo).attr('x2', fxo).attr('y2', fyo)
+    .attr('stroke', 'rgba(200,60,40,.5)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4,3')
+    .transition().duration(800).attr('x2', txo).attr('y2', tyo)
+
+  slideG.transition().duration(1000).ease(d3Lib.easeCubicInOut)
+    .attr('transform', `translate(${txo},${tyo})`)
+    .on('end', () => {
+      // Pan al nuevo punto
+      const ptx = W / 2 - scale * tx, pty = H / 2 - scale * ty
+      mapSvg!.transition().duration(800).ease(d3Lib.easeCubicInOut)
+        .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(ptx, pty).scale(scale))
+        .on('end', () => {
+          drawNodes(gs, onSelectNode)
+          drawConquistador(gs)
+          setTimeout(onDone, 400)
+        })
+    })
+}
+
+/** Pan final a Guatemala — donde empieza el jugador */
+function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void): void {
+  if (!mapSvg || !mapProj || !mapZoom) return
+  const wrap = document.getElementById('map-canvas-wrap')
+  if (!wrap) return
+  const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
+  const GUATEMALA = { lon: -90.3, lat: 15.5 }
+  const s2 = 3.2
+  const [gx, gy] = mapProj([GUATEMALA.lon, GUATEMALA.lat]) as [number, number]
+  const gtx = W / 2 - s2 * gx, gty = H / 2 - s2 * gy
+  mapSvg.transition().duration(2000).ease(d3Lib.easeCubicInOut)
+    .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(gtx, gty).scale(s2))
+    .on('end', () => {
+      drawNodes(gs, onSelectNode)
+      drawConquistador(gs)
+      // Listo — el jugador puede interactuar
+    })
+}
+
 export function setupResizeHandler(getGs: () => GameState, getSelectNodeFn: () => ((id: string) => void) | undefined): void {
   let _resizeTimer: ReturnType<typeof setTimeout>
   window.addEventListener('resize', () => {

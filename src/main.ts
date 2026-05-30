@@ -36,6 +36,7 @@ import {
   buildMap, drawNodes, drawConquistador,
   animateConqStep, centerOnNextNodes,
   resetMap, setupResizeHandler,
+  waitForMapThenCinematic,
 } from './screens/MapScreen.js'
 
 // ── UI ────────────────────────────────────────────────
@@ -229,8 +230,11 @@ function startNewGame(diff: 'educativo' | 'historico', name: string): void {
   showStatsBar()
   updateStatsBar(gs)
 
-  buildMap(gs, _selectNodeFn)
   showScreen('map-screen')
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    buildMap(gs, _selectNodeFn)
+    waitForMapThenCinematic(gs, _selectNodeFn)
+  }))
 }
 
 // ══════════════════════════════════════════════════════
