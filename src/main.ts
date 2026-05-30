@@ -233,7 +233,7 @@ function startNewGame(diff: 'educativo' | 'historico', name: string): void {
   showScreen('map-screen')
   requestAnimationFrame(() => requestAnimationFrame(() => {
     buildMap(gs, _selectNodeFn)
-    waitForMapThenCinematic(gs, _selectNodeFn)
+    waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
   }))
 }
 

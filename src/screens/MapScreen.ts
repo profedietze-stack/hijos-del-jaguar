@@ -745,11 +745,15 @@ export function resetMap(): void {
 // ══════════════════════════════════════════════════════
 
 /** Espera a que buildMap termine y lanza la cinemática */
-export function waitForMapThenCinematic(gs: GameState, onSelectNode?: (id: string) => void): void {
+export function waitForMapThenCinematic(
+  gs:           GameState,
+  onSelectNode: ((id: string) => void) | undefined,
+  onGsUpdate:   (newGs: GameState) => void,
+): void {
   const _wait = (attempts: number) => {
-    if (attempts > 60) { runOpeningCinematic(gs, onSelectNode); return }
+    if (attempts > 60) { runOpeningCinematic(gs, onSelectNode, onGsUpdate); return }
     if (_mapInitialized && mapSvg && mapProj && mapZoom) {
-      setTimeout(() => runOpeningCinematic(gs, onSelectNode), 200)
+      setTimeout(() => runOpeningCinematic(gs, onSelectNode, onGsUpdate), 200)
     } else {
       setTimeout(() => _wait(attempts + 1), 50)
     }
@@ -758,7 +762,11 @@ export function waitForMapThenCinematic(gs: GameState, onSelectNode?: (id: strin
 }
 
 /** Lanza la secuencia cinemática de apertura */
-export function runOpeningCinematic(gs: GameState, onSelectNode?: (id: string) => void): void {
+export function runOpeningCinematic(
+  gs:           GameState,
+  onSelectNode: ((id: string) => void) | undefined,
+  onGsUpdate:   (newGs: GameState) => void,
+): void {
   if (!mapSvg || !mapProj || !mapZoom || !mapG) return
 
   const TENOCHTITLAN = CONQ_BRIDGE[0]  // lon:-99.1, lat:19.4
@@ -1006,12 +1014,12 @@ export function runOpeningCinematic(gs: GameState, onSelectNode?: (id: string) =
                 () => {
                   _removeCard()
                   // PASO 6: Conquistador avanza de cb0 → cb1 animado
-                  const fromWp = { ...CONQ_BRIDGE[gs.conq.routeIdx] }
-                  const newGs = { ...gs, conq: { ...gs.conq, routeIdx: 1 } }
+                  const fromWp = CONQ_BRIDGE[0]
+                  const newGs: GameState = { ...gs, conq: { ...gs.conq, routeIdx: 1 } }
                   const toWp = CONQ_BRIDGE[1]
                   showNotif(`⚔️ ${toWp.name ?? 'Avance'} — Los españoles avanzan`, 'loss')
-                  // Reutilizamos la animación interna via advanceConquistadorAnimated
-                  // pero controlando el estado manualmente para no mutar gs
+                  // Propagar el nuevo estado a main.ts ANTES de que el jugador interactúe
+                  onGsUpdate(newGs)
                   _animConqCinematic(fromWp, toWp, newGs, onSelectNode, () => {
                     // PASO 7: Pan a Guatemala
                     _panToGuatemala(newGs, onSelectNode)
