@@ -1388,36 +1388,51 @@ function _showOneHistCinematic(
 
   // ── Card histórica con botón "Continuar con la huida" ───────────────────
   function _showHistCard(cb: () => void): void {
-    const existing = document.getElementById('hist-cinematic-card')
-    if (existing) existing.remove()
+    // Limpiar instancias previas
+    document.getElementById('hist-cinematic-overlay')?.remove()
+    document.getElementById('hist-cinematic-card')?.remove()
 
+    // ── Overlay oscuro que bloquea todo el juego detrás ──────────────────
+    const overlay = document.createElement('div')
+    overlay.id = 'hist-cinematic-overlay'
+    overlay.style.cssText = [
+      'position:fixed;top:0;left:0;width:100%;height:100%;',
+      'background:rgba(0,0,0,.72);',
+      'z-index:9990;pointer-events:all;',   // captura clicks, bloquea juego
+      'opacity:0;transition:opacity .6s ease;',
+    ].join('')
+    document.body.appendChild(overlay)
+    requestAnimationFrame(() => requestAnimationFrame(() => { overlay.style.opacity = '1' }))
+
+    // ── Card centrada encima del overlay ─────────────────────────────────
     const card = document.createElement('div')
     card.id = 'hist-cinematic-card'
-    const borderColor = marker.conquered ? 'rgba(192,57,43,.55)' : 'rgba(80,140,50,.5)'
-    const glowColor   = marker.conquered ? 'rgba(80,20,10,.5)'   : 'rgba(30,80,20,.4)'
+    const borderColor = marker.conquered ? 'rgba(192,57,43,.6)'  : 'rgba(80,140,50,.5)'
+    const glowColor   = marker.conquered ? 'rgba(80,20,10,.6)'   : 'rgba(30,80,20,.4)'
     card.style.cssText = [
       'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);',
       'z-index:9999;pointer-events:auto;text-align:center;',
       "font-family:'Cinzel',serif;",
-      'padding:1.4rem 2rem 1rem;border-radius:4px;',
-      `background:rgba(2,4,2,.93);border:1px solid ${borderColor};`,
-      `box-shadow:0 0 40px ${glowColor};`,
-      'max-width:min(90vw,560px);opacity:0;transition:opacity .9s ease;',
+      'padding:1.6rem 2.2rem 1.2rem;border-radius:5px;',
+      `background:rgba(4,2,2,.97);border:1px solid ${borderColor};`,
+      `box-shadow:0 0 60px ${glowColor},0 0 120px rgba(0,0,0,.8);`,
+      'max-width:min(92vw,580px);width:100%;',
+      'opacity:0;transition:opacity .8s ease;',
     ].join('')
 
     const conqBadge = marker.conquered
-      ? `<div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(120,20,10,.5);border:1px solid rgba(192,57,43,.4);border-radius:3px;padding:.2rem .6rem;margin-bottom:.7rem;font-size:.65rem;letter-spacing:.12em;color:rgba(230,100,80,.9)">👑 CONQUISTADO POR ESPAÑA</div>`
+      ? `<div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(120,20,10,.55);border:1px solid rgba(192,57,43,.45);border-radius:3px;padding:.22rem .7rem;margin-bottom:.8rem;font-size:.65rem;letter-spacing:.13em;color:rgba(230,100,80,.95)">👑 CONQUISTADO POR ESPAÑA</div>`
       : ''
 
     card.innerHTML = `
       ${conqBadge}
       <div style="color:rgba(200,120,60,.85);font-size:clamp(.65rem,2vw,.85rem);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem">${marker.year}</div>
-      <div style="color:#f0d090;font-size:clamp(1rem,3vw,1.35rem);margin-bottom:.75rem">${marker.icon} ${marker.label}</div>
-      <div style="color:rgba(210,220,180,.78);font-size:clamp(.72rem,2vw,.9rem);font-family:'Crimson Text',serif;font-style:italic;line-height:1.65;margin-bottom:1.2rem">${marker.narr}</div>
+      <div style="color:#f0d090;font-size:clamp(1.05rem,3vw,1.4rem);margin-bottom:.8rem">${marker.icon} ${marker.label}</div>
+      <div style="color:rgba(215,225,185,.8);font-size:clamp(.74rem,2vw,.92rem);font-family:'Crimson Text',serif;font-style:italic;line-height:1.7;margin-bottom:1.4rem">${marker.narr}</div>
       <button id="hist-card-continue" style="
-        font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.1em;cursor:pointer;
-        background:rgba(50,20,10,.8);border:1px solid rgba(180,90,40,.6);color:rgba(230,170,80,.95);
-        padding:.45rem 1.2rem;border-radius:3px;transition:background .2s,border-color .2s;
+        font-family:'Cinzel',serif;font-size:.74rem;letter-spacing:.1em;cursor:pointer;
+        background:rgba(50,20,10,.85);border:1px solid rgba(180,90,40,.65);color:rgba(230,175,80,.98);
+        padding:.5rem 1.4rem;border-radius:3px;transition:background .2s,border-color .2s,color .2s;
       ">Continuar con la huida →</button>`
 
     document.body.appendChild(card)
@@ -1426,16 +1441,23 @@ function _showOneHistCinematic(
     const btn = document.getElementById('hist-card-continue')
     if (btn) {
       btn.addEventListener('mouseenter', () => {
-        ;(btn as HTMLButtonElement).style.background = 'rgba(90,40,10,.9)'
-        ;(btn as HTMLButtonElement).style.borderColor = 'rgba(220,140,60,.8)'
+        ;(btn as HTMLButtonElement).style.background    = 'rgba(100,45,10,.95)'
+        ;(btn as HTMLButtonElement).style.borderColor   = 'rgba(230,150,60,.85)'
+        ;(btn as HTMLButtonElement).style.color         = '#fff'
       })
       btn.addEventListener('mouseleave', () => {
-        ;(btn as HTMLButtonElement).style.background = 'rgba(50,20,10,.8)'
-        ;(btn as HTMLButtonElement).style.borderColor = 'rgba(180,90,40,.6)'
+        ;(btn as HTMLButtonElement).style.background    = 'rgba(50,20,10,.85)'
+        ;(btn as HTMLButtonElement).style.borderColor   = 'rgba(180,90,40,.65)'
+        ;(btn as HTMLButtonElement).style.color         = 'rgba(230,175,80,.98)'
       })
       btn.addEventListener('click', () => {
-        card.style.opacity = '0'
-        setTimeout(() => { card.remove(); cb() }, 700)
+        overlay.style.opacity = '0'
+        card.style.opacity    = '0'
+        setTimeout(() => {
+          overlay.remove()
+          card.remove()
+          cb()
+        }, 700)
       })
     }
   }

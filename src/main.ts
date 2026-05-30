@@ -384,7 +384,15 @@ function onDecision(decisionIndex: number): void {
   if (gs.conq.caught) {
     sfxConqCatch()
     animateConqStep(preConqGs, gs, conqResult.reorg, () => {
-      setTimeout(() => triggerConqCatch(), 400)
+      // Si hay marcadores históricos nuevos, mostrarlos ANTES del evento de captura.
+      // Así nunca se superpone la cinemática con el event screen.
+      if (newMarkers.length > 0) {
+        runHistMarkerCinematic(newMarkers, gs, _selectNodeFn, () => {
+          setTimeout(() => triggerConqCatch(), 400)
+        })
+      } else {
+        setTimeout(() => triggerConqCatch(), 400)
+      }
     }, _selectNodeFn)
   } else if (!conqResult.reorg) {
     sfxConqAdvance()
