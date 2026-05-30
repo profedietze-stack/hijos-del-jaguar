@@ -237,29 +237,27 @@ function _showReorgCard(cb: () => void): void {
 }
 
 function _animateConqAdvance(
-  from:   { lon: number; lat: number },
-  to:     { lon: number; lat: number },
-  gs:     GameState,
-  onDone: () => void,
+  from:         { lon: number; lat: number },
+  to:           { lon: number; lat: number },
+  gs:           GameState,
+  onSelectNode: ((id: string) => void) | undefined,
+  onDone:       () => void,
 ): void {
   if (!mapSvg || !mapProj || !mapZoom) { _conqAnimating = false; onDone(); return }
   _conqAnimating = true
-  const wrap  = document.getElementById('map-canvas-wrap')
+  const wrap = document.getElementById('map-canvas-wrap')
   const W = wrap?.clientWidth ?? 900, H = wrap?.clientHeight ?? 580
   const scale = 3.0, OX = 18, OY = -10
 
   const isMapVisible = () => document.getElementById('map-screen')?.classList.contains('active')
 
-  function panTo(lon: number, lat: number, dur: number, delay: number, cb: () => void) {
+  function panTo(lon: number, lat: number, dur: number, cb: () => void) {
+    if (!_conqAnimating || !isMapVisible()) { _conqAnimating = false; cb(); return }
     const [px, py] = mapProj!([lon, lat]) as [number, number]
     const tx = W / 2 - scale * px, ty = H / 2 - scale * py
-    setTimeout(() => {
-      if (!_conqAnimating) { cb(); return }
-      if (!isMapVisible()) { _conqAnimating = false; cb(); return }
-      mapSvg!.transition().duration(dur).ease(d3Lib.easeCubicInOut)
-        .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
-        .on('end', cb)
-    }, delay)
+    mapSvg!.transition().duration(dur).ease(d3Lib.easeCubicInOut)
+      .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
+      .on('end', cb)
   }
 
   function slideToken(fromWp: typeof from, toWp: typeof to, dur: number, cb: () => void) {
@@ -268,18 +266,34 @@ function _animateConqAdvance(
     const [tx, ty] = mapProj([toWp.lon,   toWp.lat])   as [number, number]
     const fxo = fx + OX, fyo = fy + OY, txo = tx + OX, tyo = ty + OY
     mapG.selectAll('.conq-layer').remove()
-    const slideG = mapG.append('g').attr('class', 'conq-layer conq-token-anim').attr('transform', `translate(${fxo},${fyo})`).attr('pointer-events', 'none')
-    mapG.insert('line', 'g.conq-token-anim').attr('class', 'conq-layer').attr('x1', fxo).attr('y1', fyo).attr('x2', fxo).attr('y2', fyo)
-      .attr('stroke', 'rgba(220,60,40,.7)').attr('stroke-width', 2).attr('stroke-dasharray', '4,3').attr('pointer-events', 'none')
-      .transition().duration(dur).ease(d3Lib.easeCubicInOut).attr('x2', txo).attr('y2', tyo)
-    const halo = slideG.append('circle').attr('r', 14).attr('fill', 'none').attr('stroke', 'rgba(192,57,43,.6)').attr('stroke-width', 1.5)
-    halo.append('animate').attr('attributeName', 'r').attr('values', '14;20;14').attr('dur', '1.8s').attr('repeatCount', 'indefinite')
-    slideG.append('circle').attr('r', 14).attr('fill', 'rgba(139,26,26,.1)').attr('stroke', 'rgba(192,57,43,.15)').attr('stroke-width', 8)
-    slideG.append('circle').attr('r', 11).attr('fill', 'rgba(100,15,15,.85)').attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 2)
-    slideG.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central').attr('font-size', '13px').attr('pointer-events', 'none').text('👑')
-    slideG.append('rect').attr('x', -32).attr('y', 14).attr('width', 64).attr('height', 11).attr('fill', 'rgba(6,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
-    slideG.append('text').attr('text-anchor', 'middle').attr('y', 22).attr('font-size', '7px').attr('font-family', 'Cinzel,serif').attr('fill', 'rgba(220,100,80,.95)').attr('pointer-events', 'none').text('CONQUISTADORES')
-    slideG.transition().duration(dur).ease(d3Lib.easeCubicInOut).attr('transform', `translate(${txo},${tyo})`).on('end', cb)
+    const slideG = mapG.append('g')
+      .attr('class', 'conq-layer conq-token-anim')
+      .attr('transform', `translate(${fxo},${fyo})`)
+      .attr('pointer-events', 'none')
+    mapG.insert('line', 'g.conq-token-anim')
+      .attr('class', 'conq-layer')
+      .attr('x1', fxo).attr('y1', fyo).attr('x2', fxo).attr('y2', fyo)
+      .attr('stroke', 'rgba(220,60,40,.7)').attr('stroke-width', 2)
+      .attr('stroke-dasharray', '4,3').attr('pointer-events', 'none')
+      .transition().duration(dur).ease(d3Lib.easeCubicInOut)
+      .attr('x2', txo).attr('y2', tyo)
+    const halo = slideG.append('circle').attr('r', 14).attr('fill', 'none')
+      .attr('stroke', 'rgba(192,57,43,.6)').attr('stroke-width', 1.5)
+    halo.append('animate').attr('attributeName', 'r').attr('values', '14;20;14')
+      .attr('dur', '1.8s').attr('repeatCount', 'indefinite')
+    slideG.append('circle').attr('r', 14).attr('fill', 'rgba(139,26,26,.1)')
+      .attr('stroke', 'rgba(192,57,43,.15)').attr('stroke-width', 8)
+    slideG.append('circle').attr('r', 11).attr('fill', 'rgba(100,15,15,.85)')
+      .attr('stroke', 'rgba(220,60,40,.9)').attr('stroke-width', 2)
+    slideG.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .attr('font-size', '13px').attr('pointer-events', 'none').text('👑')
+    slideG.append('rect').attr('x', -32).attr('y', 14).attr('width', 64).attr('height', 11)
+      .attr('fill', 'rgba(6,2,2,.82)').attr('rx', 2).attr('pointer-events', 'none')
+    slideG.append('text').attr('text-anchor', 'middle').attr('y', 22)
+      .attr('font-size', '7px').attr('font-family', 'Cinzel,serif')
+      .attr('fill', 'rgba(220,100,80,.95)').attr('pointer-events', 'none').text('CONQUISTADORES')
+    slideG.transition().duration(dur).ease(d3Lib.easeCubicInOut)
+      .attr('transform', `translate(${txo},${tyo})`).on('end', cb)
   }
 
   const _wait = (attempt: number, fn: () => void) => {
@@ -288,25 +302,25 @@ function _animateConqAdvance(
     setTimeout(() => _wait(attempt + 1, fn), 100)
   }
 
+  // Secuencia: slide del token + pan al destino en paralelo → centrar → callback
   _wait(0, () => {
-    panTo(from.lon, from.lat, 650, 0, () => {
+    if (!_conqAnimating) return
+    // Redibujar nodos CON onSelectNode para mantener los handlers activos
+    drawNodes(gs, onSelectNode)
+    // Slide del token (950ms) y pan al destino (950ms) en paralelo
+    slideToken(from, to, 950, () => {
+      if (!_conqAnimating) return
+      // Al terminar el slide: conquistador estático en destino
+      drawNodes(gs, onSelectNode)
+      drawConquistador(gs)
+    })
+    panTo(to.lon, to.lat, 950, () => {
       if (!_conqAnimating) return
       setTimeout(() => {
-        if (!_conqAnimating) return
-        drawNodes(gs)
-        slideToken(from, to, 950, () => {
-          if (!_conqAnimating) return
-          drawNodes(gs); drawConquistador(gs)
-        })
-        panTo(to.lon, to.lat, 950, 0, () => {
-          if (!_conqAnimating) return
-          setTimeout(() => {
-            _conqAnimating = false
-            if (isMapVisible()) _centerOnNextNodes(gs)
-            onDone()
-          }, 800)
-        })
-      }, 500)
+        _conqAnimating = false
+        if (isMapVisible()) _centerOnNextNodes(gs)
+        onDone()
+      }, 400)
     })
   })
 }
@@ -347,7 +361,7 @@ export function advanceConquistadorAnimated(gs: GameState, cb: (caught: boolean)
   showNotif(`⚔️ Los conquistadores avanzan — ${toName}`, 'loss')
   if (isJump) showNotif('⚔️ ¡Los conquistadores te han alcanzado!', 'loss')
 
-  _animateConqAdvance(fromWp, toWp, gs, () => cb(isJump))
+  _animateConqAdvance(fromWp, toWp, gs, undefined, () => cb(isJump))
 }
 
 /**
@@ -355,17 +369,18 @@ export function advanceConquistadorAnimated(gs: GameState, cb: (caught: boolean)
  * Elimina el doble azar: la decisión ya fue tomada por el motor, aquí solo se anima.
  */
 export function animateConqStep(
-  oldGs:  GameState,
-  newGs:  GameState,
-  reorg:  boolean,
-  cb:     () => void,
+  oldGs:        GameState,
+  newGs:        GameState,
+  reorg:        boolean,
+  cb:           () => void,
+  onSelectNode?: (id: string) => void,
 ): void {
   if (reorg) { _showReorgCard(cb); return }
   const fromWp = conqCurrentNode(oldGs)
   const toWp   = conqCurrentNode(newGs)
   if (!fromWp || !toWp) { cb(); return }
   if (fromWp.lon === toWp.lon && fromWp.lat === toWp.lat) { cb(); return }
-  _animateConqAdvance(fromWp, toWp, newGs, cb)
+  _animateConqAdvance(fromWp, toWp, newGs, onSelectNode, cb)
 }
 
 // ── Cámara ────────────────────────────────────────────

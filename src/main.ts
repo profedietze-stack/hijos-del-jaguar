@@ -346,12 +346,12 @@ function onDecision(decisionIndex: number): void {
     // Captura: animar el salto y luego disparar el evento dramático
     animateConqStep(preConqGs, gs, conqResult.reorg, () => {
       setTimeout(() => triggerConqCatch(), 400)
-    })
+    }, _selectNodeFn)
   } else {
     // Movimiento normal: animar y luego centrar cámara en próximos nodos
     animateConqStep(preConqGs, gs, conqResult.reorg, () => {
       centerOnNextNodes(gs)
-    })
+    }, _selectNodeFn)
   }
 }
 
