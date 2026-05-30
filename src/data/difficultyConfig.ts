@@ -50,4 +50,30 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
       good: { m: 20 },
     },
   },
+
+  legendario: {
+    label: 'Legendario',
+    desc:  'Sin piedad. La historia no tuvo segunda oportunidad.',
+    initStats: { food: 42, moral: 38, salud: 48, union: 45, warriors: 18, shamans: 6, civilians: 20 },
+    fxMult:    { pos: 0.65, neg: 1.55 },
+    dimCutoff: 60,
+    decay: {
+      1: { food: -8,  salud: -5  },
+      2: { food: -12, salud: -8  },
+      3: { food: -15, salud: -10 },
+      4: { food: -11, salud: -7  },
+    },
+    deathThreshold:      { food: 42, salud: 40 },
+    deathProb:           { 1: 0.45, 2: 0.60, 3: 0.75, 4: 0.55 },
+    lowUnionThreshold:   35,
+    lowUnionMoralPenalty: -9,
+    lowUnionDeathProb:   0.35,
+    alliancePenaltyActFrom:  2,
+    alliancePenaltyIfNone:   { food: -8, moral: -12 },
+    defeatThreshold:     15,
+    endingThresholds: {
+      epic: { m: 34, a: 4 },
+      good: { m: 24 },
+    },
+  },
 }

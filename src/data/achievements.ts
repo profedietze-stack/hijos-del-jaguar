@@ -89,6 +89,52 @@ export const LOGROS_DEF: AchievementDef[] = [
       [...new Set(d.alliances)].length >= 4 &&
       d.end?.badge?.includes('ÉPICO') === true,
   },
+
+  // ── LEGENDARIO (5) ────────────────────────────────────────────
+  {
+    id: 'leg_sobreviviente',
+    modos: ['legendario'],
+    icon: '💀',
+    nombre: 'Contra el Apocalipsis',
+    desc: 'Completa una partida en modo Legendario.',
+    cond: (d) => d.diff === 'legendario',
+  },
+  {
+    id: 'leg_alianzas',
+    modos: ['legendario'],
+    icon: '🌐',
+    nombre: 'La Red Imposible',
+    desc: 'Forja 4 o más alianzas en modo Legendario.',
+    cond: (d) => d.diff === 'legendario' && [...new Set(d.alliances)].length >= 4,
+  },
+  {
+    id: 'leg_imparable',
+    modos: ['legendario'],
+    icon: '🔱',
+    nombre: 'Imparable',
+    desc: 'Llega al final en Legendario con al menos 20 supervivientes.',
+    cond: (d) => d.diff === 'legendario' && d.m >= 20,
+  },
+  {
+    id: 'leg_fantasma',
+    modos: ['legendario'],
+    icon: '👻',
+    nombre: 'El Pueblo Fantasma',
+    desc: 'En Legendario, sobrevivir un encuentro con los conquistadores.',
+    cond: (d) => d.diff === 'legendario' && d.conquCaught === true,
+  },
+  {
+    id: 'leg_dios',
+    modos: ['legendario'],
+    icon: '🌟',
+    nombre: 'Hijo del Jaguar',
+    desc: 'Termina Legendario con final épico: 34+ supervivientes, 4+ alianzas.',
+    cond: (d) =>
+      d.diff === 'legendario' &&
+      d.m >= 34 &&
+      [...new Set(d.alliances)].length >= 4 &&
+      d.end?.badge?.includes('ÉPICO') === true,
+  },
 ]
 
 export const LOGROS_KEY = 'jaguar_logros'

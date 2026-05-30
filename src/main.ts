@@ -119,6 +119,7 @@ function wireAllButtons(): void {
   // ── Intro: dificultad ────────────────────────────────
   on('diff-edu',  () => { sfxClick(); selectDiff('educativo') })
   on('diff-his',  () => { sfxClick(); selectDiff('historico') })
+  on('diff-leg',  () => { sfxClick(); selectDiff('legendario') })
   on('btn-comenzar',    () => { sfxClick(); onComenzarClicked() })
   on('btn-back-intro',  () => { sfxClick(); mountMenu() })
 
@@ -223,10 +224,10 @@ function onNameConfirmed(): void {
   if (!name) return
   const diff = getSelectedDiff()
   if (!diff) return
-  startNewGame(diff as 'educativo' | 'historico', name)
+  startNewGame(diff as 'educativo' | 'historico' | 'legendario', name)
 }
 
-function startNewGame(diff: 'educativo' | 'historico', name: string): void {
+function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: string): void {
   gs = createInitialState(diff, name)
   _inCatchEvent = false
   clearSavedGame()

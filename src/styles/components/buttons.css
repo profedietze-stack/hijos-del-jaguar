@@ -66,7 +66,7 @@
 }
 .diff-badge.historico  { background: rgba(139,26,26,.35); color: #e07070; border: 1px solid rgba(192,57,43,.4); }
 .diff-badge.educativo  { background: rgba(45,90,30,.35);  color: #6db84a; border: 1px solid rgba(74,140,48,.4); }
-.diff-badge.realista   { background: rgba(60,0,60,.5);    color: #c060e0; border: 1px solid rgba(160,40,200,.5); }
+.diff-badge.legendario { background: rgba(60,0,60,.5);    color: #c060e0; border: 1px solid rgba(160,40,200,.5); }
 
 /* ── Botón de decisión (en evento) ── */
 .dec-btn {

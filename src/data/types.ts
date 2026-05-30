@@ -2,7 +2,7 @@
 // TIPOS BASE DEL JUEGO
 // ══════════════════════════════════════════════════════
 
-export type Difficulty = 'educativo' | 'historico'
+export type Difficulty = 'educativo' | 'historico' | 'legendario'
 
 export type ActNumber = 1 | 2 | 3 | 4
 
