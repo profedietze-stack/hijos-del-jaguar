@@ -3,14 +3,10 @@
 // Música procedimental: menú (flauta andina) + juego (tambores urgentes)
 // ══════════════════════════════════════════════════════
 
-type TrackName = 'menu' | 'game'
-type ToneTime  = number | string   // ToneTime simplificado para CDN
+import * as Tone from 'tone'
 
-// Accede a Tone.js cargado como CDN (global window.Tone)
-type ToneLib = typeof import('tone')
-function T(): ToneLib {
-  return (window as unknown as { Tone: ToneLib }).Tone
-}
+type TrackName = 'menu' | 'game'
+type ToneTime  = number | string
 
 let _started        = false
 let _currentTrack: TrackName | null = null
@@ -19,8 +15,6 @@ let _gameParts:  Array<() => void> = []
 
 async function _ensureStarted(): Promise<boolean> {
   if (_started) return true
-  const Tone = T()
-  if (!Tone) return false
   try {
     await Tone.start()
     _started = true
@@ -32,8 +26,6 @@ async function _ensureStarted(): Promise<boolean> {
 
 export function sfxClick(): void {
   if (!_started) return
-  const Tone = T()
-  if (!Tone) return
   try {
     const mem = new Tone.MembraneSynth({
       pitchDecay: 0.04, octaves: 3,
@@ -54,8 +46,6 @@ export function sfxClick(): void {
 // ── Música MENÚ: flauta de pan andina + drone ────────
 
 function _buildMenu(): void {
-  const Tone = T()
-  if (!Tone) return
   try {
     const rev   = new Tone.Reverb({ decay: 6, wet: 0.55 }).toDestination()
     const vol   = new Tone.Volume(-8).connect(rev)
@@ -131,8 +121,6 @@ function _buildMenu(): void {
 // ── Música JUEGO: tambores urgentes + quena ──────────
 
 function _buildGame(): void {
-  const Tone = T()
-  if (!Tone) return
   try {
     const rev     = new Tone.Reverb({ decay: 2.5, wet: 0.3 }).toDestination()
     const dly     = new Tone.FeedbackDelay({ delayTime: '8n', feedback: 0.22, wet: 0.18 }).connect(rev)
@@ -220,8 +208,6 @@ function _buildGame(): void {
 // ── Parar el track actual ─────────────────────────────
 
 function _stopCurrent(): void {
-  const Tone = T()
-  if (!Tone) return
   try {
     ;(_currentTrack === 'menu' ? _menuParts : _gameParts).forEach(fn => fn())
     _menuParts = []
