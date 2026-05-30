@@ -13,7 +13,7 @@ export default defineConfig({
       reporter:  ['text', 'lcov'],
     },
   },
-  base: './',
+  base: '/hijos-del-jaguar/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
