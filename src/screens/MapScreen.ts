@@ -1463,8 +1463,18 @@ function _showOneHistCinematic(
   }
 
   // ── Secuencia principal ───────────────────────────────────────────────────
+  // Breve delay + cancelar transiciones pendientes antes de panear.
+  // Sin esto, el primer marcador (Cajamarca) hereda la transición de
+  // animateConqStep y D3 dispara 'interrupt' inmediatamente, saltando el pan.
+  setTimeout(() => {
+    if (mapSvg) (mapSvg as unknown as { interrupt: () => void }).interrupt()
+  }, 80)
+
   // PASO 1: Pan al marcador histórico (con fallback)
-  _panTo(marker.lon, marker.lat, scale, 1800, () => {
+  // Delay de 150ms para que cualquier transición D3 previa (animateConqStep)
+  // termine antes de que iniciemos el nuevo pan. Sin esto, D3 dispara
+  // 'interrupt' de inmediato en el primer marcador y se saltea la animación.
+  setTimeout(() => _panTo(marker.lon, marker.lat, scale, 1800, () => {
     const [mx, my] = mapProj!([marker.lon, marker.lat]) as [number, number]
 
     // PASO 2: Token del conquistador + fuego (si conquista)
@@ -1487,7 +1497,7 @@ function _showOneHistCinematic(
         })
       })
     }, 500)
-  })
+  }), 150)
 }
 
 /** Pan de vuelta a la zona del jugador después de una cinemática histórica */
