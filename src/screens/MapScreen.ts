@@ -261,7 +261,8 @@ function _drawConqTokenAtPos(px: number, py: number, m: HistMarker): void {
 
 export function drawConquistador(gs: GameState): void {
   if (!mapG || !mapProj) return
-  mapG.selectAll('.conq-layer').remove()
+  // Eliminar tanto la capa estática como la dinámica para redibujo completo
+  mapG.selectAll('.conq-layer, .conq-bg-layer').remove()
 
   // ── 1. Ruta punteada: Tenochtitlán → cb1 → cb2 → cb3 → n00 ──────────────
   const routePoints: [number, number][] = []
@@ -275,7 +276,8 @@ export function drawConquistador(gs: GameState): void {
   for (let i = 0; i < routePoints.length - 1; i++) {
     const [x1, y1] = routePoints[i]
     const [x2, y2] = routePoints[i + 1]
-    mapG.append('line').attr('class', 'conq-layer')
+    // conq-bg-layer: ruta estática — NO se elimina durante la animación del token
+    mapG.append('line').attr('class', 'conq-bg-layer')
       .attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
       .attr('stroke', 'rgba(180,50,30,.35)').attr('stroke-width', 1.4)
       .attr('stroke-dasharray', '5,4').attr('pointer-events', 'none')
@@ -283,7 +285,8 @@ export function drawConquistador(gs: GameState): void {
 
   // ── 2. Tenochtitlán — marcador permanente (cb0) ──────────────────────────
   const [tx, ty] = routePoints[0]
-  const tg = mapG.append('g').attr('class', 'conq-layer')
+  // conq-bg-layer: marcador estático de Tenochtitlán
+  const tg = mapG.append('g').attr('class', 'conq-bg-layer')
     .attr('transform', `translate(${tx},${ty})`).attr('cursor', 'help')
 
   // Base pirámide simplificada
@@ -310,7 +313,8 @@ export function drawConquistador(gs: GameState): void {
   // ── 3. Waypoints intermedios (cb1, cb2, cb3) ─────────────────────────────
   CONQ_BRIDGE.slice(1).forEach((cb, i) => {
     const [wx, wy] = routePoints[i + 1]
-    const wg = mapG!.append('g').attr('class', 'conq-layer')
+    // conq-bg-layer: waypoints estáticos
+    const wg = mapG!.append('g').attr('class', 'conq-bg-layer')
       .attr('transform', `translate(${wx},${wy})`).attr('cursor', 'help')
     wg.append('circle').attr('r', 5).attr('fill', 'rgba(80,10,5,.7)')
       .attr('stroke', 'rgba(180,60,40,.55)').attr('stroke-width', 1)
