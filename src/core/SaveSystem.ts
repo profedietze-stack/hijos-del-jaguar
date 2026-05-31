@@ -20,6 +20,7 @@ export const LOGROS_KEY   = 'jaguar_logros'
 interface SavePayload {
   diff:        string
   caciqueName: string
+  tribeToken?: string
   stats:       GameState['stats']
   nodes:       GameState['nodes']
   history:     string[]
@@ -34,6 +35,7 @@ export function saveGame(gs: GameState): void {
   const payload: SavePayload = {
     diff:        gs.diff,
     caciqueName: gs.caciqueName,
+    tribeToken:  gs.tribeToken,
     stats:       gs.stats,
     nodes:       gs.nodes,
     history:     gs.history,
@@ -111,6 +113,7 @@ export function loadGame(): GameState | null {
   const gs: GameState = {
     diff:        (d.diff as GameState['diff']) ?? 'educativo',
     caciqueName: d.caciqueName ?? '',
+    tribeToken:  d.tribeToken ?? '🦅',
     stats:       d.stats,
     nodes,
     history:     d.history     ?? [],

@@ -48,6 +48,7 @@ export interface Notif {
 export interface GameState {
   diff:         Difficulty
   caciqueName:  string
+  tribeToken:   string          // emoji elegido por el jugador para representar su tribu
   stats:        Stats
   nodes:        Record<string, NodeState>
   history:      string[]        // IDs de nodos visitados en orden
@@ -77,7 +78,7 @@ export function clamp(v: number, mn = 0, mx = 100): number {
  * Construye un GameState fresco para una partida nueva.
  * Asigna aleatoriamente un evento de cada pool de nodo.
  */
-export function createInitialState(diff: Difficulty, caciqueName: string): GameState {
+export function createInitialState(diff: Difficulty, caciqueName: string, tribeToken = '🦅'): GameState {
   const cfg = DIFF_CONFIG[diff]
 
   // Clonar nodos y asignar evento aleatorio de cada pool
@@ -97,6 +98,7 @@ export function createInitialState(diff: Difficulty, caciqueName: string): GameS
   return {
     diff,
     caciqueName,
+    tribeToken,
     stats:       { ...cfg.initStats },
     nodes,
     history:     [],
@@ -118,6 +120,7 @@ export function createInitialState(diff: Difficulty, caciqueName: string): GameS
 export function cloneState(gs: GameState): GameState {
   return {
     ...gs,
+    tribeToken: gs.tribeToken ?? '🦅',
     stats:    { ...gs.stats },
     history:  [...gs.history],
     alliances:[...gs.alliances],

@@ -257,6 +257,117 @@ function _drawConqTokenAtPos(px: number, py: number, m: HistMarker): void {
     .on('mouseleave', hideGeoTip)
 }
 
+// ── Token del jugador (tribu) ─────────────────────────
+
+const PLAYER_FILL   = 'rgba(20,80,30,.88)'
+const PLAYER_STROKE = 'rgba(70,200,80,.9)'
+const PLAYER_PULSE  = 'rgba(60,180,60,.55)'
+
+/**
+ * Dibuja el token de la tribu del jugador en el último nodo completado.
+ * El token muestra el emoji elegido en la pantalla de nombre.
+ */
+export function drawPlayerToken(gs: GameState): void {
+  if (!mapG || !mapProj) return
+  mapG.selectAll('.player-token-layer').remove()
+  const lastId = lastCompleted(gs)
+  if (!lastId) return
+  const nd = gs.nodes[lastId]
+  if (!nd) return
+
+  const [x, y] = mapProj([nd.lon, nd.lat]) as [number, number]
+  const token = gs.tribeToken ?? '🦅'
+  // Offset: lado izquierdo del nodo (opuesto al conquistador que está a la derecha)
+  const OX = -20, OY = -10
+
+  const pg = mapG.append('g')
+    .attr('class', 'player-token-layer')
+    .attr('transform', `translate(${x + OX},${y + OY})`)
+    .attr('pointer-events', 'all')
+    .attr('cursor', 'help')
+
+  // Pulso exterior verde
+  const pulse = pg.append('circle').attr('r', 14).attr('fill', 'none')
+    .attr('stroke', PLAYER_PULSE).attr('stroke-width', 1.2)
+  pulse.append('animate').attr('attributeName', 'r').attr('values', '14;20;14')
+    .attr('dur', '2.4s').attr('repeatCount', 'indefinite')
+
+  // Halo suave
+  pg.append('circle').attr('r', 14).attr('fill', 'none')
+    .attr('stroke', 'rgba(70,180,60,.1)').attr('stroke-width', 8)
+
+  // Círculo del jugador
+  pg.append('circle').attr('r', 11)
+    .attr('fill', PLAYER_FILL)
+    .attr('stroke', PLAYER_STROKE).attr('stroke-width', 2)
+
+  // Emoji de la tribu
+  pg.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+    .attr('font-size', '13px').attr('pointer-events', 'none').text(token)
+
+  // Etiqueta debajo
+  pg.append('rect').attr('x', -28).attr('y', 14).attr('width', 56).attr('height', 11)
+    .attr('fill', 'rgba(4,8,4,.82)').attr('rx', 2).attr('pointer-events', 'none')
+  pg.append('text').attr('text-anchor', 'middle').attr('y', 22)
+    .attr('font-size', '6.5px').attr('font-family', 'Cinzel,serif')
+    .attr('fill', 'rgba(80,210,90,.95)').attr('pointer-events', 'none').text('TU TRIBU')
+
+  // Tooltip
+  const cacique = gs.caciqueName ?? 'Cacique'
+  pg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev,
+    `<strong style="color:#4fce60">${token} ${cacique}</strong><br>Aquí se encuentra tu pueblo`))
+    .on('mouseleave', hideGeoTip)
+}
+
+/**
+ * Anima el token tribal deslizándose de fromNd a toNd.
+ * Se llama desde main.ts después de que el jugador completa un nodo.
+ */
+export function animatePlayerToken(
+  fromNd: { lon: number; lat: number },
+  toNd:   { lon: number; lat: number },
+  gs:     GameState,
+): void {
+  if (!mapG || !mapProj) return
+  const OX = -20, OY = -10
+  const [fx, fy] = mapProj([fromNd.lon, fromNd.lat]) as [number, number]
+  const [tx, ty] = mapProj([toNd.lon,   toNd.lat])   as [number, number]
+  const fxo = fx + OX, fyo = fy + OY
+  const txo = tx + OX, tyo = ty + OY
+  const token = gs.tribeToken ?? '🦅'
+
+  // Quitar token estático — lo reconstruimos como animación
+  mapG.selectAll('.player-token-layer').remove()
+
+  // Línea de trail del movimiento
+  mapG.append('line').attr('class', 'player-token-layer')
+    .attr('x1', fxo).attr('y1', fyo).attr('x2', fxo).attr('y2', fyo)
+    .attr('stroke', 'rgba(70,200,80,.5)').attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '4,3').attr('pointer-events', 'none')
+    .transition().duration(900).ease(d3Lib.easeCubicInOut)
+    .attr('x2', txo).attr('y2', tyo)
+
+  // Token animado
+  const slideG = mapG.append('g')
+    .attr('class', 'player-token-layer player-token-anim')
+    .attr('transform', `translate(${fxo},${fyo})`)
+    .attr('pointer-events', 'none')
+
+  slideG.append('circle').attr('r', 14).attr('fill', 'none')
+    .attr('stroke', PLAYER_PULSE).attr('stroke-width', 1.2)
+  slideG.append('circle').attr('r', 11)
+    .attr('fill', PLAYER_FILL).attr('stroke', PLAYER_STROKE).attr('stroke-width', 2)
+  slideG.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+    .attr('font-size', '13px').attr('pointer-events', 'none').text(token)
+
+  slideG.transition().duration(900).ease(d3Lib.easeCubicInOut)
+    .attr('transform', `translate(${txo},${tyo})`)
+    .on('end', () => {
+      // Reemplazar animación por token estático definitivo
+      drawPlayerToken(gs)
+    })
+}
+
 // ── Conquistador ──────────────────────────────────────
 
 export function drawConquistador(gs: GameState): void {
@@ -608,7 +719,7 @@ const LABEL_OFFSET: Record<string, [number, number]> = {
 
 export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void): void {
   if (!mapG || !mapProj) return
-  mapG.selectAll('.ng,.el,.conq-layer').remove()
+  mapG.selectAll('.ng,.el,.conq-layer,.player-token-layer').remove()
   drawTribePath(gs)
 
   const nodes = gs.nodes
@@ -732,6 +843,7 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
   })
 
   drawConquistador(gs)
+  drawPlayerToken(gs)
 }
 
 // ── Overlays geográficos (ríos, Andes, biomas) ────────

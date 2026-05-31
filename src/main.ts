@@ -29,7 +29,7 @@ import {
 import { mountSplash }                                  from './screens/SplashScreen.js'
 import { mountMenu }                                    from './screens/MenuScreen.js'
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
-import { mountNameScreen, randomCaciqueName, getEnteredName } from './screens/NameScreen.js'
+import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
 import { mountEventScreen }                             from './screens/EventScreen.js'
 import { mountEndingScreen, captureEnding } from './screens/EndingScreen.js'
 import { mountHistoryScreen, hsTab }                    from './screens/HistoryScreen.js'
@@ -39,6 +39,7 @@ import {
   resetMap, setupResizeHandler,
   waitForMapThenCinematic,
   getNewHistMarkersForAct, runHistMarkerCinematic,
+  animatePlayerToken,
 } from './screens/MapScreen.js'
 
 // ── UI ────────────────────────────────────────────────
@@ -231,11 +232,12 @@ function onNameConfirmed(): void {
   if (!name) return
   const diff = getSelectedDiff()
   if (!diff) return
-  startNewGame(diff as 'educativo' | 'historico' | 'legendario', name)
+  const token = getSelectedToken()
+  startNewGame(diff as 'educativo' | 'historico' | 'legendario', name, token)
 }
 
-function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: string): void {
-  gs = createInitialState(diff, name)
+function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: string, tribeToken = '🦅'): void {
+  gs = createInitialState(diff, name, tribeToken)
   _inCatchEvent = false
   clearSavedGame()
   resetMap()
@@ -263,8 +265,9 @@ function continueGame(): void {
     return
   }
   gs = normalizeConqState(loaded)
-  // Safety: partidas antiguas pueden no tener caciqueName
+  // Safety: partidas antiguas pueden no tener caciqueName o tribeToken
   if (!gs.caciqueName) gs = { ...gs, caciqueName: 'el cacique' }
+  if (!gs.tribeToken)  gs = { ...gs, tribeToken: '🦅' }
   _inCatchEvent = false
   _selectNodeFn = onSelectNode
 
@@ -313,6 +316,10 @@ function onDecision(decisionIndex: number): void {
   const prevAct = gs.history.length > 0
     ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
     : 1
+
+  // Nodo desde donde el jugador se mueve (para animar el token tribal)
+  const prevLastNodeId = gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
+  const prevLastNode   = prevLastNodeId ? gs.nodes[prevLastNodeId] : null
 
   // SFX de decisión
   sfxDecision()
@@ -369,6 +376,13 @@ function onDecision(decisionIndex: number): void {
   updateStatsBar(gs)
   saveGame(gs)
   flashSaveIndicator()
+
+  // Animar el token tribal del jugador desde el nodo anterior al nuevo
+  const newLastNodeId = gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
+  const newLastNode   = newLastNodeId ? gs.nodes[newLastNodeId] : null
+  if (prevLastNode && newLastNode && prevLastNodeId !== newLastNodeId) {
+    animatePlayerToken(prevLastNode, newLastNode, gs)
+  }
 
   // Detectar si hubo cambio de acto → marcadores históricos nuevos
   const newAct = gs.history.length > 0

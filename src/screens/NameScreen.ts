@@ -1,8 +1,26 @@
 import { CACIQUE_NAMES }  from '../data/nodes.js'
 import { showScreen }      from '../ui/dom.js'
 
+// Tokens tribales — emojis representativos de culturas aborígenes americanas
+export const TRIBE_TOKENS: { emoji: string; name: string }[] = [
+  { emoji: '🦅', name: 'Cóndor'        },
+  { emoji: '🐆', name: 'Jaguar'         },
+  { emoji: '🦁', name: 'Puma'           },
+  { emoji: '🐍', name: 'Serpiente'      },
+  { emoji: '🦜', name: 'Guacamayo'      },
+  { emoji: '☀️', name: 'Sol Inca'       },
+  { emoji: '🌙', name: 'Quilla'         },
+  { emoji: '🐢', name: 'Tortuga'        },
+  { emoji: '🦋', name: 'Mariposa'       },
+  { emoji: '🌽', name: 'Maíz sagrado'   },
+  { emoji: '🌺', name: 'Flor Amazónica' },
+  { emoji: '⛰️', name: 'Andes'          },
+]
+
+let _selectedToken = TRIBE_TOKENS[0].emoji   // default: Cóndor
+
 // ══════════════════════════════════════════════════════
-// NAME SCREEN — elección del nombre del cacique
+// NAME SCREEN — elección del nombre y token del cacique
 // ══════════════════════════════════════════════════════
 
 export function mountNameScreen(): void {
@@ -31,8 +49,32 @@ export function mountNameScreen(): void {
   const btnConfirm = document.getElementById('btn-name-confirm') as HTMLButtonElement | null
   if (btnConfirm) btnConfirm.disabled = true
 
+  // Selector de token tribal
+  _buildTokenPicker()
+
   showScreen('name-screen')
   setTimeout(() => input?.focus(), 300)
+}
+
+/** Construye la grilla de selección de token tribal */
+function _buildTokenPicker(): void {
+  const container = document.getElementById('tribe-token-picker')
+  if (!container) return
+
+  const btns = TRIBE_TOKENS.map(t => {
+    const sel = t.emoji === _selectedToken ? ' selected' : ''
+    return `<button class="token-btn${sel}" data-emoji="${t.emoji}" title="${t.name}" aria-label="${t.name}"><span class="token-emoji">${t.emoji}</span><span class="token-name">${t.name}</span></button>`
+  }).join('')
+
+  container.innerHTML = `<div class="token-picker-label">Elige el símbolo de tu tribu</div><div class="token-grid">${btns}</div>`
+
+  container.querySelectorAll<HTMLButtonElement>('.token-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _selectedToken = btn.dataset.emoji ?? TRIBE_TOKENS[0].emoji
+      container.querySelectorAll('.token-btn').forEach(b => b.classList.remove('selected'))
+      btn.classList.add('selected')
+    })
+  })
 }
 
 export function selectCaciqueName(name: string): void {
@@ -55,4 +97,9 @@ export function getEnteredName(): string | null {
   if (!input) return null
   const name = input.value.trim()
   return name.length >= 2 ? name : null
+}
+
+/** Devuelve el emoji del token de tribu seleccionado */
+export function getSelectedToken(): string {
+  return _selectedToken
 }
