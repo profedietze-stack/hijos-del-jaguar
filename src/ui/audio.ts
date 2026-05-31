@@ -1,22 +1,23 @@
 // ══════════════════════════════════════════════════════
-// AUDIO ENGINE — Tone.js generativo
+// AUDIO ENGINE v3 — Tone.js + raw Web Audio API
 //
-// ARQUITECTURA:
-//   Master chain:   Compressor → Limiter → Destination
-//   Música menú:    synths → vol → menuRev (lazy) → Limiter
-//   Música juego:   synths → vol → gameDly (lazy) → gameRev (lazy) → Limiter
-//   SFX secos:      farm → sfxDryBus → Limiter
-//   SFX con eco:    farm → sfxRevBus → sfxSharedRev → Limiter
+// ARQUITECTURA ANTI-ARTIFACTS:
 //
-// REGLA ANTI-ARTIFACTS:
-//   1. _initMasterChain() crea el master bus + SFX buses + farms.
-//      Los reverbs de MÚSICA se crean LAZY (primera vez) en _buildMenu/Game,
-//      de modo que si su creación falla no aborta la inicialización critica
-//      (_sfxDryBus nulo = silencio total en botones).
-//   2. Una vez creados, los reverbs de música se REUSAN en llamadas
-//      posteriores (no se recrea el OfflineAudioContext = sin spike).
-//   3. Synths de SFX pre-creados en farms: cero allocación durante gameplay.
-//   4. Transport NUNCA se detiene entre tracks (sin click de stop/start).
+//   Clicks:  MembraneSynth[3] → clickVol → Tone.Destination
+//   SFX:     OscillatorNode + GainNode → _rawOut → ctx.destination
+//            (auto-GC automático tras osc.stop() — cero disposal manual)
+//   Música:  Sequences → vol → lazyReverb → Tone.Destination
+//
+// POR QUÉ ESTO FUNCIONA:
+//   La versión anterior tenía 9 NoiseSynths + 6 Tone.Vibrato
+//   PRE-CREADOS en el farm. NoiseSynth usa AudioBufferSourceNode en
+//   loop infinito; Vibrato usa un LFO continuo. Ambos procesan muestras
+//   24/7 aunque no suenen nada → CPU del audio thread overloaded →
+//   cualquier evento de JS (mousemove) produce dropouts.
+//
+//   Ahora: solo 3 MembraneSynths persistentes (click pool).
+//   Todo lo demás (SFX de gameplay) usa OscillatorNode raw que
+//   existe 0.2–2 segundos y luego el browser lo GC automáticamente.
 // ══════════════════════════════════════════════════════
 
 import * as Tone from 'tone'
@@ -29,55 +30,25 @@ let _currentTrack: TrackName | null = null
 let _menuParts:  Array<() => void> = []
 let _gameParts:  Array<() => void> = []
 
-// ── Master chain ──────────────────────────────────────
-let _masterComp:    Tone.Compressor | null = null
-let _masterLimiter: Tone.Limiter    | null = null
+// ── Click pool (los ÚNICOS synths persistentes de SFX) ─
+const POOL = 3
+let _clickPool: Tone.MembraneSynth[] = []
+let _clickVol:  Tone.Volume | null   = null
+let _poolIdx   = 0
 
-// ── Reverbs de música (lazy — creados la primera vez que se usa el track) ─
-// Se reúsan en llamadas posteriores → sin OfflineAudioContext spike.
+// ── Raw SFX output (GainNode nativo) ─────────────────
+// Todos los OscillatorNode raw van aquí. Se controla separado
+// del canal Tone.js para poder mutear con toggleMute().
+let _rawOut: GainNode | null = null
+
+// ── Throttles ─────────────────────────────────────────
+let _lastHover  = 0
+const HOVER_GAP = 150   // ms mínimos entre hover sounds
+
+// ── Music reverbs (lazy — creados la primera vez) ─────
 let _menuRev: Tone.Reverb        | null = null
 let _gameRev: Tone.Reverb        | null = null
 let _gameDly: Tone.FeedbackDelay | null = null
-
-// ── Buses SFX ─────────────────────────────────────────
-// Creados en _initMasterChain() — ANTES de cualquier Reverb — para que
-// una falla en la creación de reverbs no deje _sfxDryBus en null.
-let _sfxDryBus:    Tone.Volume | null = null
-let _sfxRevBus:    Tone.Volume | null = null
-let _sfxSharedRev: Tone.Reverb | null = null
-
-// ── Click/hover pools ─────────────────────────────────
-const POOL = 3
-let _clickMemPool: Tone.MembraneSynth[] = []
-let _clickNoiPool: Tone.NoiseSynth[]    = []
-let _hoverPool:    Tone.MembraneSynth[] = []
-let _poolIdx = 0
-
-// ── SFX Farm ──────────────────────────────────────────
-// Synths pre-creados para todos los SFX de gameplay.
-// Cada tipo tiene SFARM voces en round-robin → cero allocación durante el juego.
-const SFARM = 6
-let _fMem: Tone.MembraneSynth[] = []  // bombo / percusión
-let _fSin: Tone.Synth[]         = []  // flauta / tono sine (vía vibrato)
-let _fSaw: Tone.Synth[]         = []  // peligro / negativo
-let _fMet: Tone.MetalSynth[]    = []  // shimmer / metal
-let _fNoi: Tone.NoiseSynth[]    = []  // textura
-let _fVib: Tone.Vibrato[]       = []  // vibratos inline para _fSin
-
-// Índices round-robin independientes por tipo
-let _iMem = 0, _iSin = 0, _iSaw = 0, _iMet = 0, _iNoi = 0
-
-// Campana cinemática dedicada (decay 1.8s)
-let _cinematicBell: Tone.MetalSynth | null = null
-let _cinematicSub:  Tone.Synth      | null = null
-
-// ── Helpers round-robin ───────────────────────────────
-
-function _nm(): Tone.MembraneSynth | undefined { return _fMem[(_iMem++) % SFARM] }
-function _ns(): Tone.Synth         | undefined { return _fSin[(_iSin++) % SFARM] }
-function _nw(): Tone.Synth         | undefined { return _fSaw[(_iSaw++) % SFARM] }
-function _nk(): Tone.MetalSynth    | undefined { return _fMet[(_iMet++) % SFARM] }
-function _nn(): Tone.NoiseSynth    | undefined { return _fNoi[(_iNoi++) % SFARM] }
 
 // ─────────────────────────────────────────────────────
 
@@ -86,204 +57,171 @@ async function _ensureStarted(): Promise<boolean> {
   try {
     await Tone.start()
     _started = true
-    _initMasterChain()
+    _initChain()
     return true
   } catch { return false }
 }
 
-/**
- * Crea el master bus, los buses SFX y los farms.
- * Los reverbs de música se crean en _buildMenu/_buildGame (lazy).
- * Orden crítico: _sfxDryBus debe estar antes de cualquier Reverb
- * para que un error en Reverb no lo deje en null.
- */
-function _initMasterChain(): void {
+function _initChain(): void {
   try {
-    // 1. Master bus
-    _masterComp    = new Tone.Compressor({
-      threshold: -18, ratio: 4, attack: 0.003, release: 0.12, knee: 6,
-    }).toDestination()
-    _masterLimiter = new Tone.Limiter(-1).connect(_masterComp)
-
-    // 2. Buses SFX (ANTES de cualquier Reverb — crítico)
-    _sfxDryBus    = new Tone.Volume(-2).connect(_masterLimiter)
-    _sfxSharedRev = new Tone.Reverb({ decay: 1.8, wet: 0.28 }).connect(_masterLimiter)
-    _sfxRevBus    = new Tone.Volume(-3).connect(_sfxSharedRev)
-
-    // 3. Click/hover pools
+    // 1. Click pool: 3 MembraneSynths → Tone.Destination
+    //    (sin NoiseSynth — los NoiseSynth corren continuamente)
+    _clickVol = new Tone.Volume(-4).toDestination()
     for (let i = 0; i < POOL; i++) {
-      _clickMemPool.push(new Tone.MembraneSynth({
+      _clickPool.push(new Tone.MembraneSynth({
         pitchDecay: 0.04, octaves: 3,
         envelope: { attack: 0.001, decay: 0.09, sustain: 0, release: 0.05 },
         volume: -14,
-      }).connect(_sfxDryBus))
-      _clickNoiPool.push(new Tone.NoiseSynth({
-        noise: { type: 'brown' as const },
-        envelope: { attack: 0.001, decay: 0.06, sustain: 0, release: 0.03 },
-        volume: -22,
-      }).connect(_sfxDryBus))
-      _hoverPool.push(new Tone.MembraneSynth({
-        pitchDecay: 0.02, octaves: 2,
-        envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.03 },
-        volume: -28,
-      }).connect(_sfxDryBus))
+      }).connect(_clickVol))
     }
 
-    // 4. SFX farm
-    for (let i = 0; i < SFARM; i++) {
-      _fMem.push(new Tone.MembraneSynth({
-        pitchDecay: 0.08, octaves: 5,
-        envelope: { attack: 0.001, decay: 0.35, sustain: 0, release: 0.2 },
-        volume: -10,
-      }).connect(_sfxRevBus))
+    // 2. Raw SFX output: GainNode nativo → ctx.destination
+    //    Separado de Tone.Destination para poder controlarlo en toggleMute()
+    const ctx = Tone.getContext().rawContext as AudioContext
+    _rawOut = ctx.createGain()
+    _rawOut.gain.value = 1.0
+    _rawOut.connect(ctx.destination)
 
-      const vib = new Tone.Vibrato({ frequency: 5, depth: 0.1 }).connect(_sfxRevBus)
-      _fVib.push(vib)
-      _fSin.push(new Tone.Synth({
-        oscillator: { type: 'sine' as const },
-        envelope: { attack: 0.05, decay: 0.25, sustain: 0.4, release: 0.65 },
-        volume: -18,
-      }).connect(vib))
+  } catch { /* silencioso */ }
+}
 
-      _fSaw.push(new Tone.Synth({
-        oscillator: { type: 'sawtooth' as const },
-        envelope: { attack: 0.02, decay: 0.38, sustain: 0.08, release: 0.45 },
-        volume: -20,
-      }).connect(_sfxRevBus))
+// ── Raw WebAudio helpers ──────────────────────────────
 
-      _fMet.push(new Tone.MetalSynth({
-        envelope: { attack: 0.001, decay: 0.5, release: 0.5 },
-        harmonicity: 3.0, modulationIndex: 16, resonance: 2200, octaves: 0.9,
-        volume: -22,
-      } as never).connect(_sfxRevBus))
+/** Acceso al AudioContext nativo */
+function _ctx(): AudioContext | null {
+  try { return Tone.getContext().rawContext as AudioContext } catch { return null }
+}
 
-      _fNoi.push(new Tone.NoiseSynth({
-        noise: { type: 'brown' as const },
-        envelope: { attack: 0.02, decay: 0.28, sustain: 0, release: 0.2 },
-        volume: -26,
-      }).connect(_sfxDryBus))
+/**
+ * Tono puro: crea OscillatorNode+GainNode, suena `dur` segundos,
+ * se auto-GC tras osc.stop(). Si se pasa endFreq, hace sweep de frecuencia.
+ */
+function _tone(
+  freq:    number,
+  vol:     number,
+  dur:     number,
+  type:    OscillatorType = 'sine',
+  offset:  number = 0,
+  endFreq?: number,
+): void {
+  if (!_rawOut) return
+  const ctx = _ctx(); if (!ctx) return
+  try {
+    const now = ctx.currentTime + offset
+    const osc = ctx.createOscillator()
+    const g   = ctx.createGain()
+    osc.type = type
+    osc.frequency.setValueAtTime(freq, now)
+    if (endFreq !== undefined) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(endFreq, 5), now + dur * 0.45)
     }
+    // Envelope: ataque suave + decay exponencial
+    g.gain.setValueAtTime(0.001, now)
+    g.gain.linearRampToValueAtTime(vol, now + Math.min(0.008, dur * 0.12))
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur)
+    osc.connect(g)
+    g.connect(_rawOut)
+    osc.start(now)
+    osc.stop(now + dur + 0.02)   // tras stop(): GC automático
+  } catch { /* silencioso */ }
+}
 
-    // 5. Campana cinemática dedicada
-    _cinematicBell = new Tone.MetalSynth({
-      envelope: { attack: 0.001, decay: 1.8, release: 2.0 },
-      harmonicity: 2.0, modulationIndex: 8, resonance: 800, octaves: 0.5,
-      volume: -20,
-    } as never).connect(_sfxRevBus)
-    _cinematicSub = new Tone.Synth({
-      oscillator: { type: 'sine' as const },
-      envelope: { attack: 0.3, decay: 1.5, sustain: 0, release: 2.0 },
-      volume: -24,
-    }).connect(_sfxDryBus)
-
-  } catch { /* silencioso — los buses críticos ya fueron creados arriba */ }
+/**
+ * Drum hit: sine con pitch sweep descendente (simula MembraneSynth).
+ * startHz = pitch inicial (audible), baja al 12% en `dur*0.45` segundos.
+ */
+function _drum(startHz: number, vol: number, dur: number, offset = 0): void {
+  _tone(startHz, vol, dur, 'sine', offset, startHz * 0.12)
 }
 
 // ── SFX ──────────────────────────────────────────────
 
+/** Toc de madera — botones genéricos (pool pre-creado) */
 export function sfxClick(): void {
-  if (!_started || !_sfxDryBus) return
+  if (!_started || !_clickVol) return
   try {
     const idx = _poolIdx % POOL; _poolIdx++
-    _clickMemPool[idx]?.triggerAttackRelease('C2', '16n')
-    _clickNoiPool[idx]?.triggerAttackRelease('16n')
+    _clickPool[idx]?.triggerAttackRelease('C2', '16n')
   } catch { /* silencioso */ }
 }
 
+/** Ping suave al pasar por encima de un nodo (throttleado) */
 export function sfxNodeHover(): void {
-  if (!_started || !_sfxDryBus) return
-  try {
-    const idx = _poolIdx % POOL; _poolIdx++
-    _hoverPool[idx]?.triggerAttackRelease('G2', '32n')
-  } catch { /* silencioso */ }
+  if (!_started) return
+  const now = Date.now()
+  if (now - _lastHover < HOVER_GAP) return
+  _lastHover = now
+  _tone(880, 0.04, 0.035, 'sine')
 }
 
+/** Seleccionar un nodo en el mapa */
 export function sfxNodeSelect(): void {
   if (!_started) return
-  try {
-    const fl = _ns(); const sh = _nk()
-    fl?.triggerAttackRelease('E4', '4n')
-    sh?.triggerAttackRelease('8n', '+0.04')
-    fl?.triggerAttackRelease('B4', '4n', '+0.18')
-  } catch { /* silencioso */ }
+  _tone(659, 0.12, 0.20, 'sine')
+  _tone(988, 0.09, 0.18, 'sine', 0.16)
 }
 
+/** Tomar una decisión en un evento */
 export function sfxDecision(): void {
   if (!_started) return
-  try {
-    const b1 = _nm(); const b2 = _nm(); const tn = _ns()
-    b1?.triggerAttackRelease('C1', '8n')
-    b2?.triggerAttackRelease('G1', '8n', '+0.12')
-    tn?.triggerAttackRelease('A2', '2n', '+0.08')
-  } catch { /* silencioso */ }
+  _drum(420, 0.28, 0.30)
+  _drum(300, 0.20, 0.18, 0.12)
+  _tone(110, 0.12, 0.55, 'triangle', 0.08)
 }
 
+/** Resultado positivo (alianza, ganancia) */
 export function sfxPositive(): void {
   if (!_started) return
-  try {
-    const fl = _ns()
-    const notes = ['A3', 'C4', 'E4', 'A4']
-    notes.forEach((n, i) => fl?.triggerAttackRelease(n, '8n', `+${i * 0.13}`))
-  } catch { /* silencioso */ }
+  ;[220, 277, 330, 440].forEach((hz, i) =>
+    _tone(hz, 0.11, 0.22, 'sine', i * 0.13),
+  )
 }
 
+/** Resultado negativo (pérdida, peligro) */
 export function sfxNegative(): void {
   if (!_started) return
-  try {
-    const sw = _nw(); const no = _nn()
-    sw?.triggerAttackRelease('E3',  '8n')
-    sw?.triggerAttackRelease('Eb3', '8n', '+0.15')
-    sw?.triggerAttackRelease('D3',  '8n', '+0.3')
-    no?.triggerAttackRelease('4n', '+0.05')
-  } catch { /* silencioso */ }
+  _tone(164, 0.14, 0.20, 'sawtooth', 0.00)
+  _tone(155, 0.12, 0.20, 'sawtooth', 0.16)
+  _tone(146, 0.10, 0.25, 'sawtooth', 0.32)
 }
 
+/** El conquistador avanza */
 export function sfxConqAdvance(): void {
   if (!_started) return
-  try {
-    const d1 = _nm(); const d2 = _nm(); const sh = _nk()
-    d1?.triggerAttackRelease('C1', '4n')
-    d2?.triggerAttackRelease('C1', '4n', '+0.22')
-    sh?.triggerAttackRelease('16n', '+0.1')
-  } catch { /* silencioso */ }
+  _drum(500, 0.26, 0.38, 0.00)
+  _drum(500, 0.20, 0.30, 0.22)
+  _tone(880, 0.07, 0.18, 'sine', 0.10)
 }
 
+/** El conquistador te alcanza (alerta máxima) */
 export function sfxConqCatch(): void {
   if (!_started) return
-  try {
-    const d1  = _nm(); const d2  = _nm(); const d3 = _nm()
-    const dng = _nw()
-    d1?.triggerAttackRelease('C1', '8n')
-    d2?.triggerAttackRelease('C1', '8n', '+0.18')
-    d3?.triggerAttackRelease('C1', '8n', '+0.36')
-    dng?.triggerAttackRelease('A1', '2n', '+0.2')
-  } catch { /* silencioso */ }
+  _drum(600, 0.30, 0.45, 0.00)
+  _drum(600, 0.26, 0.38, 0.18)
+  _drum(600, 0.22, 0.30, 0.36)
+  _tone(110, 0.16, 1.20, 'sawtooth', 0.20)
 }
 
+/** Cinemática / transición de acto */
 export function sfxCinematic(): void {
   if (!_started) return
-  try {
-    _cinematicBell?.triggerAttackRelease('2n', '+0')
-    _cinematicSub?.triggerAttackRelease('A1', '1n', '+0.1')
-  } catch { /* silencioso */ }
+  _tone(880, 0.13, 2.20, 'sine', 0.00)
+  _tone(55,  0.09, 1.80, 'sine', 0.10)
 }
 
 // ── Música MENÚ ───────────────────────────────────────
-// El reverb de menú se crea LAZY (una sola vez). En llamadas
-// posteriores se reutiliza → sin OfflineAudioContext spike.
 
 function _buildMenu(): void {
-  if (!_masterLimiter) return
+  if (!_started) return
   try {
-    // Lazy-create el reverb de menú (solo la primera vez)
+    // Reverb lazy (una sola vez)
     if (!_menuRev) {
       _menuRev = new Tone.Reverb({ decay: 6, wet: 0.55 })
-      _menuRev.connect(_masterLimiter)
+      _menuRev.toDestination()
     }
-    const dest = _menuRev
 
-    const vol  = new Tone.Volume(-10).connect(dest)
-    const vol2 = new Tone.Volume(-16).connect(dest)
+    const vol  = new Tone.Volume(-10).connect(_menuRev)
+    const vol2 = new Tone.Volume(-16).connect(_menuRev)
 
     const drone = new Tone.Synth({
       oscillator: { type: 'triangle' as const },
@@ -319,7 +257,7 @@ function _buildMenu(): void {
       noise: { type: 'white' as const },
       envelope: { attack: 0.002, decay: 0.06, sustain: 0, release: 0.04 },
       volume: -30,
-    }).connect(dest)
+    }).connect(_menuRev)
     const shakerLoop = new Tone.Loop((time: ToneTime) => {
       shaker.triggerAttackRelease('16n', time)
     }, '8n')
@@ -329,7 +267,7 @@ function _buildMenu(): void {
       noise: { type: 'pink' as const },
       envelope: { attack: 0.8, decay: 1.2, sustain: 0, release: 1.5 },
       volume: -34,
-    }).connect(dest)
+    }).connect(_menuRev)
     const rainLoop = new Tone.Loop((time: ToneTime) => {
       if (Math.random() < 0.3) rain.triggerAttackRelease('2n', time)
     }, '4')
@@ -346,9 +284,9 @@ function _buildMenu(): void {
       () => { try {
         flute.dispose(); vib.dispose()
         shaker.dispose(); rain.dispose()
-        drone.dispose(); drone5.dispose()
-        vol.dispose(); vol2.dispose()
-        // _menuRev NO se disposa — es un nodo reutilizable
+        drone.dispose();  drone5.dispose()
+        vol.dispose();    vol2.dispose()
+        // _menuRev se REUTILIZA — no se disposa
       } catch { /* noop */ } },
     ]
   } catch { /* silencioso */ }
@@ -357,12 +295,12 @@ function _buildMenu(): void {
 // ── Música JUEGO ──────────────────────────────────────
 
 function _buildGame(): void {
-  if (!_masterLimiter) return
+  if (!_started) return
   try {
-    // Lazy-create reverb y delay del juego (solo la primera vez)
+    // Reverb y delay lazy (una sola vez)
     if (!_gameRev) {
       _gameRev = new Tone.Reverb({ decay: 2.5, wet: 0.30 })
-      _gameRev.connect(_masterLimiter)
+      _gameRev.toDestination()
     }
     if (!_gameDly) {
       _gameDly = new Tone.FeedbackDelay({ delayTime: '8n', feedback: 0.22, wet: 0.18 })
@@ -441,24 +379,22 @@ function _buildGame(): void {
       () => { melLoop.stop();   melLoop.dispose()   },
       () => { quenaLoop.stop(); quenaLoop.dispose() },
       () => { try {
-        bombo.dispose(); mid.dispose(); click.dispose()
+        bombo.dispose();  mid.dispose();   click.dispose()
         melody.dispose(); quena.dispose(); qVib.dispose()
         volMain.dispose(); volPerc.dispose()
-        // _gameRev y _gameDly NO se disposan — son nodos reutilizables
+        // _gameRev y _gameDly se REUTILIZAN — no se disposan
       } catch { /* noop */ } },
     ]
   } catch { /* silencioso */ }
 }
 
-// ── Parar el track actual ─────────────────────────────
+// ── Stop track ────────────────────────────────────────
 
 function _stopCurrent(): void {
   try {
     ;(_currentTrack === 'menu' ? _menuParts : _gameParts).forEach(fn => fn())
     _menuParts = []
     _gameParts = []
-    // Transport NUNCA se para — sin click de stop/start.
-    // cancel() limpia eventos one-shot rezagados.
     Tone.getTransport().cancel()
   } catch { /* silencioso */ }
   _currentTrack = null
@@ -472,10 +408,7 @@ export async function playTrack(track: TrackName): Promise<void> {
   if (!ok) return
   _stopCurrent()
   _currentTrack = track
-  // Arrancar el transport si todavía no está corriendo
-  if (Tone.getTransport().state !== 'started') {
-    Tone.getTransport().start()
-  }
+  if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
   if (track === 'menu') _buildMenu()
   else                  _buildGame()
 }
@@ -493,10 +426,14 @@ export function isMuted(): boolean { return _muted }
 
 export function toggleMute(): void {
   _muted = !_muted
-  try { Tone.getDestination().mute = _muted } catch { /* silencioso */ }
+  // Canal Tone.js (música + click pool)
+  try { Tone.getDestination().mute = _muted } catch { /* noop */ }
+  // Canal raw SFX (oscillators nativos)
+  if (_rawOut) _rawOut.gain.value = _muted ? 0 : 1
+  // Botón UI
   const btn = document.getElementById('btn-mute')
   if (btn) {
-    btn.textContent = _muted ? '🔇' : '🔊'
-    btn.style.opacity = _muted ? '0.9' : '0.55'
+    btn.textContent    = _muted ? '🔇' : '🔊'
+    btn.style.opacity  = _muted ? '0.9' : '0.55'
   }
 }
