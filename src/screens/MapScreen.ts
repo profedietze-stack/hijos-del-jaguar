@@ -1467,41 +1467,54 @@ function _showOneHistCinematic(
   }
 
   // ── Secuencia principal ───────────────────────────────────────────────────
-  // Breve delay + cancelar transiciones pendientes antes de panear.
-  // Sin esto, el primer marcador (Cajamarca) hereda la transición de
-  // animateConqStep y D3 dispara 'interrupt' inmediatamente, saltando el pan.
+  //
+  // Bug de Cajamarca (primer marcador):
+  //   _animateConqAdvance llama _centerOnNextNodes() JUSTO ANTES de onDone().
+  //   _centerOnNextNodes hace setTimeout(centerMapOn, 180ms).
+  //   Si el interrupt se dispara a 80ms (antes de esos 180ms) no hay
+  //   transición activa que cancelar → noop.
+  //   Luego el pan empieza a 150ms, pero centerMapOn arranca a 180ms y
+  //   lo interrumpe 30ms después → D3 dispara 'interrupt' → proceed() se
+  //   llama inmediatamente sin que la cámara se haya movido.
+  //
+  // Fix:
+  //   • interrupt a 260ms  → después de que centerMapOn arrange (180ms)
+  //   • pan a 380ms        → 120ms después del interrupt, transición limpia
+  //   • fuego visible 2500ms antes del cartel → jugador puede ver la ciudad
+
   setTimeout(() => {
     if (mapSvg) (mapSvg as unknown as { interrupt: () => void }).interrupt()
-  }, 80)
+  }, 260)
 
-  // PASO 1: Pan al marcador histórico (con fallback)
-  // Delay de 150ms para que cualquier transición D3 previa (animateConqStep)
-  // termine antes de que iniciemos el nuevo pan. Sin esto, D3 dispara
-  // 'interrupt' de inmediato en el primer marcador y se saltea la animación.
+  // PASO 1: Pan al marcador histórico
   setTimeout(() => _panTo(marker.lon, marker.lat, scale, 1800, () => {
     const [mx, my] = mapProj!([marker.lon, marker.lat]) as [number, number]
 
-    // PASO 2: Token del conquistador + fuego (si conquista)
+    // PASO 2: Token del conquistador aparece en la ciudad
     _addConqTokenEffect(mx, my)
-    if (marker.conquered) _addFireEffect(mx, my)
 
-    // PASO 3: Card con botón — no se cierra sola
+    // PASO 3: Fuego aparece 400ms después del token (efecto de llegada)
+    if (marker.conquered) {
+      setTimeout(() => _addFireEffect(mx, my), 400)
+    }
+
+    // PASO 4: Card aparece 2500ms después del pan — el jugador tiene tiempo
+    // de ver la ciudad conquistada / el evento antes de que aparezca el texto
     setTimeout(() => {
       _showHistCard(() => {
-        // PASO 4: Marcar como conquistado (para token persistente) y limpiar cinematic overlays
+        // PASO 5: Limpiar efectos cinemáticos y marcar como conquistado
         _conqueredMarkers.add(marker.id)
         mapG?.selectAll(`.hist-conq-cinematic-${marker.id}`).remove()
         mapG?.selectAll(`.hist-fire-${marker.id}`).remove()
 
-        // PASO 5: Pan de vuelta al jugador
+        // PASO 6: Pan de vuelta al jugador
         _panBackToPlayer(gs, () => {
-          // Redibujar marcadores con el token persistente ya incluido
           drawHistMarkers(gs)
           onDone()
         })
       })
-    }, 500)
-  }), 150)
+    }, 2500)
+  }), 380)
 }
 
 /** Pan de vuelta a la zona del jugador después de una cinemática histórica */
