@@ -89,9 +89,32 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════
+       SPLASH SCREEN — carga inicial, activa audio y fullscreen
+  ══════════════════════════════════════════════════ -->
+  <div id="splash-screen">
+    <div class="splash-bg"></div>
+    <div class="splash-particles" id="splash-particles"></div>
+    <div class="splash-content">
+      <div class="splash-eyebrow">Una historia de resistencia</div>
+      <h1 class="splash-title">Hijos<br>del Jaguar</h1>
+      <div class="splash-sub">La Gran Huida</div>
+      <div class="splash-divider"></div>
+      <div class="splash-loading" id="splash-loading">
+        <span></span><span></span><span></span>
+      </div>
+      <button class="splash-btn" id="btn-splash-start" style="display:none">
+        ▶ &nbsp;Comenzar
+      </button>
+      <div class="splash-hint" id="splash-hint" style="display:none">
+        Activá el sonido y la pantalla completa
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
        PANTALLA: MENÚ PRINCIPAL
   ══════════════════════════════════════════════════ -->
-  <div id="menu-screen" class="screen active">
+  <div id="menu-screen" class="screen">
     <div class="menu-bg"></div>
     <div class="menu-content">
       <div class="menu-eyebrow">Una historia de resistencia</div>

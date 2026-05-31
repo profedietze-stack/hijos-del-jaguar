@@ -26,6 +26,7 @@ import {
 } from './core/SaveSystem.js'
 
 // ── Screens ───────────────────────────────────────────
+import { mountSplash }                                  from './screens/SplashScreen.js'
 import { mountMenu }                                    from './screens/MenuScreen.js'
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName } from './screens/NameScreen.js'
@@ -91,9 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
     () => gs,
     () => _selectNodeFn,
   )
-  playTrack('menu')
-  mountMenu()
   _registerServiceWorker()
+
+  // El splash es el primer gesto del usuario.
+  // Tone.js requiere un gesto para iniciar el AudioContext,
+  // así que arrancamos el audio DESPUÉS de que el usuario hace click en el splash.
+  mountSplash().then(() => {
+    playTrack('menu')
+    mountMenu()
+  })
 })
 
 // ── Service Worker ────────────────────────────────────
