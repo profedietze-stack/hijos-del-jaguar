@@ -44,19 +44,25 @@ export const NODES_DEF: Record<string, NodeDef> = {
   n09: { id:'n09', name:'La Encrucijada', lon:-67.5, lat:-43.0, act:4, icon:'⭐', desc:'El momento de elegir el destino definitivo de tu pueblo.',             eventPool:['e_encrucijada'],             next:['n10a','n10b','n10c'] },
 
   // ── ACTO IV — Rama A: Amazonas Profundo ─────────────────────
-  n10a: { id:'n10a',  name:'Alto Amazonas',      lon:-74.5, lat:-5.0,  act:4, icon:'🌿', desc:'Remontar el Amazonas hacia sus fuentes sagradas.',              eventPool:['e_amazonia_final_a','e_amazonia_final_b'], next:['n10a2'] },
-  n10a2:{ id:'n10a2', name:'Confluencia Sagrada', lon:-73.5, lat:-7.0,  act:4, icon:'💧', desc:'Donde los ríos se unen y el tiempo se detiene.',               eventPool:['e_confluencia','e_confluencia_b'],          next:['n11a'] },
-  n11a: { id:'n11a',  name:'Pueblo del Río',      lon:-73.0, lat:-9.0,  act:4, icon:'🏡', desc:'Fundar una nueva aldea donde el río nace.',                    eventPool:['e_fin_amazonas'],                           next:[] },
+  n10a: { id:'n10a',  name:'Alto Amazonas',        lon:-74.5, lat:-5.0,  act:4, icon:'🌿', desc:'Remontar el Amazonas hacia sus fuentes sagradas.',                 eventPool:['e_amazonia_final_a','e_amazonia_final_b'],   next:['n10a2'] },
+  n10a2:{ id:'n10a2', name:'Confluencia Sagrada',   lon:-73.5, lat:-7.0,  act:4, icon:'💧', desc:'Donde los ríos se unen y el tiempo se detiene.',                  eventPool:['e_confluencia','e_confluencia_b'],            next:['n10a3a','n10a3b'] },
+  n10a3a:{ id:'n10a3a',name:'Los Yagua del Ucayali',lon:-71.5, lat:-8.5,  act:4, icon:'🎋', desc:'Un pueblo del río que conoce cada afluente como si fuera su casa.', eventPool:['e_yagua','e_yagua_b'],                       next:['n11a'] },
+  n10a3b:{ id:'n10a3b',name:'Las Fuentes Sagradas', lon:-75.0, lat:-9.5,  act:4, icon:'⛰️', desc:'El punto donde el gran río nace como un hilo de agua pura.',        eventPool:['e_fuentes_sagradas','e_fuentes_sagradas_b'], next:['n11a'] },
+  n11a: { id:'n11a',  name:'Pueblo del Río',        lon:-73.0, lat:-11.0, act:4, icon:'🏡', desc:'Fundar una nueva aldea donde el río nace.',                        eventPool:['e_fin_amazonas'],                            next:[] },
 
   // ── ACTO IV — Rama B: Patagonia Argentina ───────────────────
-  n10b: { id:'n10b',  name:'Río Negro',        lon:-65.0, lat:-40.5, act:4, icon:'🌬️', desc:'Cruzar el río que marca el fin del mundo conocido.',              eventPool:['e_patagonia_arg_a','e_patagonia_arg_b'],   next:['n10b2'] },
-  n10b2:{ id:'n10b2', name:'Las Lagunas Azules',lon:-66.5, lat:-43.5, act:4, icon:'🦢', desc:'Un campo de lagunas color turquesa en la estepa infinita.',       eventPool:['e_lagunas_azules','e_lagunas_azules_b'],   next:['n11b'] },
-  n11b: { id:'n11b',  name:'Patagonia Argentina',lon:-66.0, lat:-48.0, act:4, icon:'🌟', desc:'La estepa infinita. El viento y las estrellas.',                 eventPool:['e_fin_patagonia_arg'],                      next:[] },
+  n10b: { id:'n10b',  name:'Río Negro',            lon:-65.0, lat:-40.5, act:4, icon:'🌬️', desc:'Cruzar el río que marca el fin del mundo conocido.',                eventPool:['e_patagonia_arg_a','e_patagonia_arg_b'],     next:['n10b2'] },
+  n10b2:{ id:'n10b2', name:'Las Lagunas Azules',    lon:-66.5, lat:-43.5, act:4, icon:'🦢', desc:'Un campo de lagunas color turquesa en la estepa infinita.',          eventPool:['e_lagunas_azules','e_lagunas_azules_b'],     next:['n10b3a','n10b3b'] },
+  n10b3a:{ id:'n10b3a',name:'Los Tehuelches del Sur',lon:-69.0, lat:-46.0, act:4, icon:'🦬', desc:'Los maestros de la Patagonia profunda, guardianes del viento sur.', eventPool:['e_tehuelches_sur','e_tehuelches_sur_b'],     next:['n11b'] },
+  n10b3b:{ id:'n10b3b',name:'La Gran Estepa',        lon:-65.5, lat:-46.0, act:4, icon:'🌾', desc:'La llanura sin fin donde el horizonte es solo viento y guanacos.',  eventPool:['e_gran_estepa','e_gran_estepa_b'],           next:['n11b'] },
+  n11b: { id:'n11b',  name:'Patagonia Argentina',    lon:-67.0, lat:-49.5, act:4, icon:'🌟', desc:'La estepa infinita. El viento y las estrellas.',                   eventPool:['e_fin_patagonia_arg'],                       next:[] },
 
   // ── ACTO IV — Rama C: Patagonia Chilena ─────────────────────
-  n10c: { id:'n10c',  name:'Paso Andino',      lon:-72.0, lat:-40.0, act:4, icon:'🏔️', desc:'Cruzar los Andes hacia la vertiente del Pacífico.',               eventPool:['e_patagonia_chi_a','e_patagonia_chi_b'],   next:['n10c2'] },
-  n10c2:{ id:'n10c2', name:'Bosque Milenario', lon:-73.0, lat:-42.5, act:4, icon:'🌲', desc:'Árboles de tres mil años. El bosque más antiguo del continente.',  eventPool:['e_bosque_milenario','e_bosque_milenario_b'], next:['n11c'] },
-  n11c: { id:'n11c',  name:'Patagonia Chilena', lon:-73.5, lat:-47.0, act:4, icon:'🌊', desc:'Los canales patagónicos: agua, bosque y silencio.',               eventPool:['e_fin_patagonia_chi'],                      next:[] },
+  n10c: { id:'n10c',  name:'Paso Andino',           lon:-72.0, lat:-40.0, act:4, icon:'🏔️', desc:'Cruzar los Andes hacia la vertiente del Pacífico.',                eventPool:['e_patagonia_chi_a','e_patagonia_chi_b'],     next:['n10c2'] },
+  n10c2:{ id:'n10c2', name:'Bosque Milenario',       lon:-73.0, lat:-42.5, act:4, icon:'🌲', desc:'Árboles de tres mil años. El bosque más antiguo del continente.',  eventPool:['e_bosque_milenario','e_bosque_milenario_b'], next:['n10c3a','n10c3b'] },
+  n10c3a:{ id:'n10c3a',name:'Los Canales Australes', lon:-73.5, lat:-44.5, act:4, icon:'⛵', desc:'El laberinto de agua entre islas — solo los kawésqar lo conocen.',  eventPool:['e_canales_australes','e_canales_australes_b'], next:['n11c'] },
+  n10c3b:{ id:'n10c3b',name:'Los Kawésqar',          lon:-75.2, lat:-46.0, act:4, icon:'🚣', desc:'El pueblo nómade del mar: viven en canoas, conocen cada canal.',    eventPool:['e_kawesqar','e_kawesqar_b'],                 next:['n11c'] },
+  n11c: { id:'n11c',  name:'Patagonia Chilena',      lon:-73.5, lat:-48.5, act:4, icon:'🌊', desc:'Los canales patagónicos: agua, bosque y silencio.',                eventPool:['e_fin_patagonia_chi'],                       next:[] },
 }
 
 export const EDGES: [string, string][] = [
@@ -86,9 +92,15 @@ export const EDGES: [string, string][] = [
   ['n08a','n09'], ['n08b','n09'], ['n08c','n09'],
   // Acto IV
   ['n09','n10a'], ['n09','n10b'], ['n09','n10c'],
-  ['n10a','n10a2'], ['n10a2','n11a'],
-  ['n10b','n10b2'], ['n10b2','n11b'],
-  ['n10c','n10c2'], ['n10c2','n11c'],
+  ['n10a','n10a2'],
+  ['n10a2','n10a3a'], ['n10a2','n10a3b'],
+  ['n10a3a','n11a'], ['n10a3b','n11a'],
+  ['n10b','n10b2'],
+  ['n10b2','n10b3a'], ['n10b2','n10b3b'],
+  ['n10b3a','n11b'], ['n10b3b','n11b'],
+  ['n10c','n10c2'],
+  ['n10c2','n10c3a'], ['n10c2','n10c3b'],
+  ['n10c3a','n11c'], ['n10c3b','n11c'],
 ]
 
 // Ruta del conquistador (nodos geográficos, no del grafo del juego)

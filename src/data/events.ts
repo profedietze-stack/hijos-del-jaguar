@@ -972,6 +972,203 @@ Los <span class="tt" data-tip="Kawésqar (Alacalufes): pueblo nómade marino de 
     ],
   },
 
+  // ── ACTO IV — Nuevos nodos intermedios (bifurcaciones) ────
+
+  // Rama A · n10a3a — Los Yagua del Ucayali
+  e_yagua: {
+    title: 'Los Guardianes del Ucayali',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
+    cap:   'Alto Ucayali — el río que nunca para',
+    narr:  `Aparecen en las orillas sin hacer ruido, pintados de rojo achiote con diseños que el chamán reconoce como mapas: no del territorio, sino del cuerpo. Cara, brazos, torso — todo un lenguaje de posición en el mundo.<br><br>
+Son <span class="tt" data-tip="Yagua: pueblo indígena del alto Amazonas peruano y colombiano. Hablan una lengua aíslada sin parentesco demostrado con ningún otro idioma. Sus pinturas corporales de achiote tienen función ritual y social: indican identidad, estatus y relación con el mundo espiritual.">yagua</span>. Llevan generaciones viviendo entre estos afluentes y conocen cada recodo del río como el interior de su propia casa.<br><br>
+Su líder ofrece algo que no se pide pero se reconoce: comida, refugio por una noche, silencio sobre el paso del grupo.<br><br>
+<em>"¿Cuánto tiempo llevan viviendo aquí?"</em> pregunta el chamán.<br><br>
+El líder piensa. <em>"Desde antes de que el río tuviera su nombre actual."</em>`,
+    decisions: [
+      { text: 'Quedarse tres días aprendiendo sus rutas del río. El conocimiento salva vidas.',    effects: { food: +20, moral: +25, salud: +15, union: +20 }, allianceKey: 'yagua' },
+      { text: 'Intercambiar técnicas de curación por guía a través del laberinto de afluentes.',   effects: { food: +15, moral: +20, salud: +20, union: +15 } },
+      { text: 'Agradecer y seguir camino propio. No crear lazos que dificulten avanzar.',          effects: { food: +5,  moral: +15, salud: +5,  union: +10 } },
+    ],
+  },
+
+  e_yagua_b: {
+    title: 'El Río Que Recuerda',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1559827291-72ee739d0d9a?w=1200&q=80',
+    cap:   'Ucayali — aguas que guardan memoria',
+    narr:  `Los yagua tienen una práctica que el chamán no vio en ningún otro pueblo: cuando alguien del grupo muere, arrojan al río un objeto que perteneció a esa persona. Dicen que el río lo lleva al mar, el mar a las nubes, las nubes al origen.<br><br>
+El chamán escucha esto y se queda muy quieto por un tiempo largo. Luego pregunta si pueden hacer lo mismo con sus muertos — los que dejaron atrás, los que cayeron en los ríos del norte.<br><br>
+Los yagua consultan entre ellos. La respuesta llega en la misma tarde: <em>"El Ucayali conecta con todos los ríos. Lo que se le entrega aquí llega a todos los lugares al mismo tiempo."</em><br><br>
+Es la primera vez desde Guatemala que alguien les ofrece una manera de despedirse de los que perdieron.`,
+    decisions: [
+      { text: 'Hacer el rito yagua por cada persona que perdieron en el camino. Es hora.',         effects: { food: +10, moral: +40, salud: +10, union: +35 } },
+      { text: 'Observar el rito sin participar. Respetar sin apropiarse.',                        effects: { food: +5,  moral: +28, salud: +5,  union: +22 } },
+      { text: 'Combinar el rito yagua con las propias tradiciones. Crear algo nuevo entre los dos.', effects: { food: +8, moral: +32, salud: +8, union: +30 } },
+    ],
+  },
+
+  // Rama A · n10a3b — Las Fuentes Sagradas
+  e_fuentes_sagradas: {
+    title: 'El Principio del Agua',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=1200&q=80',
+    cap:   'Fuentes del Amazonas — donde el río nace',
+    narr:  `Remontan el afluente durante días. El río se vuelve más angosto, más limpio, más rápido. Al decimoquinto día encuentran el punto donde el agua emerge directamente de la roca: una grieta en la piedra de la que brota un hilo de agua tan transparente que parece inexistente hasta que lo tocan.<br><br>
+El chamán se arrodilla y moja la frente. Se levanta despacio.<br><br>
+<em>"Este agua no fue nunca tocada por mano española. Nunca. Nadie sabe que está aquí."</em><br><br>
+Los niños del grupo se acercan y ponen las manos bajo el hilo. El agua está fría con ese frío que solo tienen las cosas que vienen de muy adentro de la tierra.`,
+    decisions: [
+      { text: 'Fundar aquí, en la fuente. Nadie busca en el origen de un río.',                    effects: { food: +18, moral: +42, salud: +18, union: +35 } },
+      { text: 'Construir un santuario en la fuente y seguir buscando el lugar definitivo.',        effects: { food: +10, moral: +35, salud: +12, union: +28 } },
+      { text: 'Guardar silencio absoluto sobre este lugar. La fuente debe seguir siendo secreta.', effects: { food: +12, moral: +30, salud: +10, union: +25 } },
+    ],
+  },
+
+  e_fuentes_sagradas_b: {
+    title: 'Los Que Siempre Estuvieron',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
+    cap:   'Fuentes del Amazonas — el encuentro inesperado',
+    narr:  `En la cabecera del río, donde esperaban encontrar solo piedra y agua, hay una aldea pequeña. Diez familias. Llevan generaciones aquí — tantas que no recuerdan haber venido de otro lugar. Para ellos, este es simplemente el mundo.<br><br>
+No muestran sorpresa al ver al grupo. El anciano que parece ser el líder dice: <em>"Sabíamos que vendrían. El río siempre trae a los que el mundo de abajo ya no puede sostener."</em><br><br>
+Los <span class="tt" data-tip="Pueblos cabecera: en muchas cuencas amazónicas, los grupos que habitan las fuentes de los ríos son considerados guardianes del origen del agua. En cosmovisiones amazónicas, el agua viene de las montañas, que son el mundo de los ancestros.">guardianes de las fuentes</span> son pocos pero llevan una relación con el lugar que ningún ejército puede deshacer.`,
+    decisions: [
+      { text: 'Pedirles vivir junto a ellos. Esta aldea es lo que buscaban.',                     effects: { food: +25, moral: +38, salud: +20, union: +32 }, allianceKey: 'guardianes_fuentes' },
+      { text: 'Establecerse cerca pero separados. Cerca del refugio, lejos de la dependencia.',   effects: { food: +18, moral: +28, salud: +15, union: +22 } },
+      { text: 'Intercambiar historias del norte a cambio de conocimiento del lugar.',             effects: { food: +12, moral: +32, salud: +10, union: +25 } },
+    ],
+  },
+
+  // Rama B · n10b3a — Los Tehuelches del Sur
+  e_tehuelches_sur: {
+    title: 'Los Maestros de la Estepa Profunda',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80',
+    cap:   'Patagonia austral — tierra tehuelche del sur',
+    narr:  `Los <span class="tt" data-tip="Tehuelches australes (Aonikenk): el grupo más meridional de los tehuelches, cazadores de guanacos con bolas arrojadizas. Conocían miles de kilómetros de estepa de memoria. Los conquistadores nunca los sometieron.">tehuelches del sur</span> tienen algo que distingue a los que vivieron siempre en un lugar: no necesitan explicar su territorio porque no existe en ellos la idea de que alguien pueda no conocerlo.<br><br>
+El encuentro ocurre sin palabras iniciales. Comparten un fuego que nadie encendió para los otros pero que los otros pueden usar. Con el tiempo, el silencio se vuelve cómodo. Cómodo es el primer paso de la confianza.<br><br>
+Al tercer día, un tehuelche joven enseña sin ser pedido: cómo leer el viento, cómo encontrar agua bajo la estepa seca, cómo moverse sin dejar rastro visible.`,
+    decisions: [
+      { text: 'Aprender todo lo que enseñen. Su conocimiento de este lugar es irremplazable.',    effects: { food: +22, moral: +30, salud: +20, union: +25 }, allianceKey: 'tehuelches_sur' },
+      { text: 'Proponer vida en paralelo: dos grupos que se ayudan sin fusionarse.',               effects: { food: +18, moral: +25, salud: +15, union: +22 } },
+      { text: 'Compartir las propias historias. Que el intercambio sea mutuo.',                   effects: { food: +12, moral: +28, salud: +10, union: +28 } },
+    ],
+  },
+
+  e_tehuelches_sur_b: {
+    title: 'El Secreto de las Bolas',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80',
+    cap:   'Patagonia — la caza como arte y ciencia',
+    narr:  `Los tehuelches cazan guanacos con <span class="tt" data-tip="Boleadoras: arma de caza formada por piedras envueltas en cuero unidas con tiras del mismo material. Se arrojan girando y enredan las patas del animal. Los tehuelches las usaban con precisión asombrosa. Adoptadas luego por los gauchos.">boleadoras</span>: piedras unidas por tiras de cuero que se arrojan girando y enredan las patas del animal. La destreza es tal que los guerreros jóvenes del grupo quedan en silencio mirando.<br><br>
+Un tehuelche viejo observa el asombro con satisfacción tranquila: <em>"Esto que ven — quince años de práctica. No hay atajo. Pero hay método."</em><br><br>
+Ofrece enseñar a quienes quieran. La condición: paciencia. Y aceptar que los primeros intentos serán malos.`,
+    decisions: [
+      { text: 'Dedicar dos semanas a aprender. La habilidad vale el tiempo.',                     effects: { food: +30, moral: +28, salud: +12, union: +20, warriors: +2 } },
+      { text: 'Aprender lo básico mientras el tehuelche caza para el grupo.',                     effects: { food: +25, moral: +20, salud: +10, union: +15 } },
+      { text: 'Intercambiar: enseñarles medicina del norte a cambio de técnicas de caza.',        effects: { food: +20, moral: +30, salud: +18, union: +25 }, allianceKey: 'tehuelches_boleadoras' },
+    ],
+  },
+
+  // Rama B · n10b3b — La Gran Estepa
+  e_gran_estepa: {
+    title: 'El Horizonte que No Acaba',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80',
+    cap:   'Patagonia — la estepa sin límite visible',
+    narr:  `La estepa es tan plana que se puede ver la curvatura de la tierra. El viento es constante — no como tormenta sino como clima, como si el movimiento del aire fuera aquí el estado normal del mundo en reposo.<br><br>
+Los <span class="tt" data-tip="Guanaco (Lama guanicoe): el herbívoro terrestre más grande de Sudamérica. Su lana es más fina que la de la llama. Un guanaco adulto puede correr a 60 km/h.">guanacos</span> cruzan en manadas de cientos, el suelo que vibra antes de que lleguen. El chamán observa el movimiento y dice: <em>"Todo lo que necesitamos está en movimiento. Nosotros también tenemos que aprender a movernos con lo que se mueve."</em><br><br>
+La estepa, vacía a primera vista, está llena de señales para quien sabe leerlas.`,
+    decisions: [
+      { text: 'Seguir las manadas. El guanaco sabe dónde está el agua y el refugio.',              effects: { food: +28, moral: +22, salud: +18, union: +20 } },
+      { text: 'Establecerse en el punto donde los vientos se cruzan. El centro de la estepa.',     effects: { food: +15, moral: +30, salud: +15, union: +28 } },
+      { text: 'Construir una toldo permanente y aprender a cazar desde un lugar fijo.',            effects: { food: +22, moral: +18, salud: +20, union: +15 } },
+    ],
+  },
+
+  e_gran_estepa_b: {
+    title: 'La Noche Patagónica',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80',
+    cap:   'Patagonia — el cielo del sur',
+    narr:  `La noche patagónica no tiene competencia. Sin árboles altos, sin montañas cercanas, sin ninguna fuente de luz humana en kilómetros a la redonda, el cielo del sur es un espectáculo que el grupo completo recibe en silencio.<br><br>
+La <span class="tt" data-tip="Cruz del Sur (Crux): constelación visible solo desde el hemisferio sur, usada para navegación por marinos y pueblos indígenas durante milenios. Los tehuelches, kawésqar y mapuches tenían nombres propios para ella y la usaban para orientación en la Patagonia.">Cruz del Sur</span> está en el centro. El chamán la señala con emoción contenida: <em>"La conocíamos de las historias de los navegantes. Pero nunca la vi así. Nunca."</em><br><br>
+Un guerrero joven propone algo que nadie esperaba: dibujar el cielo en cuero. Hacer un mapa de las estrellas del sur para no perderse nunca más.`,
+    decisions: [
+      { text: 'Pasar una semana mapeando el cielo austral. Es el primer mapa propio.',            effects: { food: -5,  moral: +40, salud: +5,  union: +32 } },
+      { text: 'Observar y memorizar. No todo el conocimiento necesita ser escrito.',               effects: { food: +5,  moral: +30, salud: +8,  union: +25 } },
+      { text: 'Celebrar con un rito. El cielo del sur merece una ceremonia de llegada.',           effects: { food: +8,  moral: +35, salud: +10, union: +38 } },
+    ],
+  },
+
+  // Rama C · n10c3a — Los Canales Australes
+  e_canales_australes: {
+    title: 'El Laberinto del Agua',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1200&q=80',
+    cap:   'Canales patagónicos — el mar entre las islas',
+    narr:  `No hay costa — hay cientos de costas. El mar entra por la tierra en canales que se bifurcan, se cruzan, se pierden. Cada curva revela otra bifurcación. Sin guía, perderse aquí es la única opción disponible.<br><br>
+Un niño kawésqar de no más de diez años aparece en la orilla observando. No tiene miedo. Tiene esa calma específica de quien está completamente en casa.<br><br>
+El chamán intenta comunicarse. El niño responde en su lengua y señala con seguridad hacia el norte del canal, luego al este, luego dibuja con el dedo en el agua algo que podría ser un mapa.<br><br>
+Hay algo universal en la urgencia que ambos comparten sin necesitar palabras.`,
+    decisions: [
+      { text: 'Seguir al niño. Un kawésqar de diez años sabe más de estos canales que cualquier adulto del grupo.', effects: { food: +15, moral: +28, salud: +15, union: +25 }, allianceKey: 'kawesqar_nino' },
+      { text: 'Pedir que lleve a los adultos de su comunidad. Necesitan guías más experimentados.',                  effects: { food: +10, moral: +22, salud: +10, union: +18 } },
+      { text: 'Construir una balsa y explorar solos el primer canal. Aprender haciendo.',                             effects: { food: -8,  moral: +20, salud: -8,  union: +15, warriors: -1 } },
+    ],
+  },
+
+  e_canales_australes_b: {
+    title: 'El Idioma del Agua',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1200&q=80',
+    cap:   'Canales — cuando el agua habla',
+    narr:  `Los kawésqar se mueven por los canales sin brújula ni mapa visible. Leen el color del agua: verde oscuro es fondo rocoso y peligroso; verde claro es seguro; negro es profundidad sin fondo. Leen la dirección del oleaje entre las islas. Leen el comportamiento de los lobos marinos en las rocas.<br><br>
+El chamán pasa tres días en una canoa kawésqar aprendiendo a mirar. Al final del tercer día dice algo que sorprende al grupo:<br><br>
+<em>"El agua aquí habla. No en metáfora. En información real. Hay que aprender a escucharla."</em><br><br>
+Un guerrero mayor pregunta: <em>"¿Y cuánto tiempo lleva aprender?"</em> El kawésqar señala a sus hijos pequeños: <em>"Así de chicos empezamos."</em>`,
+    decisions: [
+      { text: 'Dedicar meses a aprender. Vale más este conocimiento que la velocidad.',            effects: { food: +20, moral: +35, salud: +20, union: +30 }, allianceKey: 'kawesqar_canales' },
+      { text: 'Aprender lo esencial para no morir. El resto viene con la práctica.',               effects: { food: +15, moral: +25, salud: +15, union: +22 } },
+      { text: 'Pedir a los kawésqar que naveguen con el grupo hasta el destino final.',            effects: { food: +12, moral: +30, salud: +12, union: +28 } },
+    ],
+  },
+
+  // Rama C · n10c3b — Los Kawésqar
+  e_kawesqar: {
+    title: 'El Pueblo del Mar Eterno',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1200&q=80',
+    cap:   'Archipiélago kawésqar — el fin del mundo habitado',
+    narr:  `Los <span class="tt" data-tip="Kawésqar (también llamados Alacalufes): pueblo nómade marino de los canales patagónicos chilenos. Vivían en canoas de corteza, cazaban lobos marinos y recorrían miles de kilómetros de canales de memoria. El contacto con europeos los devastó: hoy quedan menos de 20 hablantes del idioma.">kawésqar</span> no tienen aldeas: tienen canoas. Su casa es el agua. Sus fuegos arden en la proa, en el agua misma.<br><br>
+La anciana más respetada examina al cacique durante un tiempo incómodo. Luego habla, y el jóven intérprete traduce con lentitud:<br><br>
+<em>"Dice que llegaron con demasiado peso. No en las manos. En aquí."</em> Señala el pecho. <em>"Dice que el mar solo acepta a los que aprendieron a soltar."</em><br><br>
+El chamán escucha esto y no dice nada por mucho tiempo.`,
+    decisions: [
+      { text: 'Aprender a vivir sobre el agua como los kawésqar. Empezar desde cero.',             effects: { food: +20, moral: +38, salud: +18, union: +32 }, allianceKey: 'kawesqar' },
+      { text: 'Establecerse en tierra cerca de ellos. Aprender sin perder lo que ya saben.',       effects: { food: +15, moral: +28, salud: +15, union: +25 } },
+      { text: 'Escuchar a la anciana. Hacer una ceremonia de soltar lo que ya no pueden cargar.', effects: { food: +10, moral: +42, salud: +12, union: +38 } },
+    ],
+  },
+
+  e_kawesqar_b: {
+    title: 'La Canoa que No Necesita Mapa',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80',
+    cap:   'Canales kawésqar — navegación sin brújula',
+    narr:  `La canoa kawésqar es una obra de ingeniería que nadie creería capaz de cruzar los canales más peligrosos del continente. La madera de coigüe, curvada al fuego, ligada con tendones, calafateada con algas. Una embarcación que vive como el agua que la rodea: flexible, viva, temporal.<br><br>
+Un hombre kawésqar les enseña a construir una. No da instrucciones — los hace trabajar junto a él, corrigiendo con las manos sin decir palabras. En cuatro días, el grupo tiene su primera canoa propia.<br><br>
+El kawésqar la empuja al agua y con un solo movimiento de remo la lleva a velocidad sorprendente.<br><br>
+<em>"La canoa es parte del cuerpo"</em>, dice. <em>"Cuando entiendan eso, pueden ir a cualquier lugar."</em>`,
+    decisions: [
+      { text: 'Construir más canoas. Si conocen el agua, conocen esta tierra.',                   effects: { food: +22, moral: +32, salud: +18, union: +28 } },
+      { text: 'Aprender a navegar antes de construir más. La habilidad precede al material.',     effects: { food: +15, moral: +30, salud: +15, union: +25 } },
+      { text: 'Combinar canoas kawésqar con técnicas propias. Crear algo nuevo.',                 effects: { food: +18, moral: +35, salud: +12, union: +32 }, allianceKey: 'kawesqar_navegacion' },
+    ],
+  },
+
+
   // ── EVENTO ESPECIAL: el conquistador alcanza al grupo ─────────
 
   _conq_catch: {
