@@ -264,15 +264,20 @@ const PLAYER_STROKE = 'rgba(70,200,80,.9)'
 const PLAYER_PULSE  = 'rgba(60,180,60,.55)'
 
 /**
- * Dibuja el token de la tribu del jugador en el último nodo completado.
- * El token muestra el emoji elegido en la pantalla de nombre.
+ * Dibuja el token de la tribu del jugador.
+ * Prioridad de posición: overrideNd > último nodo completado > n00 (inicio).
+ * Así el token es visible desde el primer frame de la partida.
  */
-export function drawPlayerToken(gs: GameState): void {
+export function drawPlayerToken(gs: GameState, overrideNd?: { lon: number; lat: number }): void {
   if (!mapG || !mapProj) return
   mapG.selectAll('.player-token-layer').remove()
-  const lastId = lastCompleted(gs)
-  if (!lastId) return
-  const nd = gs.nodes[lastId]
+
+  // Determinar posición: override → último completado → n00 (inicio de partida)
+  let nd: { lon: number; lat: number } | null = overrideNd ?? null
+  if (!nd) {
+    const lastId = lastCompleted(gs)
+    nd = lastId ? (gs.nodes[lastId] ?? null) : (gs.nodes['n00'] ?? null)
+  }
   if (!nd) return
 
   const [x, y] = mapProj([nd.lon, nd.lat]) as [number, number]
@@ -365,6 +370,86 @@ export function animatePlayerToken(
     .on('end', () => {
       // Reemplazar animación por token estático definitivo
       drawPlayerToken(gs)
+    })
+}
+
+/**
+ * Animación completa de "movimiento al nodo seleccionado" antes del evento.
+ * 1. Pan suave de cámara hacia el destino
+ * 2. Huella/camino tribal animado
+ * 3. Token del jugador deslizándose desde fromNd → toNd
+ * 4. Llama cb() cuando termina (~1200ms)
+ *
+ * Si fromNd y toNd son la misma posición (inicio en n00), llama cb() inmediatamente.
+ */
+export function animatePlayerToNode(
+  fromNd: { lon: number; lat: number },
+  toNd:   { lon: number; lat: number },
+  gs:     GameState,
+  cb:     () => void,
+): void {
+  if (!mapG || !mapProj) { cb(); return }
+
+  // Misma posición → no hay movimiento (ej: primer click en n00)
+  const samePos = Math.abs(fromNd.lon - toNd.lon) < 0.001 && Math.abs(fromNd.lat - toNd.lat) < 0.001
+  if (samePos) { cb(); return }
+
+  const DUR  = 1000  // token slide
+  const OX   = -20, OY = -10
+  const [fx, fy] = mapProj([fromNd.lon, fromNd.lat]) as [number, number]
+  const [tx, ty] = mapProj([toNd.lon,   toNd.lat])   as [number, number]
+  const fxo = fx + OX, fyo = fy + OY
+  const txo = tx + OX, tyo = ty + OY
+  const token = gs.tribeToken ?? '🦅'
+
+  // ── 1. Pan suave de cámara (paralelo, 750ms) ──────────
+  if (mapSvg && mapZoom) {
+    const wrap = document.getElementById('map-canvas-wrap')
+    const W = wrap?.clientWidth ?? 900, H = wrap?.clientHeight ?? 580
+    const scale = 2.8
+    const ptx = W / 2 - scale * tx, pty = H / 2 - scale * ty
+    mapSvg.transition().duration(750).ease(d3Lib.easeCubicInOut)
+      .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(ptx, pty).scale(scale))
+  }
+
+  // ── 2. Camino tribal animado (huellas) ────────────────
+  animateTribeStep(gs, fromNd, toNd)
+
+  // ── 3. Token del jugador deslizándose ─────────────────
+  mapG.selectAll('.player-token-layer').remove()
+
+  // Línea de trail del token
+  mapG.append('line').attr('class', 'player-token-layer')
+    .attr('x1', fxo).attr('y1', fyo).attr('x2', fxo).attr('y2', fyo)
+    .attr('stroke', 'rgba(70,200,80,.5)').attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '4,3').attr('pointer-events', 'none')
+    .transition().duration(DUR).ease(d3Lib.easeCubicInOut)
+    .attr('x2', txo).attr('y2', tyo)
+
+  const slideG = mapG.append('g')
+    .attr('class', 'player-token-layer player-token-anim')
+    .attr('transform', `translate(${fxo},${fyo})`)
+    .attr('pointer-events', 'none')
+
+  // Halo de movimiento
+  slideG.append('circle').attr('r', 14).attr('fill', 'none')
+    .attr('stroke', PLAYER_PULSE).attr('stroke-width', 1.2)
+  // Círculo del jugador
+  slideG.append('circle').attr('r', 11)
+    .attr('fill', PLAYER_FILL).attr('stroke', PLAYER_STROKE).attr('stroke-width', 2)
+  // Emoji de tribu
+  slideG.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+    .attr('font-size', '13px').attr('pointer-events', 'none').text(token)
+
+  slideG.transition().duration(DUR).ease(d3Lib.easeCubicInOut)
+    .attr('transform', `translate(${txo},${tyo})`)
+    .on('end', () => {
+      // Reemplazar animación por token estático en el destino
+      // Pasamos overrideNd porque gs.history no incluye toNd aún
+      mapG!.selectAll('.player-token-layer').remove()
+      drawPlayerToken(gs, toNd)
+      // Pequeña pausa (legibilidad) antes de lanzar el evento
+      setTimeout(cb, 120)
     })
 }
 

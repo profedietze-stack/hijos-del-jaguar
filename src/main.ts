@@ -39,7 +39,7 @@ import {
   resetMap, setupResizeHandler,
   waitForMapThenCinematic,
   getNewHistMarkersForAct, runHistMarkerCinematic,
-  animatePlayerToken,
+  animatePlayerToNode,
 } from './screens/MapScreen.js'
 
 // ── UI ────────────────────────────────────────────────
@@ -307,10 +307,25 @@ function continueGame(): void {
 
 function onSelectNode(nodeId: string): void {
   sfxNodeSelect()
-  gs = engineSelectNode(gs, nodeId)
-  saveGame(gs)
-  flashSaveIndicator()
-  mountEventScreen(gs, onDecision)
+
+  // Posición actual del token: último nodo completado, o n00 al inicio
+  const fromId = gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
+  const fromNd = fromId ? gs.nodes[fromId] : gs.nodes['n00']
+  const toNd   = gs.nodes[nodeId]
+
+  const _launchEvent = () => {
+    gs = engineSelectNode(gs, nodeId)
+    saveGame(gs)
+    flashSaveIndicator()
+    mountEventScreen(gs, onDecision)
+  }
+
+  // Animar token hacia el nodo seleccionado, luego lanzar el evento
+  if (fromNd && toNd) {
+    animatePlayerToNode(fromNd, toNd, gs, _launchEvent)
+  } else {
+    _launchEvent()
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -333,9 +348,6 @@ function onDecision(decisionIndex: number): void {
     ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
     : 1
 
-  // Nodo desde donde el jugador se mueve (para animar el token tribal)
-  const prevLastNodeId = gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
-  const prevLastNode   = prevLastNodeId ? gs.nodes[prevLastNodeId] : null
 
   // SFX de decisión
   sfxDecision()
@@ -393,12 +405,8 @@ function onDecision(decisionIndex: number): void {
   saveGame(gs)
   flashSaveIndicator()
 
-  // Animar el token tribal del jugador desde el nodo anterior al nuevo
-  const newLastNodeId = gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
-  const newLastNode   = newLastNodeId ? gs.nodes[newLastNodeId] : null
-  if (prevLastNode && newLastNode && prevLastNodeId !== newLastNodeId) {
-    animatePlayerToken(prevLastNode, newLastNode, gs)
-  }
+  // (El token tribal ya fue animado en onSelectNode antes del evento;
+  //  drawPlayerToken se llama dentro de drawNodes con la posición correcta)
 
   // Detectar si hubo cambio de acto → marcadores históricos nuevos
   const newAct = gs.history.length > 0
