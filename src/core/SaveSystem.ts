@@ -58,6 +58,13 @@ export function clearSavedGame(): void {
   localStorage.removeItem(SAVE_KEY)
 }
 
+/** Borra TODO el progreso del juego: partida, historial y logros */
+export function clearAllProgress(): void {
+  localStorage.removeItem(SAVE_KEY)
+  localStorage.removeItem(HISTORY_KEY)
+  localStorage.removeItem(LOGROS_KEY)
+}
+
 /**
  * Carga la partida guardada y la convierte en un GameState válido.
  * Incluye compatibilidad hacia atrás con saves viejos.

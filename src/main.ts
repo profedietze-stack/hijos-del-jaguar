@@ -21,7 +21,7 @@ import {
 
 // ── Save ──────────────────────────────────────────────
 import {
-  saveGame, loadGame, clearSavedGame,
+  saveGame, loadGame, clearSavedGame, clearAllProgress,
   pushToHistory, unlockAchievements, loadUnlockedAchievements,
 } from './core/SaveSystem.js'
 
@@ -120,6 +120,22 @@ function wireAllButtons(): void {
   // ── Menú ─────────────────────────────────────────────
   on('btn-mute',     () => { toggleMute() })
   on('btn-nueva',    () => { sfxClick(); mountIntro() })
+  on('btn-reset-all', () => {
+    sfxClick()
+    showConfirmModal(
+      '⚠️ Borrar todo el progreso',
+      'Se eliminarán <strong>todas las partidas guardadas, el historial y los logros</strong> desbloqueados. Esta acción no se puede deshacer.',
+      () => {
+        clearAllProgress()
+        gs = null!
+        _inCatchEvent = false
+        _selectNodeFn = undefined
+        hideStatsBar()
+        resetMap()
+        mountMenu()
+      },
+    )
+  })
   on('btn-continue', () => { sfxClick(); continueGame() })
   on('btn-history',  () => { sfxClick(); mountHistoryScreen() })
   on('btn-info-didactica', () => { sfxClick(); openDidacticaOverlay() })

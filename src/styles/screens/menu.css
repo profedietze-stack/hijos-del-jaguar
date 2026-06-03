@@ -70,6 +70,26 @@
   letter-spacing: .1em;
 }
 
+.btn-reset-all {
+  background: none;
+  border: none;
+  color: rgba(160,60,50,.45);
+  font-family: var(--font-heading);
+  font-size: .6rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: .3rem .6rem;
+  margin-top: .4rem;
+  transition: color .2s, opacity .2s;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+.btn-reset-all:hover {
+  color: rgba(210,70,55,.75);
+}
+
 @media (max-width: 600px) {
   .menu-content { padding: 1.2rem 1rem; gap: .4rem; }
   .menu-title { font-size: clamp(1.8rem, 9vw, 3rem); }
