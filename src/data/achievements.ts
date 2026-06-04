@@ -32,8 +32,8 @@ export const LOGROS_DEF: AchievementDef[] = [
     modos: ['educativo'],
     icon: '🗺️',
     nombre: 'Caminante Curioso',
-    desc: 'Visita al menos 10 lugares en una sola partida.',
-    cond: (d) => d.visitedCount >= 10,
+    desc: 'Visita al menos 15 lugares en una sola partida.',
+    cond: (d) => d.visitedCount >= 15,
   },
 
   // ── HISTÓRICO (6) ─────────────────────────────────────────────
@@ -50,8 +50,8 @@ export const LOGROS_DEF: AchievementDef[] = [
     modos: ['historico'],
     icon: '🕸️',
     nombre: 'La Gran Red',
-    desc: 'Forja 5 o más alianzas únicas en modo Histórico.',
-    cond: (d) => d.diff === 'historico' && [...new Set(d.alliances)].length >= 5,
+    desc: 'Forja 7 o más alianzas únicas en modo Histórico.',
+    cond: (d) => d.diff === 'historico' && [...new Set(d.alliances)].length >= 7,
   },
   {
     id: 'his_supervivencia',
@@ -104,8 +104,8 @@ export const LOGROS_DEF: AchievementDef[] = [
     modos: ['legendario'],
     icon: '🌐',
     nombre: 'La Red Imposible',
-    desc: 'Forja 4 o más alianzas en modo Legendario.',
-    cond: (d) => d.diff === 'legendario' && [...new Set(d.alliances)].length >= 4,
+    desc: 'Forja 6 o más alianzas en modo Legendario.',
+    cond: (d) => d.diff === 'legendario' && [...new Set(d.alliances)].length >= 6,
   },
   {
     id: 'leg_imparable',

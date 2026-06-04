@@ -1,7 +1,7 @@
 import type { GameEvent } from './types.js'
 
 // ══════════════════════════════════════════════════════
-// EVENTOS DEL JUEGO — 60 eventos, 4 Actos
+// EVENTOS DEL JUEGO — 87 eventos, 4 Actos
 // Cada nodo tiene un eventPool con 2 ids; se elige uno
 // al azar para dar rejugabilidad.
 // ══════════════════════════════════════════════════════

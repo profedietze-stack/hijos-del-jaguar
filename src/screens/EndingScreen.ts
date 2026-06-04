@@ -15,6 +15,7 @@ import * as topojson from 'topojson-client'
 // ── Nombres de alianzas ───────────────────────────────
 
 const ALLIANCE_NAMES: Record<string, string> = {
+  // ── Originales ──────────────────────────────────────
   pipil:                 'Pipiles',
   cunas:                 'Cunas/Guna',
   caribes:               'Caribes',
@@ -36,6 +37,23 @@ const ALLIANCE_NAMES: Record<string, string> = {
   ranqueles:             'Ranqueles',
   sierras:               'Chamana de las Sierras',
   interprete:            'El Intérprete',
+  // ── Expansión Acto I ────────────────────────────────
+  tzotziles:             'Tzotziles de Chiapas',
+  ngabe_bugle:           'Ngäbe-Buglé',
+  cimarron:              'El Cimarrón',
+  // ── Expansión Acto III ──────────────────────────────
+  omaguacas:             'Omaguacas',
+  tobas:                 'Tobas (Qom)',
+  tobas_agua:            'Tobas (guardianes del agua)',
+  guaranies_ibera:       'Guaraníes del Iberá',
+  // ── Expansión Acto IV ───────────────────────────────
+  yagua:                 'Yagua del Ucayali',
+  guardianes_fuentes:    'Guardianes de las Fuentes',
+  tehuelches_sur:        'Tehuelches del Sur',
+  tehuelches_boleadoras: 'Tehuelches (boleadoras)',
+  kawesqar_nino:         'Kawésqar (niño guía)',
+  kawesqar_canales:      'Kawésqar (canales)',
+  kawesqar_navegacion:   'Kawésqar (navegación)',
 }
 
 // ── Preguntas de reflexión ────────────────────────────
@@ -167,12 +185,13 @@ function calcScore(
   const allyScore    = alliances.length * 120
   const exploreScore = history.length * 45
   const timeBonus    = dur > 0 ? Math.max(0, Math.round(800 - dur * 3)) : 0
-  const diffMult     = diff === 'historico' ? 1.5 : 1.0
+  const diffMult     = diff === 'legendario' ? 2.0 : diff === 'historico' ? 1.5 : 1.0
+  const diffMultStr  = diff === 'legendario' ? '×2'  : diff === 'historico' ? '×1.5' : '×1'
   const raw = Math.round((survScore + allyScore + exploreScore + timeBonus) * diffMult)
   return {
     total: raw,
     breakdown: [
-      { label: 'Supervivientes', val: survScore,    mult: diff === 'historico' ? '×1.5' : '×1' },
+      { label: 'Supervivientes', val: survScore,    mult: diffMultStr },
       { label: 'Alianzas',       val: allyScore,    mult: '' },
       { label: 'Exploración',    val: exploreScore, mult: '' },
       { label: 'Velocidad',      val: timeBonus,    mult: '' },
@@ -445,7 +464,7 @@ function _populateCaptureCard(
     ? ganados.map(l => `<span class="cap-logro">${l.icon} ${l.nombre}</span>`).join('')
     : '')
 
-  cSet('captura-footer', `${endDate} · ${gs.diff === 'historico' ? '⚔️ Histórico' : '📖 Educativo'}`)
+  cSet('captura-footer', `${endDate} · ${gs.diff === 'legendario' ? '💀 Legendario' : gs.diff === 'historico' ? '⚔️ Histórico' : '📖 Educativo'}`)
 }
 
 // ── mountEndingScreen ─────────────────────────────────
@@ -500,7 +519,7 @@ export function mountEndingScreen(
   // ── Stats grid
   const cfg       = DIFF_CONFIG[diff]
   const dfeatThr  = cfg.defeatThreshold
-  const modeLabel = diff === 'historico' ? '⚔️ Histórico' : '📖 Educativo'
+  const modeLabel = diff === 'legendario' ? '💀 Legendario' : diff === 'historico' ? '⚔️ Histórico' : '📖 Educativo'
   const endDate   = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })
   const avgRes    = Math.round((s.food + s.moral + s.salud + s.union) / 4)
 
