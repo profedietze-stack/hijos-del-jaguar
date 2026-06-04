@@ -917,6 +917,23 @@ Señala hacia adentro: el Amazonas que aquí comienza como un hilo de agua limpi
     ],
   },
 
+  e_encrucijada_b: {
+    title: 'El Peso de los que No Llegaron',
+    act:   'Acto IV · El Destino',
+    img:   'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
+    cap:   'Patagonia — la llanura que termina el mundo conocido',
+    narr:  `El chamán mayor convoca una ceremonia inesperada. No anuncia destinos — anuncia cuentas.<br><br>
+Nombra a cada persona que partió de Guatemala y no llegó hasta aquí. Cada nombre cae sobre el círculo como una piedra. Son muchos más de los que el grupo recuerda conscientemente. Los niños que nacieron en el camino escuchan por primera vez cuántos murieron antes de que ellos existieran.<br><br>
+Cuando termina, el silencio dura mucho tiempo. Luego el chamán habla:<br><br>
+<em>"Los que no llegaron también eligieron. Eligieron con su vida que nosotros siguiéramos. Ahora les debemos una elección que valga lo que ellos pagaron."</em><br><br>
+El sol está cayendo sobre el horizonte patagónico. Hay tres caminos. Y el peso de los muertos en cada paso.`,
+    decisions: [
+      { text: 'El Amazonas. Los que murieron en la selva nos señalaron ese camino con su sacrificio. Terminar donde ellos quisieron llegar.',                effects: { food: -3,  moral: +28, union: +15 }, finalTag: 'dest_amazonas'      },
+      { text: 'La estepa patagónica. Los que murieron en las pampas nos dieron esa tierra. Quedarnos donde ellos cayeron.',                               effects: { food: -6,  moral: +25, union: +22 }, finalTag: 'dest_patagonia_arg' },
+      { text: 'Los canales del fin del mundo. El lugar más lejano posible — donde ninguna memoria de persecución pueda alcanzarnos jamás.',                effects: { food: -8,  moral: +30, union: +18 }, finalTag: 'dest_patagonia_chi' },
+    ],
+  },
+
   // ── Nodos intermedios Acto IV ─────────────────────────────────
 
   e_confluencia: {

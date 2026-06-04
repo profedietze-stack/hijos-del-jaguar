@@ -95,7 +95,7 @@ export interface EndingDef {
   narr:  string
   refl:  string
   dest:  string
-  cond:  (m: number, alliances: string[]) => boolean
+  cond:  (m: number, alliances: string[], stats?: Stats) => boolean
 }
 
 export interface HistoricalMarker {

@@ -94,7 +94,7 @@ export function applyDecision(gs: GameState, decision: Decision): TurnResult {
   const finished = isFinalNode(nodeId)
   if (finished) {
     const dest   = resolveDestination(next.finalTag)
-    const ending = resolveEnding(totalM(next.stats), next.alliances, dest, next.diff)
+    const ending = resolveEnding(totalM(next.stats), next.alliances, dest, next.diff, next.stats)
     next.pendingGame = buildFinishedGame(next, ending)
     return { state: next, notifs, defeated: false, finished: true, ending }
   }
@@ -217,6 +217,7 @@ export function resolveEnding(
   alliances: string[],
   dest:      string,
   diff:      string,
+  stats?:    import('../data/types.js').Stats,
 ): EndingDef {
   const cfg     = DIFF_CONFIG[diff as keyof typeof DIFF_CONFIG]
   const { epic, good } = cfg.endingThresholds
@@ -228,7 +229,7 @@ export function resolveEnding(
 
   for (const key of priority) {
     const ending = ENDINGS_DEF[key]
-    if (ending && ending.cond(m, alliances)) {
+    if (ending && ending.cond(m, alliances, stats)) {
       // Verificar umbrales explícitos de dificultad para épico/bueno
       if (key.endsWith('_excelente') && (m < epic.m || alliances.length < epic.a)) continue
       if (key.endsWith('_bueno')     && m < good.m) continue

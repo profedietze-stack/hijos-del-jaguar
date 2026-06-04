@@ -47,7 +47,7 @@ export const NODES_DEF: Record<string, NodeDef> = {
   n08d:{ id:'n08d',name:'Esteros del Iberá', lon:-57.8, lat:-28.5, act:3, icon:'🦜', desc:'El gran humedal guaraní: laberinto de agua, loros y camalotes.',    eventPool:['e_ibera','e_ibera_b'],       next:['n09'] },
 
   // ── CONVERGENCIA FINAL ───────────────────────────────────────
-  n09: { id:'n09', name:'La Encrucijada', lon:-67.5, lat:-43.0, act:4, icon:'⭐', desc:'El momento de elegir el destino definitivo de tu pueblo.',             eventPool:['e_encrucijada'],             next:['n10a','n10b','n10c'] },
+  n09: { id:'n09', name:'La Encrucijada', lon:-67.5, lat:-43.0, act:4, icon:'⭐', desc:'El momento de elegir el destino definitivo de tu pueblo.',             eventPool:['e_encrucijada','e_encrucijada_b'], next:['n10a','n10b','n10c'] },
 
   // ── ACTO IV — Rama A: Amazonas Profundo ─────────────────────
   n10a: { id:'n10a',  name:'Alto Amazonas',        lon:-74.5, lat:-5.0,  act:4, icon:'🌿', desc:'Remontar el Amazonas hacia sus fuentes sagradas.',                 eventPool:['e_amazonia_final_a','e_amazonia_final_b'],   next:['n10a2'] },
