@@ -32,16 +32,19 @@ export const NODES_DEF: Record<string, NodeDef> = {
   n05e:{ id:'n05e',name:'Amazonas Profundo',  lon:-66.0, lat:-2.5, act:2, icon:'🐆', desc:'El corazón verde del mundo. Pocos regresan.',                      eventPool:['e_selva_profunda','e_selva_profunda_b'], next:['n06b','n06a'] },
 
   // ── CONVERGENCIAS HACIA ACTO III ────────────────────────────
-  n06a:{ id:'n06a',name:'Bolivia – Altiplano', lon:-67.5, lat:-17.0, act:3, icon:'☀️', desc:'El techo del mundo. El Lago Titicaca brilla abajo.',             eventPool:['e_altiplano','e_altiplano_b'], next:['n07a','n07b'] },
-  n06b:{ id:'n06b',name:'Bolivia – Amazonas',  lon:-64.5, lat:-14.5, act:3, icon:'🌿', desc:'El Amazonas boliviano: ríos anchos y pueblos mojos.',            eventPool:['e_amazonas_boliviano','e_amazonas_boliviano_b'], next:['n07c','n07b'] },
+  n06a:{ id:'n06a',name:'Bolivia – Altiplano', lon:-67.5, lat:-17.0, act:3, icon:'☀️', desc:'El techo del mundo. El Lago Titicaca brilla abajo.',             eventPool:['e_altiplano','e_altiplano_b'], next:['n07a','n07b','n06c'] },
+  n06b:{ id:'n06b',name:'Bolivia – Amazonas',  lon:-64.5, lat:-14.5, act:3, icon:'🌿', desc:'El Amazonas boliviano: ríos anchos y pueblos mojos.',            eventPool:['e_amazonas_boliviano','e_amazonas_boliviano_b'], next:['n07c','n07b','n07d'] },
 
   // ── ACTO III — EL SUR (Bolivia → La Encrucijada) ────────────
+  n06c:{ id:'n06c',name:'Quebrada de Humahuaca', lon:-65.4, lat:-23.2, act:3, icon:'🏜️', desc:'El cañón sagrado donde los omaguacas custodiaron durante siglos el camino al sur.', eventPool:['e_humahuaca','e_humahuaca_b'], next:['n07a'] },
   n07a:{ id:'n07a',name:'Tucumán',          lon:-65.2, lat:-26.8, act:3, icon:'⚔️', desc:'Los conquistadores también llegaron hasta aquí.',                   eventPool:['e_tucuman','e_tucuman_b'],   next:['n08a','n08b'] },
   n07b:{ id:'n07b',name:'Mendoza',          lon:-68.8, lat:-32.9, act:3, icon:'🍇', desc:'Un valle fértil al pie de los Andes nevados.',                      eventPool:['e_mendoza','e_mendoza_b'],   next:['n08b','n08c'] },
-  n07c:{ id:'n07c',name:'Misiones',         lon:-55.0, lat:-27.4, act:3, icon:'⛪', desc:'El territorio de las misiones jesuitas guaraníes.',                  eventPool:['e_misiones','e_misiones_b'], next:['n08a','n08b'] },
+  n07c:{ id:'n07c',name:'Misiones',         lon:-55.0, lat:-27.4, act:3, icon:'⛪', desc:'El territorio de las misiones jesuitas guaraníes.',                  eventPool:['e_misiones','e_misiones_b'], next:['n08a','n08b','n08d'] },
+  n07d:{ id:'n07d',name:'Gran Chaco',       lon:-61.0, lat:-22.5, act:3, icon:'🌵', desc:'El infierno verde: calor, sed y pueblos que conocen sus secretos.',  eventPool:['e_chaco','e_chaco_b'],       next:['n08a'] },
   n08a:{ id:'n08a',name:'Pampas',           lon:-63.0, lat:-35.5, act:3, icon:'🌾', desc:'La llanura infinita. El caballo ya llegó hasta aquí.',               eventPool:['e_pampas','e_pampas_b'],     next:['n09'] },
   n08b:{ id:'n08b',name:'Córdoba – Sierras',lon:-64.2, lat:-31.5, act:3, icon:'🌄', desc:'Las sierras del centro. Último refugio antes del sur.',              eventPool:['e_sierras','e_sierras_b'],   next:['n09'] },
   n08c:{ id:'n08c',name:'Neuquén – Mapuches',lon:-70.0, lat:-39.0, act:3, icon:'🦅', desc:'Tierra mapuche. El pueblo que nunca fue conquistado.',              eventPool:['e_mapuches','e_mapuches_b'], next:['n09'] },
+  n08d:{ id:'n08d',name:'Esteros del Iberá', lon:-57.8, lat:-28.5, act:3, icon:'🦜', desc:'El gran humedal guaraní: laberinto de agua, loros y camalotes.',    eventPool:['e_ibera','e_ibera_b'],       next:['n09'] },
 
   // ── CONVERGENCIA FINAL ───────────────────────────────────────
   n09: { id:'n09', name:'La Encrucijada', lon:-67.5, lat:-43.0, act:4, icon:'⭐', desc:'El momento de elegir el destino definitivo de tu pueblo.',             eventPool:['e_encrucijada'],             next:['n10a','n10b','n10c'] },
@@ -90,11 +93,14 @@ export const EDGES: [string, string][] = [
   ['n05d','n05e'], ['n05d','n06b'],
   ['n05e','n06b'], ['n05e','n06a'],
   // Acto III
-  ['n06a','n07a'], ['n06a','n07b'],
-  ['n06b','n07c'], ['n06b','n07b'],
+  ['n06a','n07a'], ['n06a','n07b'], ['n06a','n06c'],
+  ['n06c','n07a'],
+  ['n06b','n07c'], ['n06b','n07b'], ['n06b','n07d'],
+  ['n07d','n08a'],
   ['n07a','n08a'], ['n07a','n08b'],
   ['n07b','n08b'], ['n07b','n08c'],
-  ['n07c','n08a'], ['n07c','n08b'],
+  ['n07c','n08a'], ['n07c','n08b'], ['n07c','n08d'],
+  ['n08d','n09'],
   ['n08a','n09'], ['n08b','n09'], ['n08c','n09'],
   // Acto IV
   ['n09','n10a'], ['n09','n10b'], ['n09','n10c'],

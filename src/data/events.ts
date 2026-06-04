@@ -808,6 +808,94 @@ Este parlamento es también un sistema de inteligencia. Y saben más de lo que m
     ],
   },
 
+  // ── ACTO III — Nodos nuevos ─────────────────────────────────────────
+
+  e_humahuaca: {
+    title: 'El Cañón que Recuerda',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1586348943529-beaae6c28db9?w=1200&q=80',
+    cap:   'Quebrada de Humahuaca — Jujuy, Argentina',
+    narr:  `El cañón corta la tierra como una herida antigua. Las paredes de roca pintada en ocres, rojos y verdes narran historias que preceden a los incas. Los <span class="tt" data-tip="Omaguacas: pueblo indígena que habitó la Quebrada de Humahuaca (actual Jujuy, Argentina) durante siglos. Controlaban el tráfico entre el Altiplano andino y las llanuras del sur. Resistieron la conquista española décadas antes que muchos otros pueblos del continente.">omaguacas</span> que custodian la quebrada ya saben por qué viene el grupo — han visto pasar a otros que también huían.<br><br>
+Una mujer mayor con un tocado de plumas de cóndor los recibe en silencio. Luego habla despacio: <em>"Este cañón ha visto pasar a los incas. Ahora pasan ustedes. Pasarán también los que los persiguen. La quebrada no recuerda a los perseguidores — solo a los que siguen su camino."</em><br><br>
+Ofrecen hospedaje, comida y algo más valioso: conocimiento del sistema de postas del Camino del Inca que todavía funciona en este tramo, aunque los españoles no lo saben aún.`,
+    decisions: [
+      { text: 'Aceptar el hospedaje y aprender el sistema de postas incaico.', allianceKey: 'omaguacas', effects: { food: +12, moral: +18, salud: +10, union: +12 } },
+      { text: 'Solo descansar una noche. Agradecer y continuar antes del amanecer.', effects: { food: +6, moral: +10, salud: +8, union: +5 } },
+      { text: 'Preguntar por los rastros de conquistadores en el norte. La información vale más.', effects: { food: +4, moral: +12, salud: +5, warriors: +1 } },
+    ],
+  },
+
+  e_humahuaca_b: {
+    title: 'La Posta del Cóndor',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80',
+    cap:   'Alturas andinas — Camino del Inca, Quebrada de Humahuaca',
+    narr:  `El Camino del Inca en este tramo es una obra de ingeniería que los siglos no borran: piedras planas, perfectas, que suben y bajan el cañón con una precisión que ningún conquistador ha podido imitar. Las postas — refugios de piedra cada cierta distancia — siguen en pie.<br><br>
+En la posta más alta, a más de tres mil metros, el grupo descansa mientras el viento trae un sonido inesperado: una bocina. Los omaguacas dicen que es la señal de que hay movimiento de tropas españolas al norte. El sistema de señales del Camino del Inca todavía funciona — los omaguacas lo mantienen en secreto.<br><br>
+El chamán mayor mira las piedras del camino. Pone la mano sobre ellas y dice en voz baja: <em>"Estas piedras llevan la memoria de un millón de pies. Añadan los suyos."</em>`,
+    decisions: [
+      { text: 'Usar el sistema de señales para saber exactamente dónde están los españoles.', effects: { food: -4, moral: +20, salud: 0,  warriors: +2 } },
+      { text: 'Bajar rápido antes de que las señales atraigan más atención.', effects: { food: -6, moral: +10, salud: -5, union: +8  } },
+    ],
+  },
+
+  e_chaco: {
+    title: 'El Infierno Verde',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=1200&q=80',
+    cap:   'Gran Chaco — Argentina, Paraguay, Bolivia',
+    narr:  `Nadie llama al Chaco por casualidad. Los que lo conocen lo respetan: cuarenta grados a la sombra, espinas en cada arbusto, sed que puede matar en horas. Pero los españoles tampoco lo cruzan — es uno de los pocos lugares del continente que todavía no han penetrado con caballos.<br><br>
+Los <span class="tt" data-tip="Tobas (Qom): pueblo indígena del Gran Chaco. Conocían cada fuente de agua del Chaco, cada camino entre las espinas, y durante siglos mantuvieron su independencia frente a incas y españoles por igual. El Gran Chaco no fue colonizado hasta finales del siglo XIX.">tobas</span> que aparecen de entre los arbustos no atacan — observan. Su líder, un hombre de cincuenta años cubierto de tatuajes geométricos, hace un gesto que la chamana interpreta: quieren ver las manos del cacique. Si están callosas de trabajo, son de los suyos. Si están suaves, son de los que mandan.`,
+    decisions: [
+      { text: 'Mostrar las manos y esperar su juicio.', allianceKey: 'tobas', effects: { food: +8, moral: +22, salud: +5, union: +15 } },
+      { text: 'Intercambiar lo que tienen por agua y guía a través del Chaco.', effects: { food: -5, moral: +12, salud: +15, warriors: +1 } },
+      { text: 'Rodear el Chaco por el borde. Más lento pero más seguro.', effects: { food: -10, moral: +5, salud: 0, union: +3 } },
+    ],
+  },
+
+  e_chaco_b: {
+    title: 'El Secreto del Agua',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=1200&q=80',
+    cap:   'Aguada en el Gran Chaco',
+    narr:  `El guía toba los lleva durante horas por un laberinto de quebrachos y espinillos que parecen todos iguales. Luego se detiene y señala el suelo. No hay nada visible. Hace un gesto: cavar.<br><br>
+A medio metro de profundidad: agua limpia, fría. Una aguada subterránea que el Chaco guarda bajo la tierra árida. El grupo bebe hasta que los estómagos duelen.<br><br>
+El guía explica, por señas y algunas palabras en castellano roto, que hay docenas de estas aguadas ocultas en el Chaco. Los tobas las conocen todas. Los españoles no encontraron ninguna todavía — por eso enviaron expediciones que murieron de sed. <em>"El Chaco no los mata"</em>, dice el guía. <em>"La ignorancia los mata."</em><br><br>
+Ofrece trazar un mapa de las aguadas. Pero pide algo a cambio: que el grupo lleve un mensaje a los guaraníes del sur.`,
+    decisions: [
+      { text: 'Aceptar el mapa y el encargo. Los mensajes entre pueblos son sagrados.', allianceKey: 'tobas_agua', effects: { food: +10, moral: +25, salud: +10, union: +18 } },
+      { text: 'Aceptar el mapa pero no el encargo. El grupo no puede comprometerse con más.', effects: { food: +8,  moral: +10, salud: +10, union: +5  } },
+    ],
+  },
+
+  e_ibera: {
+    title: 'El Espejo del Cielo',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1200&q=80',
+    cap:   'Esteros del Iberá — Corrientes, Argentina',
+    narr:  `El mundo se vuelve líquido. Las lagunas del Iberá se extienden hasta donde alcanza la vista, separadas por lenguas de tierra flotante donde crecen camalotes y habitan más pájaros de los que el grupo creyó que existían. Los loros llenan el aire de conversación.<br><br>
+Los <span class="tt" data-tip="Guaraníes del Iberá: los esteros del Iberá (actual Corrientes, Argentina) eran territorio guaraní. El nombre Iberá proviene del guaraní y significa agua brillante. Esta región de humedales era prácticamente inaccesible para los españoles a caballo.">guaraníes del Iberá</span> viven en canoas y plataformas flotantes — un pueblo que el agua hace intocable. Un joven de no más de dieciséis años guía al grupo a través de los canales en silencio absoluto, señalando con el remo cada desvío.<br><br>
+Al tercer canal, el chico señala algo en el agua: la silueta de un yacaré de más de dos metros, inmóvil como un tronco. Luego mira al cacique y sonríe por primera vez.`,
+    decisions: [
+      { text: 'Quedarse unos días. Los esteros son inaccesibles para los perseguidores y el grupo necesita descanso.', allianceKey: 'guaranies_ibera', effects: { food: +15, moral: +22, salud: +18, union: +12 } },
+      { text: 'Seguir navegando sin detenerse. Los canales son el camino más rápido al sur.', effects: { food: +5,  moral: +15, salud: +8,  warriors: +1 } },
+    ],
+  },
+
+  e_ibera_b: {
+    title: 'La Canción de los Camalotes',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+    cap:   'Humedal del Iberá al atardecer',
+    narr:  `La noche en los esteros tiene una calidad distinta. El grupo duerme en plataformas flotantes de juncos tejidos — las camas más extrañas que conocieron — mientras los sonidos del humedal los envuelven: ranas, aves nocturnas, el sonido sordo de los yacarés moviéndose en el agua oscura.<br><br>
+Una chamana guaraní mayor visita el campamento con regalos: peces ahumados, miel silvestre, y algo inesperado — información. Sabe, por su propia red de mensajeros acuáticos, que los conquistadores enviaron un contingente hacia el sur hace menos de un mes. Trae un mapa trazado con carbón sobre corteza de árbol.<br><br>
+<em>"Mis abuelos decían que el agua recuerda todo lo que pasa sobre ella"</em>, dice la chamana. <em>"El Iberá recuerda a los que la cruzaron antes. Pronto los recordará a ustedes también."</em>`,
+    decisions: [
+      { text: 'Agradecer el mapa y el aviso. La información sobre los conquistadores es oro.', effects: { food: +8,  moral: +28, salud: +5,  warriors: +2 } },
+      { text: 'Pedir que la chamana los guíe hasta la salida sur del humedal.', effects: { food: +5,  moral: +20, salud: +10, union: +8  } },
+    ],
+  },
+
   // ── ACTO IV — EL DESTINO ──────────────────────────────────────
 
   e_encrucijada: {
