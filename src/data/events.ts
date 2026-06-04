@@ -210,6 +210,98 @@ Los grabados parecen indicar una dirección hacia el sur. Pero también hay algo
     ],
   },
 
+
+  // ── ACTO I — Nodos nuevos ───────────────────────────────────
+
+  e_volcanes: {
+    title: 'La Boca del Dios',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=1200&q=80',
+    cap:   'Volcán Santiaguito — Guatemala',
+    narr:  `El Santiaguito lanza ceniza como si supiera que su pueblo huye. El chamán mayor detiene el grupo al borde del cráter dormido y cierra los ojos: <em>"Ixchel habla desde las piedras calientes. Pide algo antes de dejarnos ir."</em><br><br>
+Todos miran el volcán. La columna de ceniza dibuja formas — o quizás nadie puede evitar ver formas cuando tiene miedo. Un guerrero viejo cuenta que su abuelo conocía el camino por las faldas interiores del volcán, un sendero que los conquistadores nunca encontraron en sus mapas.<br><br>
+Pero el suelo tiembla. Y cada temblor puede ser el preludio de algo peor, o solo el volcán durmiendo. Los <span class="tt" data-tip="Kaqchikeles: pueblo maya que habitó el altiplano guatemalteco central. Su capital era Iximché. Aliados iniciales de los españoles por rivalidades con los k'iches, luego resistieron la ocupación cuando llegaron las cargas tributarias. La región volcánica era su territorio sagrado — el volcán Santiaguito era considerado morada de deidades.">ancianos kaqchikeles</span> dicen que el volcán protege a quienes lo respetan.`,
+    decisions: [
+      { text: 'Realizar la ofrenda que pide el chamán. La ceniza sagrada marcará el camino correcto.', effects: { food: -6,  moral: +18, salud: 0,   union: +12 } },
+      { text: 'Tomar el sendero interior del volcán. La vieja ruta que los mapas españoles no tienen.', effects: { food: -4,  moral: +10, salud: -8,  warriors: +1 } },
+      { text: 'Alejarse de las faldas. Un volcán activo no distingue entre perseguido y perseguidor.', effects: { food: -8,  moral: +5,  salud: +5,  civilians: 0 } },
+    ],
+  },
+
+  e_volcanes_b: {
+    title: 'Polvo de Estrellas',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1562408590-e32931084e23?w=1200&q=80',
+    cap:   'Ceniza volcánica — altiplano de Guatemala',
+    narr:  `La lluvia de ceniza cae sobre el grupo como una noche a mediodía. Los caballos de los conquistadores que se acercan resoplan y se niegan a avanzar — la ceniza les irrita los ojos, los desorienta. Por primera vez desde que comenzó la huida, el grupo tiene una ventaja que no pidieron.<br><br>
+Una niña de siete años señala al cielo cenizo: <em>"El volcán nos está tapando."</em> El guerrero más viejo asiente despacio. Algunos pueblos del altiplano conocen estas tormentas de ceniza como <span class="tt" data-tip="Toscaltetl (náhuatl): polvo de los dioses. Las erupciones volcánicas menores eran interpretadas como mensajes o protecciones divinas por varios pueblos mesoamericanos. El volcán Santa María y el Santiaguito fueron escenario de encuentros entre pueblos refugiados y fuerzas coloniales durante décadas.">toscaltetl</span> — el polvo de los dioses — y saben que duran exactamente el tiempo necesario.<br><br>
+Pero hay que decidir: aprovechar la confusión para correr, o detenerse y que la ceniza borre las huellas del grupo del suelo.`,
+    decisions: [
+      { text: 'Correr mientras los caballos están ciegos. Es ahora o nunca.', effects: { food: -3, moral: +15, salud: -6, warriors: 0 } },
+      { text: 'Detenerse. Dejar que la ceniza entierre las huellas. El rastro desaparecerá.', effects: { food: -2, moral: +8,  salud: 0,  union: +8  } },
+    ],
+  },
+
+  e_sierra_madre: {
+    title: 'Los Tejidos del Viento',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1586348943529-beaae6c28db9?w=1200&q=80',
+    cap:   'Bosque nublado — Sierra Madre de Chiapas',
+    narr:  `El camino sube durante horas. A tres mil metros, la neblina lo convierte todo en susurros. El grupo encuentra algo que no esperaba: otra tribu que también huye.<br><br>
+Son <span class="tt" data-tip="Tzotziles: pueblo maya de los Altos de Chiapas. Su nombre en su propio idioma, Batz'i k'op, significa 'el verdadero hablar'. Habitaron la Sierra Madre de Chiapas durante siglos y resistieron la conquista española durante más tiempo que muchos pueblos del sur. Su territorio de alta montaña era difícil para los caballos y arcabuces españoles.">tzotziles</span> de los Altos de Chiapas — quince personas, la mitad niños. Llevan menos comida que el grupo, pero conocen cada piedra de esta sierra. Su guía más anciano, una mujer de pelo completamente blanco, estudia al cacique durante un minuto largo sin decir nada. Luego habla en tzotzil. Una joven traduce: <em>"Dice que tus ojos parecen de alguien que sabe adónde va pero no sabe cómo llegar."</em><br><br>
+La montaña brumosa devuelve el eco de cascos de caballos, lejanos aún, desde el valle.`,
+    decisions: [
+      { text: 'Unirse a los tzotziles. Dos grupos solos mueren; uno junto puede sobrevivir.', allianceKey: 'tzotziles', effects: { food: -8, moral: +15, salud: +5,  civilians: +8, union: +15 } },
+      { text: 'Aceptar solo su guía. Ella conoce el camino; el grupo le da protección a cambio.',  effects: { food: -5, moral: +10, salud: 0,   warriors: +1, union: +8  } },
+      { text: 'Seguir solos. Más gente es más ruido, más rastro, más riesgo.',                     effects: { food: -3, moral: -5,  salud: 0,   warriors: 0,  union: -5  } },
+    ],
+  },
+
+  e_sierra_madre_b: {
+    title: 'La Niebla que Esconde',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1200&q=80',
+    cap:   'Niebla densa — altas cumbres de Chiapas',
+    narr:  `La niebla de la sierra tiene una consistencia que el grupo no conocía: no es niebla que pasa, es niebla que se queda. Los rastreadores pierden el rastro — nadie puede seguir huellas en roca cubierta de musgo mojado.<br><br>
+Por primera vez en días, el grupo puede detenerse sin miedo. Un guerrero joven propone aprovechar el tiempo para descansar de verdad: curar heridas, reparar sandalias, enseñar a los niños pequeños cómo caminar sin hacer ruido. Hay agua en todas partes — los helechos gotean.<br><br>
+El chamán encuentra <span class="tt" data-tip="Plantas medicinales de los Altos de Chiapas: el bosque de niebla (mesófilo de montaña) de la Sierra Madre contiene una biodiversidad extraordinaria. Los pueblos tzotzil y tzeltal conocían plantas como la hierba santa (Piper auritum), el árnica silvestre, y diversas orquídeas con propiedades medicinales que los chamanes usaban para tratar heridas, fiebres y estados de ánimo colectivo.">plantas medicinales de la niebla</span> que en el valle no existen. La chamana dice que pueden sanar heridas que parecían perdidas.`,
+    decisions: [
+      { text: 'Descansar dos días completos. El cuerpo y el espíritu del grupo están al límite.',  effects: { food: -10, moral: +20, salud: +20, union: +10 } },
+      { text: 'Solo una noche. Suficiente para curar heridas, no suficiente para confiarse.',       effects: { food: -6,  moral: +12, salud: +12, union: +5  } },
+      { text: 'Seguir de noche en la niebla. Si ellos no pueden rastrear, tampoco pueden bloquearnos.', effects: { food: -4,  moral: +5,  salud: -5,  warriors: +1  } },
+    ],
+  },
+
+  e_bocas_toro: {
+    title: 'El Archipiélago de los Libres',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1200&q=80',
+    cap:   'Archipiélago del Caribe — Bocas del Toro',
+    narr:  `Las islas del archipiélago son un mundo aparte. Los <span class="tt" data-tip="Ngäbe-Buglé: pueblo indígena de Panamá y Costa Rica que habitó la región de Bocas del Toro. Resistieron la evangelización española durante siglos gracias a su territorio fragmentado en islas y selvas. Las islas caribeñas actuaron como refugio para comunidades indígenas, cimarrones (esclavos africanos fugados) y piratas que desafiaban el poder colonial.">ngäbe-buglé</span> que los reciben llevan generaciones construyendo canoas que navegan entre islas sin ser vistas desde tierra firme.<br><br>
+Un hombre de mediana edad, con cicatrices que cuentan muchas historias, examina al grupo desde la orilla. Habla en un español entrecortado que aprendió de esclavos africanos fugados: <em>"Aquí los conquistadores no entran. El mar no entiende de mapas de España."</em><br><br>
+El grupo está exhausto. Las piernas no recuerdan ya lo que es terreno seco. Pero el agua clara y los peces son abundantes, y las islas tienen una calidad que el grupo necesita con urgencia: tiempo para respirar.`,
+    decisions: [
+      { text: 'Quedarse varias semanas. Aprender la navegación de islas — puede ser clave al sur.',  allianceKey: 'ngabe_bugle', effects: { food: +15, moral: +20, salud: +15, union: +12 } },
+      { text: 'Solo descansar tres días y seguir. El destino final está lejos todavía.',             effects: { food: +8,  moral: +12, salud: +10, union: +5                              } },
+      { text: 'Preguntar a los ngäbe-buglé sobre el paso hacia el sur. Su conocimiento vale más que el descanso.', effects: { food: +5, moral: +15, salud: +5, warriors: +1 } },
+    ],
+  },
+
+  e_bocas_toro_b: {
+    title: 'La Lengua del Cimarrón',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+    cap:   'Costa caribeña — Bocas del Toro, Panamá',
+    narr:  `Entre los habitantes del archipiélago hay un hombre que no es del lugar. Es africano — o más precisamente, era africano antes de escapar de los barcos de los españoles hace tres años. Se llama a sí mismo Cimarrón porque es lo que es: un hombre libre que vive fuera del sistema de los conquistadores.<br><br>
+Su historia y la del grupo se tocan en el mismo punto: ambos huyen del mismo poder. Él habla poco, escucha mucho, y una noche señala un mapa que trazó él mismo en la arena con una rama: rutas de escape que ningún español conoce porque las aprendió de ngäbe-buglé, de esclavos fugados como él, y de su propio sufrimiento.<br><br>
+<em>"El sur es libre todavía"</em>, dice. <em>"Pero hay que saber cómo llegar."</em><br><br>
+Ofrece guiar al grupo hasta Panamá por caminos interiores. A cambio, solo pide que lo lleven con ellos.`,
+    decisions: [
+      { text: 'Aceptar al cimarrón. Su conocimiento y sus conexiones pueden salvar al grupo.', allianceKey: 'cimarron', effects: { food: -5, moral: +22, salud: 0,  union: +15, warriors: +2 } },
+      { text: 'Darle comida y agradecerle el mapa, pero seguir solos. Más gente, más riesgo.',  effects: { food: -3, moral: +8,  salud: 0,  union: +5                                        } },
+    ],
+  },
+
   // ── ACTO II — TRAVESÍA (primarios) ───────────────────────────
 
   e_istmo: {

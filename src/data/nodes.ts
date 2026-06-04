@@ -7,13 +7,16 @@ import type { NodeDef } from './types.js'
 export const NODES_DEF: Record<string, NodeDef> = {
 
   // ── ACTO I — HUIDA (Guatemala → Panamá) ─────────────────────
-  n00: { id:'n00', name:'Guatemala',     lon:-90.3, lat:15.5,  act:1, icon:'🔥', desc:'El inicio. La aldea arde. Todo comenzó aquí.',                           eventPool:['e_inicio'],          next:['n01a','n01b'] },
+  n00: { id:'n00', name:'Guatemala',     lon:-90.3, lat:15.5,  act:1, icon:'🔥', desc:'El inicio. La aldea arde. Todo comenzó aquí.',                           eventPool:['e_inicio'],          next:['n01a','n01b','n00b'] },
+  n00b:{ id:'n00b',name:'Volcanes de Guatemala', lon:-90.8, lat:14.2, act:1, icon:'🌋', desc:'Las cimas humeantes que los dioses kaqchikel habitaron desde el principio.', eventPool:['e_volcanes','e_volcanes_b'], next:['n01a','n01b'] },
   n01a:{ id:'n01a',name:'El Salvador',   lon:-88.9, lat:13.5,  act:1, icon:'🌳', desc:'Ruta por la selva oscura hacia el sur.',                                eventPool:['e_selva','e_selva_b'], next:['n02a','n02b'] },
-  n01b:{ id:'n01b',name:'Honduras',      lon:-86.5, lat:14.8,  act:1, icon:'🌊', desc:'Cruzar los ríos de noche para borrar el rastro.',                       eventPool:['e_rio','e_rio_b'],    next:['n02a','n02c'] },
+  n01b:{ id:'n01b',name:'Honduras',      lon:-86.5, lat:14.8,  act:1, icon:'🌊', desc:'Cruzar los ríos de noche para borrar el rastro.',                       eventPool:['e_rio','e_rio_b'],    next:['n02a','n02c','n01c'] },
+  n01c:{ id:'n01c',name:'Sierra Madre',  lon:-89.5, lat:15.4,  act:1, icon:'⛰️', desc:'Las alturas nubladas donde los españoles no se aventuran aún.',          eventPool:['e_sierra_madre','e_sierra_madre_b'], next:['n02a','n02c'] },
   n02a:{ id:'n02a',name:'Nicaragua',     lon:-85.2, lat:12.8,  act:1, icon:'🤝', desc:'Un pueblo desconocido en los márgenes de la ruta.',                     eventPool:['e_alianza','e_alianza_b'], next:['n02b','n03'] },
-  n02b:{ id:'n02b',name:'Costa Rica',    lon:-83.8, lat:9.9,   act:1, icon:'💀', desc:'La enfermedad de los españoles llega antes que ellos.',                 eventPool:['e_fiebre','e_fiebre_b'],   next:['n03'] },
+  n02b:{ id:'n02b',name:'Costa Rica',    lon:-83.8, lat:9.9,   act:1, icon:'💀', desc:'La enfermedad de los españoles llega antes que ellos.',                 eventPool:['e_fiebre','e_fiebre_b'],   next:['n03','n02e'] },
   n02c:{ id:'n02c',name:'Costa del Caribe', lon:-82.5, lat:13.5, act:1, icon:'⛵', desc:'La costa caribeña: piratas, mercaderes y pueblos libres.',            eventPool:['e_caribe','e_caribe_b'],   next:['n02d'] },
   n02d:{ id:'n02d',name:'Darién Norte',  lon:-77.2, lat:8.5,   act:1, icon:'🌿', desc:'El extremo del continente, donde la tierra se estrecha.',               eventPool:['e_darien_norte','e_darien_norte_b'], next:['n03'] },
+  n02e:{ id:'n02e',name:'Bocas del Toro',lon:-82.2, lat:9.4,   act:1, icon:'🌺', desc:'El archipiélago caribeño donde el mar guarda secretos y aliados.',       eventPool:['e_bocas_toro','e_bocas_toro_b'],     next:['n03'] },
 
   // ── CONVERGENCIA I → II ──────────────────────────────────────
   n03: { id:'n03', name:'Panamá',        lon:-79.5, lat:8.9,   act:2, icon:'🏔️', desc:'El cuello de América. Hay que cruzarlo.',                              eventPool:['e_istmo','e_istmo_b'], next:['n04a','n04b','n04c'] },
@@ -67,12 +70,15 @@ export const NODES_DEF: Record<string, NodeDef> = {
 
 export const EDGES: [string, string][] = [
   // Acto I
-  ['n00','n01a'], ['n00','n01b'],
+  ['n00','n01a'], ['n00','n01b'], ['n00','n00b'],
+  ['n00b','n01a'], ['n00b','n01b'],
   ['n01a','n02a'], ['n01a','n02b'],
-  ['n01b','n02a'], ['n01b','n02c'],
+  ['n01b','n02a'], ['n01b','n02c'], ['n01b','n01c'],
+  ['n01c','n02a'], ['n01c','n02c'],
   ['n02a','n02b'], ['n02a','n03'],
-  ['n02b','n03'],
+  ['n02b','n03'], ['n02b','n02e'],
   ['n02c','n02d'], ['n02d','n03'],
+  ['n02e','n03'],
   // Acto II
   ['n03','n04a'], ['n03','n04b'], ['n03','n04c'],
   ['n04a','n05a'], ['n04a','n05b'],
