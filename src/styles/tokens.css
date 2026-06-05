@@ -183,7 +183,7 @@
   --font-title:   'Cinzel Decorative', serif;
   --font-heading: 'Cinzel', serif;
   --font-body:    'Crimson Text', Georgia, serif;
-  --font-alt:     'Lora', Georgia, serif;
+  /* --font-alt eliminado: Lora reemplazado por --font-body (Crimson Text) en intro.css */
 
   /* Transiciones */
   --t-fast:   0.15s ease;

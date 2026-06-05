@@ -1,7 +1,6 @@
 import type { GameState }   from '../core/GameState.js'
-import type { Decision }    from '../data/types.js'
-import { EVENTS_DEF }        from '../data/events.js'
-import { CLASE_DATA }        from '../data/claseData.js'
+import type { GameEvent, Decision } from '../data/types.js'
+import type { ClaseInfo }    from '../data/claseData.js'
 import { showScreen }        from '../ui/dom.js'
 import { showTip, hideTip, showModal } from '../ui/dom.js'
 import { isClaseMode, showFichaDidactica } from '../ui/claseMode.js'
@@ -11,9 +10,34 @@ import { isClaseMode, showFichaDidactica } from '../ui/claseMode.js'
 // Renderiza el evento actual y sus decisiones.
 // La función onDecision es inyectada por main.ts
 // (separa la UI de la lógica de juego).
+//
+// BUNDLE SPLITTING:
+//   events.ts (148 KB) y claseData.ts (19 KB) se cargan de
+//   forma diferida mediante import() dinámico. Se precargan
+//   en segundo plano cuando el mapa ya es visible (antes de
+//   que el jugador seleccione un nodo). Ver preloadEventData().
 // ══════════════════════════════════════════════════════
 
-type DecisionCallback = (decisionIndex: number) => void
+// ── Caches de módulos cargados diferidamente ──────────
+let _eventsCache: Record<string, GameEvent> | null = null
+let _claseCache:  Record<string, ClaseInfo>  | null = null
+
+/**
+ * Precarga los módulos de datos pesados en segundo plano.
+ * Llamar cuando el mapa ya es visible (antes de la primera selección de nodo).
+ * Si ya están cargados, no hace nada.
+ */
+export function preloadEventData(): void {
+  if (!_eventsCache) {
+    import('../data/events.js').then(m => { _eventsCache = m.EVENTS_DEF })
+  }
+  if (!_claseCache) {
+    import('../data/claseData.js').then(m => { _claseCache = m.CLASE_DATA })
+  }
+}
+
+/** Callback: índice de decisión + objeto Decision para que main.ts no necesite EVENTS_DEF */
+type DecisionCallback = (decisionIndex: number, decision: Decision) => void
 
 /** Personaliza la narrativa con el nombre del cacique */
 function personalizeNarr(narrHtml: string, name: string): string {
@@ -48,9 +72,19 @@ function buildHintHtml(fx: Decision['effects']): string {
 }
 
 export function mountEventScreen(gs: GameState, onDecision: DecisionCallback): void {
+  // Si los datos aún no están en caché (raro: partida cargada antes del preload)
+  // los pedimos ahora sincrónicamente — el jugador ya hizo el gesto de seleccionar un nodo.
+  if (!_eventsCache) {
+    import('../data/events.js').then(m => {
+      _eventsCache = m.EVENTS_DEF
+      mountEventScreen(gs, onDecision)
+    })
+    return
+  }
+
   const eventId = gs.currentNode ? gs.nodes[gs.currentNode]?.eventId : null
   if (!eventId) return
-  const ev = EVENTS_DEF[eventId]
+  const ev = _eventsCache[eventId]
   if (!ev) return
 
   // Modo peligro (evento del conquistador)
@@ -120,7 +154,7 @@ export function mountEventScreen(gs: GameState, onDecision: DecisionCallback): v
       btn.innerHTML = `<span class="dec-text">${dec.text}</span>${hintHtml}`
       btn.onclick = () => {
         cont.querySelectorAll<HTMLButtonElement>('.dec-btn').forEach(b => { b.disabled = true })
-        onDecision(i)
+        onDecision(i, dec)
       }
       cont.appendChild(btn)
     })
@@ -130,8 +164,17 @@ export function mountEventScreen(gs: GameState, onDecision: DecisionCallback): v
 
   // ── Modo Clase: mostrar ficha didáctica antes de las decisiones ──
   if (isClaseMode()) {
-    const claseInfo = CLASE_DATA[eventId]
-    if (claseInfo) showFichaDidactica(ev.title, claseInfo)
+    if (_claseCache) {
+      const claseInfo = _claseCache[eventId]
+      if (claseInfo) showFichaDidactica(ev.title, claseInfo)
+    } else {
+      // Cargar claseData si aún no está (modo clase activado tarde)
+      import('../data/claseData.js').then(m => {
+        _claseCache = m.CLASE_DATA
+        const claseInfo = _claseCache[eventId]
+        if (claseInfo) showFichaDidactica(ev.title, claseInfo)
+      })
+    }
   }
   // Reset de scroll: usar el elemento scrollable correcto en lugar de window.scrollTo
   // (window.scrollTo es no-op en iOS cuando overflow:hidden está en body)

@@ -129,6 +129,25 @@
   pointer-events: none;
 }
 
+/* ── Focus visible para navegación por teclado ──────────────────
+   .btn y .diff-btn usan clip-path que corta el outline normal.
+   Usamos box-shadow como alternativa (no lo corta clip-path). */
+.btn:focus-visible {
+  box-shadow: var(--shadow-glow), 0 0 0 2px var(--ocre2);
+  outline: none;
+}
+.diff-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--ocre2);
+  outline: none;
+}
+.dec-btn:focus-visible,
+.ped-close:focus-visible,
+.name-random-btn:focus-visible,
+.name-sug:focus-visible {
+  outline: 2px solid var(--ocre2);
+  outline-offset: 2px;
+}
+
 @media (max-width: 600px) {
   .btn { width: 100%; max-width: 260px; }
   .dec-btn { font-size: .9rem; padding: .6rem .9rem .6rem 1.5rem; }

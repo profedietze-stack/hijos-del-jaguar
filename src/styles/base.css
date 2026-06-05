@@ -88,6 +88,35 @@ body {
   50%       { opacity: .5; }
 }
 
+/* ── Focus visible: anillo de foco para navegación por teclado ──
+   user-select:none no impide el foco, pero sin outline el tab
+   no tiene indicador visual. Esto es necesario después de agregar
+   role=button + tabindex a los nodos del mapa SVG. */
+:focus-visible {
+  outline: 2px solid var(--ocre2);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* SVG <g> elements no soportan border-radius; usar box-shadow en su lugar */
+svg :focus-visible {
+  outline: 2px solid var(--ocre2);
+  outline-offset: 4px;
+}
+
+/* ── Reducir movimiento para usuarios que lo prefieren ─────────
+   Evita mareos y respeta las preferencias de accesibilidad del SO. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Las transiciones de pantalla se cancelan; mostrar inmediatamente */
+  .screen-enter { animation: none !important; opacity: 1; }
+  .screen-exit  { animation: none !important; opacity: 0; }
+}
+
 /* ── Scrollbar personalizado ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

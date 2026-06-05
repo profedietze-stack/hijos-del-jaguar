@@ -30,7 +30,7 @@ import { mountSplash }                                  from './screens/SplashSc
 import { mountMenu }                                    from './screens/MenuScreen.js'
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
-import { mountEventScreen }                             from './screens/EventScreen.js'
+import { mountEventScreen, preloadEventData }            from './screens/EventScreen.js'
 import { mountEndingScreen, captureEnding, setTopoCache, getTopoCache, showCaptureOverlay } from './screens/EndingScreen.js'
 import { mountHistoryScreen, hsTab }                    from './screens/HistoryScreen.js'
 import {
@@ -65,7 +65,8 @@ import { initClaseMode }                                from './ui/claseMode.js'
 import { openDidacticaOverlay }                         from './ui/didacticaOverlay.js'
 
 // ── Data ──────────────────────────────────────────────
-import { EVENTS_DEF } from './data/events.js'
+// EVENTS_DEF eliminado: events.ts y claseData.ts se cargan de forma diferida
+// desde EventScreen.preloadEventData() para reducir el bundle inicial.
 import type { NodeState, ActNumber } from './data/types.js'
 
 // ══════════════════════════════════════════════════════
@@ -265,6 +266,9 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   updateStatsBar(gs)
 
   showScreen('map-screen')
+  // Precargar events.ts y claseData.ts en segundo plano mientras el jugador
+  // ve la cinemática de apertura (~10s) — estarán listos antes del primer nodo.
+  preloadEventData()
   requestAnimationFrame(() => requestAnimationFrame(() => {
     buildMap(gs, _selectNodeFn)
     waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
@@ -292,6 +296,9 @@ function continueGame(): void {
   playTrack('game')
   showStatsBar()
   updateStatsBar(gs)
+
+  // Precargar datos de eventos en segundo plano
+  preloadEventData()
 
   // Si hay un nodo activo, ir directo al evento
   if (gs.currentNode) {
@@ -333,15 +340,9 @@ function onSelectNode(nodeId: string): void {
 // FLUJO: DECISIÓN EN EL EVENTO
 // ══════════════════════════════════════════════════════
 
-function onDecision(decisionIndex: number): void {
-  // Obtener decisión del evento actual
-  const nodeId  = gs.currentNode
-  if (!nodeId) return
-  const eventId = gs.nodes[nodeId]?.eventId
-  if (!eventId) return
-  const ev = EVENTS_DEF[eventId]
-  if (!ev) return
-  const decision = ev.decisions[decisionIndex]
+function onDecision(_decisionIndex: number, decision: import('./data/types.js').Decision): void {
+  // La decisión ya viene del callback de EventScreen (que tiene EVENTS_DEF cargado).
+  // main.ts ya no necesita importar EVENTS_DEF — split del bundle.
   if (!decision) return
 
   // Guardar el acto actual ANTES de aplicar la decisión (para detectar cambio de acto)

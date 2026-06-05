@@ -306,7 +306,7 @@
   background: rgba(255,255,255,.05);
   border: 1px solid var(--border);
   color: var(--parch);
-  font-family: var(--font-alt);
+  font-family: var(--font-body);
   font-size: 1.1rem;
   padding: .6rem .9rem;
   outline: none;
@@ -343,7 +343,7 @@
   font-size: .82rem;
   padding: .3rem .7rem;
   cursor: pointer;
-  font-family: var(--font-alt);
+  font-family: var(--font-body);
   transition: all var(--t-fast);
 }
 .name-sug:hover {
