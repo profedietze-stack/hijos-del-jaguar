@@ -57,6 +57,7 @@
   flex: 1;
   overflow: hidden;
   height: calc(100vh - 52px);
+  height: calc(100dvh - 52px);
 }
 
 /* Imagen */
@@ -187,8 +188,15 @@
   #ev-narr-wrap { padding: .9rem 1rem .7rem; }
   #dec-panel { padding: .7rem 1rem .9rem; }
 }
+@media (max-width: 600px) {
+  /* Padding inferior para safe-area (iPhone X+ home indicator) */
+  #dec-panel {
+    padding-bottom: calc(.9rem + env(safe-area-inset-bottom));
+  }
+}
+
 @media (min-width: 769px) {
-  #event-layout { flex-direction: row; height: calc(100vh - 52px); }
+  #event-layout { flex-direction: row; height: calc(100vh - 52px); height: calc(100dvh - 52px); }
   #ev-img-wrap {
     width: 42%;
     height: auto;

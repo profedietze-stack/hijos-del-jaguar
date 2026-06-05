@@ -31,7 +31,7 @@ import { mountMenu }                                    from './screens/MenuScre
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
 import { mountEventScreen }                             from './screens/EventScreen.js'
-import { mountEndingScreen, captureEnding } from './screens/EndingScreen.js'
+import { mountEndingScreen, captureEnding, setTopoCache, getTopoCache } from './screens/EndingScreen.js'
 import { mountHistoryScreen, hsTab }                    from './screens/HistoryScreen.js'
 import {
   buildMap, drawNodes, drawConquistador,
@@ -40,6 +40,7 @@ import {
   waitForMapThenCinematic,
   getNewHistMarkersForAct, runHistMarkerCinematic,
   animatePlayerToNode,
+  getMapTopoCache,
 } from './screens/MapScreen.js'
 
 // ── UI ────────────────────────────────────────────────
@@ -500,6 +501,11 @@ function showEnding(ending: import('./data/types.js').EndingDef): void {
     pushToHistory(gs.pendingGame)
   }
   clearSavedGame()
+
+  // Compartir el topo-cache con EndingScreen para evitar un segundo fetch del GeoJSON
+  const cached = getMapTopoCache()
+  if (cached) setTopoCache(cached)
+  else if (getTopoCache() === null) setTopoCache(null)   // asegura que EndingScreen lea sessionStorage
 
   playTrack('menu')
   mountEndingScreen(gs, ending, allUnlocked, freshIds)

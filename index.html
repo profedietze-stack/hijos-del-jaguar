@@ -15,7 +15,8 @@
   <meta name="application-name" content="Hijos del Jaguar">
   <meta name="apple-mobile-web-app-title" content="Hijos del Jaguar">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="/icons/icon.svg">
+  <!-- apple-touch-icon requiere PNG; SVG no es soportado en iOS Safari < 16 -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Hijos del Jaguar — La Gran Huida">
@@ -212,13 +213,13 @@
         <div class="intro-diff-wrap">
           <div class="intro-diff-label">Elegí tu modo de juego</div>
           <div class="diff-wrap">
-            <button class="diff-btn" id="diff-edu" onclick="window.game?.setDifficulty('educativo')">
+            <button class="diff-btn" id="diff-edu">
               📖 Educativo <span class="diff-badge educativo">Recomendado</span>
             </button>
-            <button class="diff-btn" id="diff-his" onclick="window.game?.setDifficulty('historico')">
+            <button class="diff-btn" id="diff-his">
               ⚔️ Histórico <span class="diff-badge historico">Desafiante</span>
             </button>
-            <button class="diff-btn" id="diff-leg" onclick="window.game?.setDifficulty('legendario')">
+            <button class="diff-btn" id="diff-leg">
               💀 Legendario <span class="diff-badge legendario">Sin piedad</span>
             </button>
           </div>
@@ -226,7 +227,7 @@
           <div class="diff-detail" id="diff-detail"></div>
           <div class="intro-cta">
             <button class="btn btn-sec" id="btn-back-intro" style="opacity:.6;margin-bottom:.5rem;">← Volver al menú</button>
-            <button class="btn" id="btn-comenzar" disabled onclick="window.game?.startNewGame()">
+            <button class="btn" id="btn-comenzar" disabled>
               Comenzar la Gran Huida
             </button>
           </div>

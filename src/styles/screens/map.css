@@ -84,6 +84,7 @@
   z-index: 10;
   border-radius: var(--r);
   min-width: 170px;
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 .leg-title {

@@ -127,15 +127,18 @@ export function mountEventScreen(gs: GameState, onDecision: DecisionCallback): v
   }
 
   showScreen('event-screen')
-  window.scrollTo(0, 0)   // reset scroll en móvil
 
   // ── Modo Clase: mostrar ficha didáctica antes de las decisiones ──
   if (isClaseMode()) {
     const claseInfo = CLASE_DATA[eventId]
     if (claseInfo) showFichaDidactica(ev.title, claseInfo)
   }
+  // Reset de scroll: usar el elemento scrollable correcto en lugar de window.scrollTo
+  // (window.scrollTo es no-op en iOS cuando overflow:hidden está en body)
   requestAnimationFrame(() => {
     const body = document.getElementById('ev-body')
     if (body) body.scrollTop = 0
+    const narrWrap = document.getElementById('ev-narr-wrap')
+    if (narrWrap) narrWrap.scrollTop = 0
   })
 }

@@ -14,6 +14,9 @@
   transition: all var(--t-normal);
   clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px),
              calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+  /* Eliminar 300ms tap-delay en Android y tap highlight en iOS */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .btn:hover:not(:disabled) {
   background: rgba(196,136,42,.25);
@@ -40,6 +43,8 @@
   transition: all var(--t-fast);
   clip-path: polygon(5px 0%, calc(100% - 5px) 0%, 100% 5px, 100% calc(100% - 5px),
              calc(100% - 5px) 100%, 5px 100%, 0% calc(100% - 5px), 0% 5px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .diff-btn:hover {
   background: rgba(196,136,42,.18);
@@ -85,6 +90,9 @@
   line-height: 1.4;
   transition: all var(--t-fast);
   position: relative;
+  /* Tap responsiveness en mobile (sin 300ms delay) */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .dec-btn::before {
   content: '▸';
@@ -98,9 +106,15 @@
   background: rgba(196,136,42,.18);
   border-color: var(--ocre);
   color: var(--parch);
-  padding-left: 1.9rem;
+  /* No cambia padding para evitar layout-shift en mobile */
 }
 .dec-btn:hover::before { opacity: 1; }
+/* Estado active para touch devices (Android/iOS) */
+.dec-btn:active:not(:disabled) {
+  background: rgba(196,136,42,.25);
+  border-color: var(--ocre);
+  color: var(--parch);
+}
 .dec-btn:disabled { opacity: .35; cursor: not-allowed; }
 
 .dec-text { display: block; }
@@ -118,10 +132,6 @@
 @media (max-width: 600px) {
   .btn { width: 100%; max-width: 260px; }
   .dec-btn { font-size: .9rem; padding: .6rem .9rem .6rem 1.5rem; }
-  .dec-btn:hover:not(:disabled) { padding-left: 1.5rem; }
-  .dec-btn:active:not(:disabled) {
-    background: rgba(196,136,42,.25);
-    border-color: var(--ocre);
-    color: var(--parch);
-  }
+  /* En móvil: área de toque más generosa con padding vertical extra */
+  .dec-btn { min-height: 52px; }
 }

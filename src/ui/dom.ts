@@ -195,7 +195,7 @@ export function showConfirmModal(
   if (!overlay || !titleEl || !msgEl || !btnOk) { onConfirm(); return }
 
   titleEl.textContent = title
-  msgEl.textContent   = message
+  msgEl.innerHTML     = message   // message puede contener <strong> y otros tags
   overlay.style.display = 'flex'
 
   const newBtn = btnOk.cloneNode(true) as HTMLButtonElement

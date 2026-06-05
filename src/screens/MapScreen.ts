@@ -24,6 +24,9 @@ let _conqAnimating = false
 
 const TOPO_STORAGE_KEY = 'jaguar_topo_v1'
 
+/** Permite que EndingScreen use el mismo cache en memoria (evita doble fetch) */
+export function getMapTopoCache(): unknown { return _topoCache }
+
 // ── Nombres de actos ──────────────────────────────────
 
 const ACT_NAMES: Record<number, string> = {
@@ -684,8 +687,9 @@ function _animateConqAdvance(
 }
 
 /**
- * Versión animada para el UI del avance del conquistador.
- * Llama al callback con (caught: boolean) cuando termina la animación.
+ * @deprecated Usar animateConqStep() en su lugar.
+ * Esta función tiene su propia lógica de probabilidad (doble azar con el engine).
+ * Se mantiene solo por compatibilidad; no llamar desde flujo principal.
  */
 export function advanceConquistadorAnimated(gs: GameState, cb: (caught: boolean) => void): void {
   if (gs.conq.caught) { cb(false); return }
@@ -907,10 +911,15 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
         ev.preventDefault()
         const tt = document.getElementById('map-node-tt')
         if (!tt) return
-        if (tt.style.display === 'block') { tt.style.display = 'none'; onSelectNode(nd.id) }
-        else {
+        if (tt.style.display === 'block') {
+          // Segundo toque: navegar directamente
+          tt.style.display = 'none'
+          onSelectNode(nd.id)
+        } else {
+          // Primer toque: mostrar tooltip brevemente y luego navegar
+          // (250ms es suficiente para dar feedback visual sin sentirse lento)
           showNdTip(ev.changedTouches[0] as unknown as MouseEvent)
-          setTimeout(() => { tt.style.display = 'none'; onSelectNode(nd.id) }, 700)
+          setTimeout(() => { tt.style.display = 'none'; onSelectNode(nd.id) }, 350)
         }
       })
     } else if (unlockedOtherPath) {
