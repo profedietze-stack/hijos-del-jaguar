@@ -570,5 +570,14 @@
   </div>
 
   <script type="module" src="/src/main.ts"></script>
+
+  <!-- Service Worker: habilita modo offline y cacheo de assets -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => { /* sin soporte */ })
+      })
+    }
+  </script>
 </body>
 </html>

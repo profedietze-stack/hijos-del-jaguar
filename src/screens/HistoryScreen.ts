@@ -78,8 +78,8 @@ function renderHsStats(h: FinishedGame[]): void {
       { v: his,                                   l: 'Partidas histórico' },
       { v: tiempoTotal + 'm',                     l: 'Tiempo total jugado' },
       { v: eventosTotal,                          l: 'Eventos resueltos' },
-      { v: scoreTotal.toLocaleString('es-AR'),    l: 'Puntaje acumulado' },
-      { v: bestScore.toLocaleString('es-AR'),     l: 'Mejor puntaje' },
+      { v: scoreTotal.toLocaleString(),    l: 'Puntaje acumulado' },
+      { v: bestScore.toLocaleString(),     l: 'Mejor puntaje' },
       { v: maxSurv,                               l: 'Máx. supervivientes' },
       { v: maxAlianzas,                           l: 'Máx. alianzas' },
     ].map(c => `<div class="hs-stat-card">
@@ -100,7 +100,7 @@ function renderHsStats(h: FinishedGame[]): void {
       { v: avgA,                              l: 'Alianzas' },
       { v: avgDur + 'm',                      l: 'Duración' },
       { v: avgVisit,                          l: 'Lugares visitados' },
-      { v: avgScore.toLocaleString('es-AR'),  l: 'Puntaje' },
+      { v: avgScore.toLocaleString(),  l: 'Puntaje' },
     ].map(c => `<div class="hs-stat-card">
       <div class="hs-stat-val">${c.v}</div>
       <div class="hs-stat-label">${c.l} prom.</div>
@@ -143,9 +143,9 @@ function renderHsStats(h: FinishedGame[]): void {
         <span>🤝 ${bh.alliances.length} alianzas</span>
         <span>⏱ ${dur}min</span>
         <span>🗺 ${bh.visitedCount ?? '?'} lugares</span>
-        <span>🏅 ${bestScore.toLocaleString('es-AR')} pts</span>
+        <span>🏅 ${bestScore.toLocaleString()} pts</span>
         <span>${modeL}</span>
-        <span>📅 ${new Date(bh.date).toLocaleDateString('es-AR')}</span>
+        <span>📅 ${new Date(bh.date).toLocaleDateString()}</span>
       </div>`
   }
 
@@ -157,7 +157,7 @@ function renderHsStats(h: FinishedGame[]): void {
     doc.innerHTML = `Este estudiante completó <strong>${total} partida${total !== 1 ? 's' : ''}</strong> con una tasa de victoria del <strong>${winRate}%</strong> — nivel ${nivelV}.
     Invirtió <strong>${tiempoTotal} minutos</strong> de juego activo resolviendo <strong>${eventosTotal} eventos históricos</strong>.
     Su promedio de alianzas es <strong>${avgA_val}</strong> (capacidad de negociación ${nivelA}).
-    Puntaje acumulado total: <strong>${scoreTotal.toLocaleString('es-AR')}</strong>.
+    Puntaje acumulado total: <strong>${scoreTotal.toLocaleString()}</strong>.
     ${his > 0 ? `Completó <strong>${his} partida${his !== 1 ? 's' : ''} en modo Histórico</strong>, lo que implica comprensión de las condiciones reales de la conquista.` : ''}
     ${epicas > 0 ? `Logró <strong>${epicas} final${epicas !== 1 ? 'es' : ''} épico${epicas !== 1 ? 's' : ''}</strong>, indicador de toma de decisiones estratégica.` : ''}`
   }
@@ -221,14 +221,14 @@ function renderHsPartidas(h: FinishedGame[]): void {
           <div class="hs-partida-badge">${e.endBadge}</div>
           <div class="hs-partida-title">${e.endTitle}</div>
         </div>
-        <div class="hs-partida-date">${new Date(e.date).toLocaleDateString('es-AR')}</div>
+        <div class="hs-partida-date">${new Date(e.date).toLocaleDateString()}</div>
       </div>
       <div class="hs-partida-stats">
         <span>👥 ${e.m} supervivientes</span>
         <span>🤝 ${e.alliances.length} alianzas</span>
         <span>🗺 ${e.visitedCount ?? '?'} lugares</span>
         <span>⏱ ${dur}min</span>
-        <span>🏅 ${score.toLocaleString('es-AR')} pts</span>
+        <span>🏅 ${score.toLocaleString()} pts</span>
         ${modeL}
         ${conqChip}
       </div>

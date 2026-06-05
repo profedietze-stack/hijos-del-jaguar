@@ -687,46 +687,6 @@ function _animateConqAdvance(
 }
 
 /**
- * @deprecated Usar animateConqStep() en su lugar.
- * Esta función tiene su propia lógica de probabilidad (doble azar con el engine).
- * Se mantiene solo por compatibilidad; no llamar desde flujo principal.
- */
-export function advanceConquistadorAnimated(gs: GameState, cb: (caught: boolean) => void): void {
-  if (gs.conq.caught) { cb(false); return }
-  if (gs.conq.reorgTurns > 0) {
-    _showReorgCard(() => cb(false))
-    return
-  }
-
-  const ri = gs.conq.routeIdx
-  const isEdu = gs.diff === 'educativo'
-  const lag = isEdu ? 2 : 1
-  const maxNormal = CONQ_BRIDGE.length + gs.history.length - lag
-  const playerPos = CONQ_BRIDGE.length + gs.history.length - 1
-  const jumpProb = isEdu ? 0.12 : 0.32
-  const doJump = Math.random() < jumpProb
-
-  let targetIdx: number
-  let isJump = false
-  if (doJump && ri < playerPos) { targetIdx = playerPos; isJump = true }
-  else if (ri < maxNormal)       { targetIdx = ri + 1 }
-  else                           { cb(false); return }
-
-  const fromWp = conqCurrentNode(gs)
-  // Note: gs is immutable — caller must update routeIdx/caught in the game state
-  // We just animate from current to target position
-  const gsCopy = { ...gs, conq: { ...gs.conq, routeIdx: targetIdx } }
-  const toWp   = conqCurrentNode(gsCopy)
-  if (!fromWp || !toWp) { cb(isJump); return }
-
-  const toName = (toWp as { name?: string }).name ?? ''
-  showNotif(`⚔️ Los conquistadores avanzan — ${toName}`, 'loss')
-  if (isJump) showNotif('⚔️ ¡Los conquistadores te han alcanzado!', 'loss')
-
-  _animateConqAdvance(fromWp, toWp, gs, undefined, () => cb(isJump))
-}
-
-/**
  * Anima el avance del conquistador usando el resultado del motor (engine-first).
  * Elimina el doble azar: la decisión ya fue tomada por el motor, aquí solo se anima.
  */
@@ -893,6 +853,10 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
 
     if (reachable && onSelectNode) {
       g.style('cursor', 'pointer')
+        .attr('role', 'button')
+        .attr('aria-label', `Ir a ${nd.name}: ${nd.desc}`)
+        .attr('tabindex', '0')
+        .attr('focusable', 'true')
       g.append('circle').attr('r', 26).attr('fill', 'transparent').attr('pointer-events', 'all')
       const showNdTip = (ev: MouseEvent) => {
         const tt = document.getElementById('map-node-tt')
@@ -907,6 +871,14 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
       g.on('mouseenter', (ev: MouseEvent) => { sfxNodeHover(); showNdTip(ev) })
         .on('mouseleave', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none' })
         .on('click', () => { const tt = document.getElementById('map-node-tt'); if (tt) tt.style.display = 'none'; onSelectNode(nd.id) })
+        .on('keydown', (ev: KeyboardEvent) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault()
+            const tt = document.getElementById('map-node-tt')
+            if (tt) tt.style.display = 'none'
+            onSelectNode(nd.id)
+          }
+        })
       g.on('touchend', (ev: TouchEvent) => {
         ev.preventDefault()
         const tt = document.getElementById('map-node-tt')

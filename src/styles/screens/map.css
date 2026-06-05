@@ -121,3 +121,22 @@
   .mh-title { font-size: .78rem; }
   .mh-hint { font-size: .85rem; }
 }
+
+/* ── Landscape mobile: teléfono girado horizontalmente ──
+   Cuando height ≤ 500px el ancho puede superar 769px y
+   activar el layout desktop. Forzamos un diseño compacto. */
+@media (max-height: 500px) {
+  #map-header {
+    padding: .3rem .9rem;
+  }
+  .mh-hint { display: none; }
+  #map-legend {
+    bottom: .4rem;
+    right: .4rem;
+    padding: .4rem .6rem;
+    font-size: .55rem;
+    min-width: 130px;
+  }
+  .leg-hint { display: none; }
+  .leg-item { margin-bottom: .18rem; }
+}

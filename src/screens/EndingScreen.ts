@@ -412,7 +412,7 @@ export async function captureEnding(): Promise<void> {
       windowWidth: doc.scrollWidth, windowHeight: doc.scrollHeight,
     })
     const link = document.createElement('a')
-    const date = new Date().toLocaleDateString('es-AR').replace(/\//g, '-')
+    const date = new Date().toLocaleDateString(undefined).replace(/\//g, '-')
     link.download = `hijos-del-jaguar-${date}.png`
     link.href = canvas.toDataURL('image/png')
     link.click()
@@ -498,7 +498,7 @@ function _populateCaptureCard(
     `<div><div class="cap-stat-val" style="font-size:.9rem">💊${s.salud}</div><div class="cap-stat-label">Salud</div></div>`,
   ].join(''))
 
-  cSet('captura-score', score.total.toLocaleString('es-AR'))
+  cSet('captura-score', score.total.toLocaleString())
 
   const newSet    = new Set(newIds)
   const ganados   = LOGROS_DEF.filter(l => newSet.has(l.id))
@@ -553,7 +553,7 @@ export function mountEndingScreen(
 
   // ── Kilómetros
   const km = calcRouteKm(history, nodes)
-  set('end-km-label', `~ ${km.toLocaleString('es-AR')} km recorridos`)
+  set('end-km-label', `~ ${km.toLocaleString()} km recorridos`)
 
   // ── Hitos
   renderHitos(history, nodes)
@@ -562,7 +562,7 @@ export function mountEndingScreen(
   const cfg       = DIFF_CONFIG[diff]
   const dfeatThr  = cfg.defeatThreshold
   const modeLabel = diff === 'legendario' ? '💀 Legendario' : diff === 'historico' ? '⚔️ Histórico' : '📖 Educativo'
-  const endDate   = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })
+  const endDate   = new Date().toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' })
   const avgRes    = Math.round((s.food + s.moral + s.salud + s.union) / 4)
 
   const cards = [
@@ -572,7 +572,7 @@ export function mountEndingScreen(
     { val: s.civilians,               label: 'Civiles',         sub: 'al llegar',              danger: false,                     warn: false              },
     { val: alliances.length,          label: 'Alianzas',        sub: 'pueblos aliados',        danger: false,                     warn: alliances.length < 2},
     { val: visitedCount,              label: 'Lugares',         sub: `de ${totalNodes} posibles`, danger: false,                  warn: false              },
-    { val: km.toLocaleString('es-AR'),label: 'Kilómetros',      sub: 'recorridos aprox.',      danger: false,                     warn: false              },
+    { val: km.toLocaleString(),label: 'Kilómetros',      sub: 'recorridos aprox.',      danger: false,                     warn: false              },
     { val: dur,                       label: 'Minutos',         sub: 'tiempo de juego',        danger: false,                     warn: false              },
     { val: modeLabel,                 label: 'Dificultad',      sub: '',                       danger: false,                     warn: false              },
     { val: avgRes,                    label: 'Recursos finales',sub: 'promedio',               danger: avgRes < 25,               warn: avgRes < 45        },
@@ -590,7 +590,7 @@ export function mountEndingScreen(
 
   // ── Puntaje
   const score = calcScore(m, alliances, history, dur, diff)
-  set('end-score-value', score.total.toLocaleString('es-AR'))
+  set('end-score-value', score.total.toLocaleString())
   const breakdownEl = document.getElementById('end-score-breakdown')
   if (breakdownEl) {
     breakdownEl.textContent = score.breakdown
