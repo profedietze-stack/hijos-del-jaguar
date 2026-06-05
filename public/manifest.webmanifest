@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "Hijos del Jaguar — La Gran Huida",
   "short_name": "Hijos del Jaguar",
   "description": "Juego narrativo de supervivencia histórica. Lidera tu tribu desde Guatemala hasta la Patagonia huyendo de la conquista española.",
@@ -12,18 +12,10 @@
   "lang": "es",
   "categories": ["games", "education"],
   "icons": [
-    {
-      "src": "./icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icons/icon.svg",     "sizes": "any",     "type": "image/svg+xml", "purpose": "any" }
   ],
   "screenshots": [],
   "prefer_related_applications": false

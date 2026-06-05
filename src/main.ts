@@ -31,7 +31,7 @@ import { mountMenu }                                    from './screens/MenuScre
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
 import { mountEventScreen }                             from './screens/EventScreen.js'
-import { mountEndingScreen, captureEnding, setTopoCache, getTopoCache } from './screens/EndingScreen.js'
+import { mountEndingScreen, captureEnding, setTopoCache, getTopoCache, showCaptureOverlay } from './screens/EndingScreen.js'
 import { mountHistoryScreen, hsTab }                    from './screens/HistoryScreen.js'
 import {
   buildMap, drawNodes, drawConquistador,
@@ -183,7 +183,7 @@ function wireAllButtons(): void {
 
   // ── Pantalla de fin ───────────────────────────────────
   on('btn-end-capture',  () => { sfxClick(); captureEnding() })
-  on('btn-end-share',    () => { sfxClick(); document.getElementById('captura-overlay')?.classList.add('visible') })
+  on('btn-end-share',    () => { sfxClick(); showCaptureOverlay() })
   on('btn-end-newgame',  () => { sfxClick(); mountIntro() })
   on('btn-end-menu',     () => { sfxClick(); playTrack('menu'); hideStatsBar(); mountMenu() })
 

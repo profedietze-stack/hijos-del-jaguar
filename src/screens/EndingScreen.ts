@@ -383,7 +383,20 @@ function renderLogros(diff: Difficulty, desbloqueados: Set<string>, nuevos: Set<
 
 // ── Captura de pantalla ───────────────────────────────
 
+/** true si el dispositivo es táctil (Android, iOS) */
+function isTouchDevice(): boolean {
+  return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)
+}
+
 export async function captureEnding(): Promise<void> {
+  // En dispositivos táctiles (iOS/Android), html2canvas falla por imágenes CORS.
+  // Mostramos la captura-overlay con instrucciones nativas del sistema operativo.
+  if (isTouchDevice()) {
+    _showMobileCaptureOverlay()
+    return
+  }
+
+  // Desktop: html2canvas funciona correctamente
   const btn    = document.querySelector<HTMLButtonElement>('.end-btn-main')
   const status = document.getElementById('end-capture-status')
   if (btn)    { btn.disabled = true; btn.textContent = '⏳ Capturando…' }
@@ -405,11 +418,40 @@ export async function captureEnding(): Promise<void> {
     link.click()
     if (status) { status.textContent = '✓ Imagen descargada correctamente'; status.style.color = 'var(--jade3)'; status.classList.add('visible') }
   } catch {
-    if (status) { status.textContent = '⚠ No se pudo capturar. Usá la tecla Impr Pant o la captura del sistema.'; status.style.color = '#e07070'; status.classList.add('visible') }
+    // Si html2canvas falla en desktop, ofrecer la tarjeta manual
+    _showMobileCaptureOverlay()
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '📸 Guardar resultado' }
     setTimeout(() => status?.classList.remove('visible'), 5000)
   }
+}
+
+/**
+ * Muestra la captura-overlay (tarjeta solo-texto) con instrucciones de captura nativa.
+ * Exportada para que main.ts la use en el botón "Ver tarjeta" también.
+ * Funciona en cualquier dispositivo y no depende de html2canvas ni CORS.
+ */
+export function showCaptureOverlay(): void { _showMobileCaptureOverlay() }
+
+function _showMobileCaptureOverlay(): void {
+  // Actualizar instrucción según plataforma
+  const instrEl = document.getElementById('captura-instruccion')
+  if (instrEl) {
+    const ua = navigator.userAgent
+    const isIOS     = /iPad|iPhone|iPod/.test(ua)
+    const isMacOS   = /Mac/.test(ua) && !isIOS
+    const isAndroid = /Android/.test(ua)
+    if (isIOS) {
+      instrEl.innerHTML = '📱 Presioná <strong>Botón lateral + Volumen arriba</strong> (o <strong>Home + Power</strong> en iPhone 8 o anterior) para capturar la pantalla.'
+    } else if (isAndroid) {
+      instrEl.innerHTML = '📱 Presioná <strong>Botón de encendido + Bajar volumen</strong> al mismo tiempo para capturar la pantalla.'
+    } else if (isMacOS) {
+      instrEl.innerHTML = 'Mac: <strong>Cmd + Shift + 4</strong> para capturar área, o <strong>Cmd + Shift + 3</strong> para pantalla completa.'
+    } else {
+      instrEl.innerHTML = 'Windows: <strong>Impr Pant</strong> o <strong>Win + Shift + S</strong> para capturar la pantalla.'
+    }
+  }
+  document.getElementById('captura-overlay')?.classList.add('visible')
 }
 
 type Html2CanvasFn = (el: HTMLElement, opts: Record<string, unknown>) => Promise<HTMLCanvasElement>

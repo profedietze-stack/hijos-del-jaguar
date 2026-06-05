@@ -26,12 +26,20 @@
 
   <title>Hijos del Jaguar — La Gran Huida</title>
 
-  <!-- Preload fuentes críticas (self-hosted en /fonts/) -->
+  <!-- Preload fuentes críticas (self-hosted — ya descargadas en /fonts/) -->
+  <!-- Cinzel Decorative 700: usada en títulos principales -->
   <link rel="preload" href="/fonts/cinzel-decorative-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/cinzel-decorative-700-ext.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Cinzel: usada en encabezados y UI -->
   <link rel="preload" href="/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/cinzel-400-ext.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Crimson Text: usada en el cuerpo narrativo (el más importante) -->
   <link rel="preload" href="/fonts/crimson-text-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/crimson-text-400-ext.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/crimson-text-400i.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/crimson-text-400i-ext.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Fallback Google Fonts mientras no tenemos self-hosted -->
+  <!-- Google Fonts como fallback de red (si no hay conexión, los locales cubren todo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
