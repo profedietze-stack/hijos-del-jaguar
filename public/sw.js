@@ -16,6 +16,7 @@ const STATIC_PRECACHE = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon.svg',
+  '/images/menu-bg.jpg',
   '/fonts/cinzel-decorative-700.woff2',
   '/fonts/cinzel-decorative-700-ext.woff2',
   '/fonts/cinzel-400.woff2',

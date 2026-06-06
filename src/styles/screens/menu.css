@@ -11,8 +11,10 @@
   inset: 0;
   background:
     linear-gradient(180deg, rgba(8,6,4,.35) 0%, rgba(8,6,4,.1) 40%, rgba(8,6,4,.9) 100%),
-    url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_rainforest.jpg/1280px-Amazon_rainforest.jpg')
+    url('/images/menu-bg.jpg')
     center / cover no-repeat;
+  animation: menu-drift 28s ease-in-out infinite alternate;
+  will-change: transform;
 }
 .menu-bg::after {
   content: '';
@@ -88,6 +90,11 @@
 }
 .btn-reset-all:hover {
   color: rgba(210,70,55,.75);
+}
+
+@keyframes menu-drift {
+  from { transform: scale(1.0) translate(0, 0); }
+  to   { transform: scale(1.05) translate(-1%, .5%); }
 }
 
 @media (max-width: 600px) {
