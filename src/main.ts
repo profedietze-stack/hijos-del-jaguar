@@ -28,6 +28,7 @@ import {
 // ── Screens ───────────────────────────────────────────
 import { mountSplash }                                  from './screens/SplashScreen.js'
 import { mountMenu }                                    from './screens/MenuScreen.js'
+import { mountCredits }                                 from './screens/CreditsScreen.js'
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
 import { mountEventScreen, preloadEventData }            from './screens/EventScreen.js'
@@ -49,6 +50,7 @@ import {
   initGlobalListeners, showScreen,
   showStatsBar, hideStatsBar, updateStatsBar,
   showNotifs, flashSaveIndicator, showConfirmModal,
+  showAchievementToasts, showTutorial, tutorialSeen,
 } from './ui/dom.js'
 
 // ── Audio ─────────────────────────────────────────────
@@ -69,6 +71,7 @@ import { openDidacticaOverlay }                         from './ui/didacticaOver
 // EVENTS_DEF eliminado: events.ts y claseData.ts se cargan de forma diferida
 // desde EventScreen.preloadEventData() para reducir el bundle inicial.
 import type { NodeState, ActNumber } from './data/types.js'
+import { LOGROS_DEF }                from './data/achievements.js'
 
 // ══════════════════════════════════════════════════════
 // ESTADO GLOBAL DE LA SESIÓN
@@ -123,6 +126,9 @@ function wireAllButtons(): void {
   // ── Menú ─────────────────────────────────────────────
   on('btn-mute',     () => { toggleMute() })
   on('btn-nueva',    () => { sfxClick(); mountIntro() })
+  on('btn-credits',         () => { sfxClick(); mountCredits() })
+  on('btn-credits-back',    () => { sfxClick(); playTrack('menu'); mountMenu() })
+  on('tut-close',           () => { /* handled by showTutorial */ })
   on('btn-reset-all', () => {
     sfxClick()
     showConfirmModal(
@@ -268,8 +274,13 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
 
   showScreen('map-screen')
   // Precargar events.ts y claseData.ts en segundo plano mientras el jugador
-  // ve la cinemática de apertura (~10s) — estarán listos antes del primer nodo.
+  // ve la cinematica de apertura (~10s) — estaran listos antes del primer nodo.
   preloadEventData()
+
+  // Tutorial de primera partida (si no fue descartado permanentemente)
+  if (!tutorialSeen()) {
+    setTimeout(() => showTutorial(), 2200)
+  }
   requestAnimationFrame(() => requestAnimationFrame(() => {
     buildMap(gs, _selectNodeFn)
     waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
@@ -517,6 +528,15 @@ function showEnding(ending: import('./data/types.js').EndingDef): void {
 
   playTrack('menu')
   mountEndingScreen(gs, ending, allUnlocked, freshIds)
+
+  // Toasts de logros recien desbloqueados (LOGROS_DEF ya esta en el bundle)
+  if (freshIds.length > 0) {
+    const toasts = freshIds
+      .map(id => LOGROS_DEF.find(a => a.id === id))
+      .filter((a): a is NonNullable<typeof a> => !!a)
+      .map(a => ({ icon: a.icon, nombre: a.nombre, desc: a.desc }))
+    showAchievementToasts(toasts, 1200)
+  }
 }
 
 // ══════════════════════════════════════════════════════

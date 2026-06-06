@@ -1,6 +1,8 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
 
+import pkg from './package.json'
+
 export default defineConfig({
   test: {
     environment: 'node',   // los módulos del motor son puros (sin DOM)
@@ -12,6 +14,9 @@ export default defineConfig({
       exclude:   ['src/data/events.ts'],   // solo datos, sin lógica
       reporter:  ['text', 'lcov'],
     },
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
   },
   base: '/hijos-del-jaguar/',
   build: {

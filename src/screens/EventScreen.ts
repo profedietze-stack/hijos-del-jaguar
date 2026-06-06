@@ -1,7 +1,7 @@
 import type { GameState }   from '../core/GameState.js'
 import type { GameEvent, Decision } from '../data/types.js'
 import type { ClaseInfo }    from '../data/claseData.js'
-import { showScreen }        from '../ui/dom.js'
+import { showScreen, showLoadingOverlay, hideLoadingOverlay } from '../ui/dom.js'
 import { showTip, hideTip, showModal } from '../ui/dom.js'
 import { isClaseMode, showFichaDidactica } from '../ui/claseMode.js'
 
@@ -75,8 +75,10 @@ export function mountEventScreen(gs: GameState, onDecision: DecisionCallback): v
   // Si los datos aún no están en caché (raro: partida cargada antes del preload)
   // los pedimos ahora sincrónicamente — el jugador ya hizo el gesto de seleccionar un nodo.
   if (!_eventsCache) {
+    showLoadingOverlay('Cargando eventos…')
     import('../data/events.js').then(m => {
       _eventsCache = m.EVENTS_DEF
+      hideLoadingOverlay()
       mountEventScreen(gs, onDecision)
     })
     return

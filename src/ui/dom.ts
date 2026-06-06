@@ -244,3 +244,107 @@ export function initGlobalListeners(): void {
     if (overlay) overlay.style.display = 'none'
   })
 }
+
+
+// ── LOADING OVERLAY ───────────────────────────────────
+
+/** Muestra un spinner de carga minimalista sobre toda la UI. */
+export function showLoadingOverlay(msg = 'Cargando…'): void {
+  const el = document.getElementById('loading-overlay')
+  const txt = document.getElementById('loading-card')?.querySelector('.ld-text') as HTMLElement | null
+  if (!el) return
+  if (txt) txt.textContent = msg
+  el.hidden = false
+}
+
+/** Oculta el spinner de carga. */
+export function hideLoadingOverlay(): void {
+  const el = document.getElementById('loading-overlay')
+  if (el) el.hidden = true
+}
+
+// ── ACHIEVEMENT TOASTS ────────────────────────────────
+
+export interface AchievementToastData {
+  icon:   string
+  nombre: string
+  desc:   string
+}
+
+/**
+ * Muestra toasts de logro desbloqueado en secuencia.
+ * @param achievements - lista de logros a mostrar
+ * @param delayMs - retraso inicial antes del primer toast (ms)
+ */
+export function showAchievementToasts(
+  achievements: AchievementToastData[],
+  delayMs = 800,
+): void {
+  const area = document.getElementById('achievement-toast-area')
+  if (!area || achievements.length === 0) return
+
+  achievements.forEach((ach, i) => {
+    setTimeout(() => {
+      const toast = document.createElement('div')
+      toast.className = 'ach-toast'
+      toast.setAttribute('role', 'status')
+      toast.innerHTML = `
+        <div class="ach-toast-eyebrow">🏆 Logro desbloqueado</div>
+        <div class="ach-toast-body">
+          <span class="ach-toast-icon" aria-hidden="true">${ach.icon}</span>
+          <div class="ach-toast-text">
+            <div class="ach-toast-name">${ach.nombre}</div>
+            <div class="ach-toast-desc">${ach.desc}</div>
+          </div>
+        </div>`
+
+      area.appendChild(toast)
+      // Forzar reflow para iniciar la transicion CSS
+      void toast.offsetWidth
+      toast.classList.add('visible')
+
+      // Auto-remove after 5s
+      setTimeout(() => {
+        toast.classList.remove('visible')
+        setTimeout(() => toast.remove(), 400)
+      }, 5000)
+    }, delayMs + i * 1200)
+  })
+}
+
+// ── TUTORIAL OVERLAY ──────────────────────────────────
+
+const TUTORIAL_KEY = 'hdj-tutorial-v1'
+
+/** Verdadero si el tutorial ya fue visto. */
+export function tutorialSeen(): boolean {
+  try { return !!localStorage.getItem(TUTORIAL_KEY) } catch { return true }
+}
+
+/**
+ * Muestra el tutorial de primera partida.
+ * @param onClose - callback cuando el jugador lo descarta
+ */
+export function showTutorial(onClose?: () => void): void {
+  const overlay = document.getElementById('tutorial-overlay')
+  if (!overlay) { onClose?.(); return }
+
+  overlay.hidden = false
+  // Forzar reflow para animacion
+  void overlay.offsetWidth
+  overlay.classList.add('visible')
+
+  const close = () => {
+    const noShow = document.getElementById('tut-no-show-check') as HTMLInputElement | null
+    if (noShow?.checked) {
+      try { localStorage.setItem(TUTORIAL_KEY, '1') } catch { /* noop */ }
+    }
+    overlay.classList.remove('visible')
+    setTimeout(() => {
+      overlay.hidden = true
+      onClose?.()
+    }, 300)
+  }
+
+  document.getElementById('tut-close')?.addEventListener('click', close, { once: true })
+}

@@ -13,3 +13,6 @@
 @import './screens/ending.css';
 @import './screens/history.css';
 @import './screens/aftermath.css';
+
+@import './components/ui-overlays.css';
+@import './screens/credits.css';

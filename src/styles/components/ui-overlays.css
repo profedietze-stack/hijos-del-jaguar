@@ -1,0 +1,241 @@
+/* ══════════════════════════════════════════════════════
+   UI OVERLAYS
+   · Tutorial overlay (primera partida)
+   · Loading spinner (carga lazy de datos)
+   · Achievement toasts (logros desbloqueados)
+══════════════════════════════════════════════════════ */
+
+/* ── TUTORIAL OVERLAY ────────────────────────────────── */
+
+#tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 4, .75);
+  opacity: 0;
+  transition: opacity .3s ease;
+  padding: 1rem;
+}
+
+#tutorial-overlay.visible { opacity: 1; }
+
+#tutorial-card {
+  background: rgba(8,6,4,.98);
+  border: 1px solid var(--border2);
+  padding: 1.8rem 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--shadow), 0 0 60px rgba(196,136,42,.1);
+  transform: translateY(12px);
+  transition: transform .3s cubic-bezier(.22,.76,.42,1);
+}
+
+#tutorial-overlay.visible #tutorial-card { transform: translateY(0); }
+
+.tut-header {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin-bottom: 1.2rem;
+}
+
+.tut-icon { font-size: 1.8rem; line-height: 1; }
+
+.tut-title {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--ocre2);
+  margin: 0;
+}
+
+.tut-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.tut-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .6rem .75rem;
+  background: rgba(196,136,42,.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.tut-item-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: .1rem;
+}
+
+.tut-list strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ocre2);
+  margin-bottom: .2rem;
+}
+
+.tut-list span {
+  font-family: var(--font-body);
+  font-size: .85rem;
+  color: var(--parch2);
+  line-height: 1.55;
+  opacity: .8;
+}
+
+.tut-no-show {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin-top: .85rem;
+  font-family: var(--font-body);
+  font-size: .78rem;
+  color: var(--parch2);
+  opacity: .5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tut-no-show input[type="checkbox"] {
+  accent-color: var(--ocre);
+  width: 14px; height: 14px;
+}
+
+@media (max-width: 480px) {
+  #tutorial-card { padding: 1.3rem 1.2rem; }
+  .tut-title     { font-size: .95rem; }
+  .tut-list span { font-size: .8rem; }
+}
+
+/* ── LOADING OVERLAY ─────────────────────────────────── */
+
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 4, .82);
+  animation: ld-fadein .2s ease both;
+}
+
+@keyframes ld-fadein { from { opacity: 0; } to { opacity: 1; } }
+
+#loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .9rem;
+}
+
+.ld-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(196,136,42,.2);
+  border-top-color: var(--ocre2);
+  border-radius: 50%;
+  animation: ld-spin .7s linear infinite;
+}
+
+@keyframes ld-spin { to { transform: rotate(360deg); } }
+
+.ld-text {
+  font-family: var(--font-heading);
+  font-size: .62rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--parch2);
+  opacity: .55;
+}
+
+/* ── ACHIEVEMENT TOASTS ──────────────────────────────── */
+
+#achievement-toast-area {
+  position: fixed;
+  top: 5rem;         /* debajo de la stats bar */
+  right: 1rem;
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  pointer-events: none;
+  max-width: 300px;
+}
+
+.ach-toast {
+  background: rgba(8,6,4,.97);
+  border: 1px solid var(--ocre);
+  border-left: 3px solid var(--ocre2);
+  padding: .7rem .9rem;
+  box-shadow: var(--shadow-sm), 0 0 20px rgba(196,136,42,.15);
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity .35s ease, transform .35s cubic-bezier(.22,.76,.42,1);
+  pointer-events: auto;
+}
+
+.ach-toast.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.ach-toast-eyebrow {
+  font-family: var(--font-heading);
+  font-size: .52rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  opacity: .75;
+  margin-bottom: .4rem;
+}
+
+.ach-toast-body {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.ach-toast-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+
+.ach-toast-name {
+  font-family: var(--font-heading);
+  font-size: .75rem;
+  color: var(--ocre2);
+  margin-bottom: .15rem;
+}
+
+.ach-toast-desc {
+  font-family: var(--font-body);
+  font-size: .75rem;
+  color: var(--parch2);
+  opacity: .65;
+  line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+  #achievement-toast-area {
+    right: .5rem;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* ── Menu credits button ─────────────────────────────── */
+.menu-btn-credits {
+  font-size: .72rem !important;
+  opacity: .6;
+  margin-top: .1rem;
+  padding: .4rem 1rem !important;
+}

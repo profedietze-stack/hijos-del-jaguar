@@ -604,6 +604,129 @@
       <div id="act-tr-hint" aria-hidden="true">Toca para continuar</div>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PANTALLA: CRÉDITOS
+  ══════════════════════════════════════════════════ -->
+  <div id="credits-screen" class="screen">
+    <div class="cr-wrap">
+      <div class="cr-eyebrow">Hijos del Jaguar</div>
+      <h2 class="cr-title">Créditos</h2>
+      <div class="cr-divider" aria-hidden="true"></div>
+
+      <section class="cr-section" aria-labelledby="cr-creation">
+        <div class="cr-section-title" id="cr-creation">Creación</div>
+        <div class="cr-name">Nicolás A. Dietze</div>
+        <div class="cr-role">Diseño, narrativa, programación y contenido histórico<br>
+          Profesor de Historia · Buenos Aires, Argentina</div>
+      </section>
+
+      <section class="cr-section" aria-labelledby="cr-sources-title">
+        <div class="cr-section-title" id="cr-sources-title">Fuentes Históricas</div>
+        <ul class="cr-sources">
+          <li><strong>Bartolomé de las Casas</strong> — <em>Brevísima relación de la destrucción de las Indias</em> (1542)</li>
+          <li><strong>Felipe Guamán Poma de Ayala</strong> — <em>Nueva corónica y buen gobierno</em> (c. 1615)</li>
+          <li><strong>Miguel León-Portilla</strong> — <em>El reverso de la conquista</em> (1964)</li>
+          <li><strong>Nathan Wachtel</strong> — <em>La visión de los vencidos</em> (1971)</li>
+          <li><strong>Alfred W. Crosby</strong> — <em>The Columbian Exchange</em> (1972)</li>
+          <li><strong>James C. Scott</strong> — <em>The Art of Not Being Governed</em> (2009)</li>
+        </ul>
+      </section>
+
+      <section class="cr-section" aria-labelledby="cr-ped-title">
+        <div class="cr-section-title" id="cr-ped-title">Intención pedagógica</div>
+        <p class="cr-ped-note">
+          Este juego fue diseñado para secundaria como herramienta complementaria en
+          <strong>Historia y Geografía de América</strong>. Invita a los estudiantes a
+          ponerse en el lugar de los pueblos originarios durante la conquista española,
+          tomando decisiones que reflejan dilemas históricos reales. No reemplaza el
+          análisis crítico de fuentes — lo promueve.
+        </p>
+      </section>
+
+      <section class="cr-section" aria-labelledby="cr-tech-title">
+        <div class="cr-section-title" id="cr-tech-title">Tecnología</div>
+        <div class="cr-tech-grid">
+          <span class="cr-tech-chip">TypeScript</span>
+          <span class="cr-tech-chip">Vite</span>
+          <span class="cr-tech-chip">D3.js</span>
+          <span class="cr-tech-chip">Tone.js</span>
+          <span class="cr-tech-chip">PWA</span>
+          <span class="cr-tech-chip">Natural Earth GeoJSON</span>
+          <span class="cr-tech-chip">Unsplash API</span>
+        </div>
+      </section>
+
+      <div class="cr-version-line" id="credits-version">v0.2.0 · Junio 2026</div>
+
+      <div class="cr-back-wrap">
+        <button class="btn" id="btn-credits-back">← Volver al menú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       TUTORIAL OVERLAY — primera partida
+  ══════════════════════════════════════════════════ -->
+  <div id="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tut-title" hidden>
+    <div id="tutorial-card">
+      <div class="tut-header">
+        <span class="tut-icon" aria-hidden="true">🦅</span>
+        <h2 id="tut-title" class="tut-title">¿Cómo jugar?</h2>
+      </div>
+      <ul class="tut-list">
+        <li>
+          <span class="tut-item-icon" aria-hidden="true">🗺️</span>
+          <div>
+            <strong>El mapa</strong>
+            <span>Seleccioná un nodo alcanzable (brillante) para avanzar la travesía.</span>
+          </div>
+        </li>
+        <li>
+          <span class="tut-item-icon" aria-hidden="true">📊</span>
+          <div>
+            <strong>Los recursos</strong>
+            <span>Mantené Alimentos, Moral, Salud y Unión en valores altos. Si caen a cero, el pueblo perece.</span>
+          </div>
+        </li>
+        <li>
+          <span class="tut-item-icon" aria-hidden="true">⚔️</span>
+          <div>
+            <strong>El conquistador</strong>
+            <span>Avanza cada turno. Elegí bien tu ruta — si te alcanza, deberás enfrentarlo.</span>
+          </div>
+        </li>
+        <li>
+          <span class="tut-item-icon" aria-hidden="true">🤝</span>
+          <div>
+            <strong>Las alianzas</strong>
+            <span>Forjar alianzas con otros pueblos mejora tus recursos y desbloquea finales épicos.</span>
+          </div>
+        </li>
+      </ul>
+      <button class="btn" id="tut-close">¡Entendido, a guiar al pueblo!</button>
+      <label class="tut-no-show">
+        <input type="checkbox" id="tut-no-show-check">
+        No mostrar al iniciar una nueva partida
+      </label>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       LOADING OVERLAY — carga de datos diferidos
+  ══════════════════════════════════════════════════ -->
+  <div id="loading-overlay" aria-live="polite" aria-label="Cargando datos del juego" hidden>
+    <div id="loading-card">
+      <div class="ld-spinner" aria-hidden="true"></div>
+      <div class="ld-text">Cargando…</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ACHIEVEMENT TOAST AREA
+  ══════════════════════════════════════════════════ -->
+  <div id="achievement-toast-area" aria-live="polite" aria-label="Logros desbloqueados"></div>
+
   <script type="module" src="/src/main.ts"></script>
 
   <!-- Service Worker: habilita modo offline y cacheo de assets -->
