@@ -31,6 +31,7 @@ import { mountMenu }                                    from './screens/MenuScre
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
 import { mountEventScreen, preloadEventData }            from './screens/EventScreen.js'
+import { showAftermath, showActTransition }           from './screens/AftermathScreen.js'
 import { mountEndingScreen, captureEnding, setTopoCache, getTopoCache, showCaptureOverlay } from './screens/EndingScreen.js'
 import { mountHistoryScreen, hsTab }                    from './screens/HistoryScreen.js'
 import {
@@ -341,42 +342,47 @@ function onSelectNode(nodeId: string): void {
 // ══════════════════════════════════════════════════════
 
 function onDecision(_decisionIndex: number, decision: import('./data/types.js').Decision): void {
-  // La decisión ya viene del callback de EventScreen (que tiene EVENTS_DEF cargado).
-  // main.ts ya no necesita importar EVENTS_DEF — split del bundle.
+  // La decision ya viene del callback de EventScreen (que tiene EVENTS_DEF cargado).
+  // main.ts ya no necesita importar EVENTS_DEF -- split del bundle.
   if (!decision) return
 
-  // Guardar el acto actual ANTES de aplicar la decisión (para detectar cambio de acto)
+  // Guardar el acto actual ANTES de aplicar la decision (para detectar cambio de acto)
   const prevAct = gs.history.length > 0
     ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
     : 1
 
-
-  // SFX de decisión
+  // SFX de decision
   sfxDecision()
 
-  // Aplicar la decisión al estado
+  // Aplicar la decision al estado
   const result = applyDecision(gs, decision)
   gs = result.state
-  // SFX según resultado (notificaciones de pérdida o ganancia)
+
+  // SFX segun resultado (feedback auditivo inmediato, antes del aftermath card)
   const hasLoss = result.notifs.some(n => n.kind === 'loss')
   const hasGain = result.notifs.some(n => n.kind === 'gain' || n.kind === 'info')
   if (hasLoss) setTimeout(sfxNegative, 180)
   else if (hasGain) setTimeout(sfxPositive, 180)
-  showNotifs(result.notifs)
+
+  // Actualizar stats bar de inmediato (el jugador ve el cambio en el HUD)
   updateStatsBar(gs)
 
-  // ── ¿Fin de partida? (derrota o nodo final) ───────────
+  // Fin de partida -> ir al ending directamente (sin aftermath card)
   if (result.finished || result.defeated) {
-    if (!result.ending) return   // safety guard
+    if (!result.ending) return
     showEnding(result.ending)
     return
   }
 
-  // ── Evento de captura del conquistador ────────────────
-  // Después del catch event, el jugador puede sobrevivir o morir
+  // Aftermath card: mostrar consecuencias antes de volver al mapa
+  showAftermath(result.notifs, () => _afterAftermath(prevAct))
+}
+
+/** Continua el flujo de juego despues de que el jugador descarta el aftermath card. */
+function _afterAftermath(prevAct: number): void {
+  // -- Evento de captura del conquistador --
   if (_inCatchEvent) {
     _inCatchEvent = false
-    // Limpiar el nodo virtual del historial
     gs = {
       ...gs,
       history:  gs.history.filter(id => id !== '_conq_catch_node'),
@@ -393,13 +399,13 @@ function onDecision(_decisionIndex: number, decision: import('./data/types.js').
     return
   }
 
-  // ── Motor del conquistador primero (sin doble azar) ──
+  // -- Motor del conquistador (sin doble azar) --
   const preConqGs = gs
   const conqResult = advanceConquistador(gs)
   gs = conqResult.state
   showNotifs(conqResult.notifs)
 
-  // Mostrar mapa con nodos y conquistador ya en su posición final
+  // Mostrar mapa con nodos y conquistador ya en su posicion final
   showScreen('map-screen')
   drawNodes(gs, _selectNodeFn)
   drawConquistador(gs)
@@ -407,21 +413,24 @@ function onDecision(_decisionIndex: number, decision: import('./data/types.js').
   saveGame(gs)
   flashSaveIndicator()
 
-  // (El token tribal ya fue animado en onSelectNode antes del evento;
-  //  drawPlayerToken se llama dentro de drawNodes con la posición correcta)
-
-  // Detectar si hubo cambio de acto → marcadores históricos nuevos
+  // Detectar si hubo cambio de acto
   const newAct = gs.history.length > 0
     ? (gs.nodes[gs.history[gs.history.length - 1]]?.act ?? 1)
     : 1
   const newMarkers = newAct > prevAct ? getNewHistMarkersForAct(newAct) : []
 
-  // Callback final: después del conquistador, mostrar cinemáticas históricas si hay
+  // Callback: despues del conquistador, cinematica de acto + marcadores
   const afterConq = () => {
-    if (newMarkers.length > 0) {
-      runHistMarkerCinematic(newMarkers, gs, _selectNodeFn, () => {
-        centerOnNextNodes(gs)
+    if (newAct > prevAct) {
+      showActTransition(newAct, () => {
+        if (newMarkers.length > 0) {
+          runHistMarkerCinematic(newMarkers, gs, _selectNodeFn, () => centerOnNextNodes(gs))
+        } else {
+          centerOnNextNodes(gs)
+        }
       })
+    } else if (newMarkers.length > 0) {
+      runHistMarkerCinematic(newMarkers, gs, _selectNodeFn, () => centerOnNextNodes(gs))
     } else {
       centerOnNextNodes(gs)
     }
@@ -431,8 +440,6 @@ function onDecision(_decisionIndex: number, decision: import('./data/types.js').
   if (gs.conq.caught) {
     sfxConqCatch()
     animateConqStep(preConqGs, gs, conqResult.reorg, () => {
-      // Si hay marcadores históricos nuevos, mostrarlos ANTES del evento de captura.
-      // Así nunca se superpone la cinemática con el event screen.
       if (newMarkers.length > 0) {
         runHistMarkerCinematic(newMarkers, gs, _selectNodeFn, () => {
           setTimeout(() => triggerConqCatch(), 400)

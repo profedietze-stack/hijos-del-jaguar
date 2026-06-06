@@ -574,6 +574,36 @@
     </div>
   </div>
 
+
+  <!-- ══════════════════════════════════════════════════
+       AFTERMATH OVERLAY — consecuencias tras una decisión
+  ══════════════════════════════════════════════════ -->
+  <div id="aftermath-overlay" role="dialog" aria-modal="true" aria-label="Consecuencias de la decisión">
+    <div id="aftermath-card">
+      <div class="am-header">
+        <div class="am-header-line"></div>
+        <div class="am-header-label">Consecuencias</div>
+        <div class="am-header-line"></div>
+      </div>
+      <div id="aftermath-effects"></div>
+      <button id="aftermath-continue" class="btn">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ACT TRANSITION — cinemática de cambio de acto
+  ══════════════════════════════════════════════════ -->
+  <div id="act-transition" role="status" aria-live="assertive" tabindex="-1">
+    <div id="act-transition-inner">
+      <div id="act-tr-glyph" aria-hidden="true"></div>
+      <div class="act-rule" aria-hidden="true"></div>
+      <div id="act-tr-badge"></div>
+      <div id="act-tr-title"></div>
+      <div id="act-tr-subtitle"></div>
+      <div class="act-rule" aria-hidden="true"></div>
+      <div id="act-tr-hint" aria-hidden="true">Toca para continuar</div>
+    </div>
+  </div>
   <script type="module" src="/src/main.ts"></script>
 
   <!-- Service Worker: habilita modo offline y cacheo de assets -->
