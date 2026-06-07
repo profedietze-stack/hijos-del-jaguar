@@ -18,7 +18,8 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
-  base: '/hijos-del-jaguar/',
+  // En Vercel el app vive en la raíz (/); en dev local usamos /hijos-del-jaguar/
+  base: process.env.VERCEL ? '/' : '/hijos-del-jaguar/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
