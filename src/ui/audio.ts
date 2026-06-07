@@ -40,6 +40,7 @@ let _poolIdx   = 0
 // Todos los OscillatorNode raw van aquí. Se controla separado
 // del canal Tone.js para poder mutear con toggleMute().
 let _rawOut: GainNode | null = null
+let _sfxGain = 0.8   // volumen SFX 0..1 (default 80%)
 
 // ── Throttles ─────────────────────────────────────────
 let _lastHover  = 0
@@ -418,22 +419,49 @@ export function stopAudio(): void {
   try { Tone.getTransport().stop() } catch { /* noop */ }
 }
 
-// ── Toggle mute ───────────────────────────────────────
+// ── Mute / volumen ────────────────────────────────────
 
 let _muted = false
 
 export function isMuted(): boolean { return _muted }
 
+/** Aplica ganancia al canal SFX respetando mute y volumen actual */
+function _syncRawGain(): void {
+  if (_rawOut) _rawOut.gain.value = _muted ? 0 : _sfxGain
+}
+
+/** Setea el volumen de música (0–100). Afecta canal Tone.js. */
+export function setMusicVolume(vol: number): void {
+  if (!_started) return
+  try {
+    const db = vol <= 0 ? -60 : 20 * Math.log10(vol / 100)
+    Tone.getDestination().volume.value = db
+  } catch { /* noop */ }
+}
+
+/** Setea el volumen de efectos (0–100). Afecta canal raw SFX. */
+export function setSfxVolume(vol: number): void {
+  _sfxGain = Math.max(0, Math.min(1, vol / 100))
+  _syncRawGain()
+}
+
+/** Silencia o activa todo el audio explícitamente (sin toggle). */
+export function setMuted(val: boolean): void {
+  _muted = val
+  try { Tone.getDestination().mute = val } catch { /* noop */ }
+  _syncRawGain()
+  _syncMuteBtn()
+}
+
+/** Toggle legado (mantiene compatibilidad con el botón del HUD). */
 export function toggleMute(): void {
-  _muted = !_muted
-  // Canal Tone.js (música + click pool)
-  try { Tone.getDestination().mute = _muted } catch { /* noop */ }
-  // Canal raw SFX (oscillators nativos)
-  if (_rawOut) _rawOut.gain.value = _muted ? 0 : 1
-  // Botón UI
+  setMuted(!_muted)
+}
+
+function _syncMuteBtn(): void {
   const btn = document.getElementById('btn-mute')
   if (btn) {
-    btn.textContent    = _muted ? '🔇' : '🔊'
-    btn.style.opacity  = _muted ? '0.9' : '0.55'
+    btn.textContent   = _muted ? '🔇' : '🔊'
+    btn.style.opacity = _muted ? '0.9' : '0.55'
   }
 }

@@ -1,0 +1,212 @@
+/* ── Modal de Configuración ── */
+
+#settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.82);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+#settings-overlay.open { opacity: 1; }
+
+#settings-modal {
+  background: linear-gradient(135deg, rgba(10,7,3,.99), rgba(18,12,4,.99));
+  border: 1px solid var(--ocre);
+  width: min(92vw, 460px);
+  box-shadow: 0 0 60px rgba(196,136,42,.25);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+#settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(196,136,42,.04);
+}
+#cfg-title {
+  font-family: var(--font-heading);
+  font-size: .78rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ocre2);
+}
+#cfg-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--parch2);
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t-fast);
+  flex-shrink: 0;
+}
+#cfg-close:hover {
+  border-color: var(--ocre2);
+  color: var(--ocre2);
+  background: rgba(196,136,42,.12);
+}
+
+/* ── Tabs ── */
+#settings-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.cfg-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--parch2);
+  font-family: var(--font-heading);
+  font-size: .56rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .72rem .4rem;
+  cursor: pointer;
+  opacity: .45;
+  transition: all var(--t-fast);
+}
+.cfg-tab:hover { opacity: .75; background: rgba(196,136,42,.05); }
+.cfg-tab.active {
+  color: var(--ocre2);
+  opacity: 1;
+  border-bottom-color: var(--ocre2);
+  background: rgba(196,136,42,.06);
+}
+
+/* ── Paneles ── */
+#settings-body {
+  padding: 1.3rem 1.4rem;
+  min-height: 190px;
+}
+.cfg-panel           { display: none; flex-direction: column; gap: 1rem; }
+.cfg-panel.active    { display: flex; }
+
+/* ── Fila de control ── */
+.cfg-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.cfg-label {
+  font-family: var(--font-heading);
+  font-size: .7rem;
+  letter-spacing: .07em;
+  color: var(--parch2);
+  flex: 1;
+}
+
+/* ── Sliders ── */
+.cfg-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+input[type='range'].cfg-range {
+  width: 110px;
+  accent-color: var(--ocre2);
+  cursor: pointer;
+}
+.cfg-val {
+  font-family: var(--font-heading);
+  font-size: .66rem;
+  color: var(--ocre);
+  min-width: 22px;
+  text-align: right;
+}
+
+/* ── Toggle switch ── */
+.cfg-toggle {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.cfg-toggle input {
+  opacity: 0;
+  width: 0; height: 0;
+  position: absolute;
+}
+.cfg-toggle-track {
+  width: 38px; height: 21px;
+  background: rgba(196,136,42,.12);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  position: relative;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.cfg-toggle input:checked ~ .cfg-toggle-track {
+  background: rgba(196,136,42,.40);
+  border-color: var(--ocre2);
+}
+.cfg-toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 15px; height: 15px;
+  background: var(--parch2);
+  border-radius: 50%;
+  transition: transform var(--t-fast), background var(--t-fast);
+}
+.cfg-toggle input:checked ~ .cfg-toggle-track .cfg-toggle-thumb {
+  transform: translateX(17px);
+  background: var(--ocre2);
+}
+
+/* ── Filas deshabilitadas (idioma) ── */
+.cfg-row--disabled .cfg-label { opacity: .38; }
+.cfg-badge {
+  font-family: var(--font-heading);
+  font-size: .58rem;
+  letter-spacing: .1em;
+  padding: .15rem .5rem;
+  border-radius: 2px;
+}
+.cfg-badge--active {
+  color: var(--jade3);
+  border: 1px solid var(--jade2);
+}
+.cfg-badge--soon {
+  color: var(--parch2);
+  border: 1px solid var(--border);
+  opacity: .38;
+}
+
+/* ── Efectos globales por settings ── */
+.cfg-reduced-motion *,
+.cfg-reduced-motion *::before,
+.cfg-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.cfg-text-large {
+  font-size: 18px;
+}
+
+.cfg-high-contrast .menu-bg,
+.cfg-high-contrast .splash-bg {
+  filter: contrast(1.2) brightness(0.9);
+}
+
+.cfg-reduced-fx .screen-enter { animation: none !important; opacity: 1; }
+.cfg-reduced-fx .screen-exit  { animation: none !important; opacity: 0; }
+.cfg-reduced-fx .notif         { animation: none !important; opacity: 1; }
+
+@media (max-width: 480px) {
+  input[type='range'].cfg-range { width: 80px; }
+  .cfg-tab { font-size: .5rem; padding: .65rem .3rem; }
+}

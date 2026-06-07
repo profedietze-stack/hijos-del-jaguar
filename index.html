@@ -130,6 +130,7 @@
   ══════════════════════════════════════════════════ -->
   <div id="menu-screen" class="screen">
     <div class="menu-bg"></div>
+    <div id="menu-particles"></div>
     <div class="menu-content">
       <div class="menu-eyebrow">Una historia de resistencia</div>
       <h1 class="menu-title">Hijos del Jaguar</h1>
@@ -138,7 +139,8 @@
       <button class="btn" id="btn-nueva">Nueva Partida</button>
       <button class="btn" id="btn-continue" disabled>Continuar</button>
       <button class="btn" id="btn-history">Logros e Historia</button>
-      <button class="btn btn-sec" id="btn-info-didactica" style="opacity:.7;font-size:.78rem;margin-top:.2rem;">📖 Info Didáctica</button>
+      <button class="btn btn-sec" id="btn-settings" style="margin-top:.2rem;">⚙ Configuración</button>
+      <button class="btn btn-sec" id="btn-info-didactica" style="opacity:.7;font-size:.78rem;">📖 Info Didáctica</button>
       <div class="menu-credits">Creado por ProfeD · v3.0</div>
       <button class="btn-reset-all" id="btn-reset-all">Borrar todo el progreso</button>
     </div>
@@ -704,7 +706,7 @@
           </div>
         </li>
       </ul>
-      <button class="btn" id="tut-close">¡Entendido, a guiar al pueblo!</button>
+      <button class="btn" id="tut-close">¡Entendido, a guiar a mi pueblo!</button>
       <label class="tut-no-show">
         <input type="checkbox" id="tut-no-show-check">
         No mostrar al iniciar una nueva partida
@@ -737,5 +739,110 @@
       })
     }
   </script>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL: CONFIGURACIÓN
+  ══════════════════════════════════════════════════ -->
+  <div id="settings-overlay" role="dialog" aria-modal="true" aria-labelledby="cfg-title" hidden>
+    <div id="settings-modal">
+
+      <div id="settings-header">
+        <span id="cfg-title">⚙ &nbsp;Configuración</span>
+        <button id="cfg-close" aria-label="Cerrar configuración">✕</button>
+      </div>
+
+      <div id="settings-tabs">
+        <button class="cfg-tab active" data-tab="audio">Audio</button>
+        <button class="cfg-tab" data-tab="access">Accesibilidad</button>
+        <button class="cfg-tab" data-tab="perf">Rendimiento</button>
+        <button class="cfg-tab" data-tab="lang">Idioma</button>
+      </div>
+
+      <div id="settings-body">
+
+        <!-- Panel: Audio -->
+        <div class="cfg-panel active" id="cfg-panel-audio">
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-music-vol">Música</label>
+            <div class="cfg-slider-wrap">
+              <input type="range" id="cfg-music-vol" class="cfg-range" min="0" max="100" value="80">
+              <span class="cfg-val" id="cfg-music-val">80</span>
+            </div>
+          </div>
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-sfx-vol">Efectos de sonido</label>
+            <div class="cfg-slider-wrap">
+              <input type="range" id="cfg-sfx-vol" class="cfg-range" min="0" max="100" value="80">
+              <span class="cfg-val" id="cfg-sfx-val">80</span>
+            </div>
+          </div>
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-muted">Silenciar todo</label>
+            <label class="cfg-toggle">
+              <input type="checkbox" id="cfg-muted">
+              <span class="cfg-toggle-track"><span class="cfg-toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Panel: Accesibilidad -->
+        <div class="cfg-panel" id="cfg-panel-access">
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-reduced-motion">Reducir movimiento</label>
+            <label class="cfg-toggle">
+              <input type="checkbox" id="cfg-reduced-motion">
+              <span class="cfg-toggle-track"><span class="cfg-toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-high-contrast">Alto contraste</label>
+            <label class="cfg-toggle">
+              <input type="checkbox" id="cfg-high-contrast">
+              <span class="cfg-toggle-track"><span class="cfg-toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-text-large">Texto grande</label>
+            <label class="cfg-toggle">
+              <input type="checkbox" id="cfg-text-large">
+              <span class="cfg-toggle-track"><span class="cfg-toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Panel: Rendimiento -->
+        <div class="cfg-panel" id="cfg-panel-perf">
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-particles">Brasas animadas (menú)</label>
+            <label class="cfg-toggle">
+              <input type="checkbox" id="cfg-particles" checked>
+              <span class="cfg-toggle-track"><span class="cfg-toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="cfg-row">
+            <label class="cfg-label" for="cfg-reduced-fx">Reducir efectos visuales</label>
+            <label class="cfg-toggle">
+              <input type="checkbox" id="cfg-reduced-fx">
+              <span class="cfg-toggle-track"><span class="cfg-toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Panel: Idioma -->
+        <div class="cfg-panel" id="cfg-panel-lang">
+          <div class="cfg-row cfg-row--disabled">
+            <span class="cfg-label">Español</span>
+            <span class="cfg-badge cfg-badge--active">✓ Activo</span>
+          </div>
+          <div class="cfg-row cfg-row--disabled">
+            <span class="cfg-label">English</span>
+            <span class="cfg-badge cfg-badge--soon">Próximamente</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

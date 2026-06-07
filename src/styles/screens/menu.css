@@ -6,22 +6,37 @@
   position: relative;
   overflow: hidden;
 }
+
+/* Fondo con más oscuridad central para que los botones respiren */
 .menu-bg {
   position: absolute;
-  inset: 0;
+  inset: -5%;          /* espacio extra para el zoom sin bordes blancos */
   background:
-    linear-gradient(180deg, rgba(8,6,4,.35) 0%, rgba(8,6,4,.1) 40%, rgba(8,6,4,.9) 100%),
-    url('/images/menu-bg.jpg')
-    center / cover no-repeat;
-  animation: menu-drift 28s ease-in-out infinite alternate;
+    /* Capa densa en centro-bajo donde viven los botones */
+    radial-gradient(ellipse 80% 60% at 50% 70%, rgba(8,6,4,.82) 0%, transparent 100%),
+    /* Capa de oscurecimiento general */
+    linear-gradient(180deg, rgba(8,6,4,.55) 0%, rgba(8,6,4,.25) 35%, rgba(8,6,4,.78) 100%),
+    url('/images/menu-bg.jpg') center / cover no-repeat;
+  animation: menu-drift 18s ease-in-out infinite alternate;
   will-change: transform;
 }
+
+/* Vignette en bordes */
 .menu-bg::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(8,6,4,.6) 100%);
+  background: radial-gradient(ellipse at center, transparent 20%, rgba(8,6,4,.75) 100%);
 }
+
+/* Canvas de brasas (creado dinámicamente por MenuEmbers.ts) */
+#menu-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .menu-content {
   position: relative;
   z-index: 1;
@@ -92,9 +107,25 @@
   color: rgba(210,70,55,.75);
 }
 
+/* Botones del menú más sólidos (override del .btn base) */
+#menu-screen .btn {
+  background: rgba(8, 6, 4, .72);
+  border-color: rgba(196,136,42,.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+#menu-screen .btn:hover:not(:disabled) {
+  background: rgba(196,136,42,.22);
+  border-color: var(--ocre2);
+}
+#menu-screen .btn:disabled {
+  background: rgba(8,6,4,.5);
+  border-color: rgba(196,136,42,.2);
+}
+
 @keyframes menu-drift {
-  from { transform: scale(1.0) translate(0, 0); }
-  to   { transform: scale(1.05) translate(-1%, .5%); }
+  from { transform: scale(1.0)  translate(0,    0);    }
+  to   { transform: scale(1.08) translate(-1.5%, .8%); }
 }
 
 @media (max-width: 600px) {

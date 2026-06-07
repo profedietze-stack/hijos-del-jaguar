@@ -67,6 +67,10 @@ import { initClaseMode }                                from './ui/claseMode.js'
 // ── Info Didáctica ────────────────────────────────────
 import { openDidacticaOverlay }                         from './ui/didacticaOverlay.js'
 
+// ── Settings ──────────────────────────────────────────
+import { initSettings }                                 from './core/SettingsSystem.js'
+import { initSettingsModal, openSettings }              from './ui/SettingsModal.js'
+
 // ── Data ──────────────────────────────────────────────
 // EVENTS_DEF eliminado: events.ts y claseData.ts se cargan de forma diferida
 // desde EventScreen.preloadEventData() para reducir el bundle inicial.
@@ -92,6 +96,8 @@ let _inCatchEvent = false
 // ══════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
+  initSettings()
+  initSettingsModal()
   initClaseMode()
   initGlobalListeners()
   wireAllButtons()
@@ -147,6 +153,7 @@ function wireAllButtons(): void {
   })
   on('btn-continue', () => { sfxClick(); continueGame() })
   on('btn-history',  () => { sfxClick(); mountHistoryScreen() })
+  on('btn-settings', () => { sfxClick(); openSettings() })
   on('btn-info-didactica', () => { sfxClick(); openDidacticaOverlay() })
 
   // ── Intro: dificultad ────────────────────────────────
@@ -277,13 +284,19 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   // ve la cinematica de apertura (~10s) — estaran listos antes del primer nodo.
   preloadEventData()
 
-  // Tutorial de primera partida (si no fue descartado permanentemente)
-  if (!tutorialSeen()) {
-    setTimeout(() => showTutorial(), 2200)
-  }
   requestAnimationFrame(() => requestAnimationFrame(() => {
     buildMap(gs, _selectNodeFn)
-    waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
+    if (!tutorialSeen()) {
+      // Primera partida: mostrar tutorial primero, lanzar cinemática al cerrar
+      setTimeout(() => {
+        showTutorial(() => {
+          waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
+        })
+      }, 2200)
+    } else {
+      // Partidas siguientes: cinemática directa
+      waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
+    }
   }))
 }
 
