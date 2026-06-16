@@ -71,6 +71,9 @@ import { openDidacticaOverlay }                         from './ui/didacticaOver
 import { initSettings }                                 from './core/SettingsSystem.js'
 import { initSettingsModal, openSettings }              from './ui/SettingsModal.js'
 
+// ── Debug (DEV only — tree-shaken en producción) ──────
+import { log, initErrorBoundary }                       from './debug/logger.js'
+
 // ── Data ──────────────────────────────────────────────
 // EVENTS_DEF eliminado: events.ts y claseData.ts se cargan de forma diferida
 // desde EventScreen.preloadEventData() para reducir el bundle inicial.
@@ -96,6 +99,7 @@ let _inCatchEvent = false
 // ══════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
+  initErrorBoundary()
   initSettings()
   initSettingsModal()
   initClaseMode()
@@ -107,10 +111,27 @@ document.addEventListener('DOMContentLoaded', () => {
   )
   _registerServiceWorker()
 
+  // Debug panel — carga dinámica (fuera del bundle de producción)
+  if (import.meta.env.DEV) {
+    import('./debug/DebugPanel.js').then(({ initDebugPanel }) => {
+      initDebugPanel({
+        getGs:      () => gs,
+        applyGs:    (newGs) => {
+          gs = newGs
+          // Reflejar cambios en el HUD si está visible
+          const bar = document.getElementById('stats-bar')
+          if (bar && bar.style.display !== 'none') updateStatsBar(gs)
+        },
+        selectNode: (id) => _selectNodeFn?.(id),
+      })
+    })
+  }
+
   // El splash es el primer gesto del usuario.
   // Tone.js requiere un gesto para iniciar el AudioContext,
   // así que arrancamos el audio DESPUÉS de que el usuario hace click en el splash.
   mountSplash().then(() => {
+    log('SCREEN', 'splash → menu')
     playTrack('menu')
     mountMenu()
   })
@@ -269,6 +290,7 @@ function onNameConfirmed(): void {
 }
 
 function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: string, tribeToken = '🦅'): void {
+  log('ENGINE', `nueva partida diff=${diff} name="${name}" token=${tribeToken}`)
   gs = createInitialState(diff, name, tribeToken)
   _inCatchEvent = false
   clearSavedGame()
@@ -381,6 +403,7 @@ function onDecision(_decisionIndex: number, decision: import('./data/types.js').
   // Aplicar la decision al estado
   const result = applyDecision(gs, decision)
   gs = result.state
+  log('ENGINE', `decision → node=${gs.currentNode ?? 'none'} defeated=${result.defeated} finished=${result.finished}`, gs.stats)
 
   // SFX segun resultado (feedback auditivo inmediato, antes del aftermath card)
   const hasLoss = result.notifs.some(n => n.kind === 'loss')
@@ -394,6 +417,7 @@ function onDecision(_decisionIndex: number, decision: import('./data/types.js').
   // Fin de partida -> ir al ending directamente (sin aftermath card)
   if (result.finished || result.defeated) {
     if (!result.ending) return
+    log('ENGINE', `ending → ${result.ending.badge}`)
     showEnding(result.ending)
     return
   }
@@ -427,6 +451,7 @@ function _afterAftermath(prevAct: number): void {
   const preConqGs = gs
   const conqResult = advanceConquistador(gs)
   gs = conqResult.state
+  log('ENGINE', `conquistador → routeIdx=${gs.conq.routeIdx} caught=${conqResult.caught} reorg=${conqResult.reorg}`)
   showNotifs(conqResult.notifs)
 
   // Mostrar mapa con nodos y conquistador ya en su posicion final
@@ -435,6 +460,7 @@ function _afterAftermath(prevAct: number): void {
   drawConquistador(gs)
   updateStatsBar(gs)
   saveGame(gs)
+  log('SAVE', `auto-save history=${gs.history.length} alliances=${gs.alliances.length}`)
   flashSaveIndicator()
 
   // Detectar si hubo cambio de acto

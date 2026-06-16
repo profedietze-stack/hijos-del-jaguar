@@ -5,6 +5,7 @@
 @import './components/stats-bar.css';
 @import './components/modals.css';
 @import './components/settings.css';
+@import './components/debug.css';
 @import './components/clase.css';
 @import './screens/splash.css';
 @import './screens/menu.css';
