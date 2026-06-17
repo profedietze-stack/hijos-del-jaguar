@@ -431,10 +431,12 @@ function _afterAftermath(prevAct: number): void {
   // -- Evento de captura del conquistador --
   if (_inCatchEvent) {
     _inCatchEvent = false
+    const prevHistory = gs.history.filter(id => id !== '_conq_catch_node')
     gs = {
       ...gs,
-      history:  gs.history.filter(id => id !== '_conq_catch_node'),
-      nodes:    Object.fromEntries(
+      history:     prevHistory,
+      currentNode: prevHistory[prevHistory.length - 1] ?? gs.currentNode,
+      nodes:       Object.fromEntries(
         Object.entries(gs.nodes).filter(([k]) => k !== '_conq_catch_node'),
       ),
       conq: { ...gs.conq, caught: false, reorgTurns: 2 },

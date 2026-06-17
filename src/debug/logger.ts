@@ -52,6 +52,12 @@ export function initErrorBoundary(): void {
   })
 
   window.addEventListener('unhandledrejection', (e) => {
+    const msg = String(e.reason?.message ?? e.reason ?? '')
+    // Ignorar rechazos de APIs del browser que no son crashes del juego
+    if (/permissions check failed|notallowederror|the play\(\) request/i.test(msg)) {
+      log('AUDIO', `Browser API rejection (ignorado): ${msg}`)
+      return
+    }
     logError('Unhandled rejection', e.reason)
     _showErrorOverlay(String(e.reason?.stack ?? e.reason))
   })

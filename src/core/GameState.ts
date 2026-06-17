@@ -157,7 +157,7 @@ export function unlockChildren(
   const out = { ...nodes }
   const parent = out[parentId]
   if (!parent) return out
-  for (const childId of parent.next) {
+  for (const childId of (parent.next ?? [])) {
     if (out[childId] && !out[childId].unlocked) {
       out[childId] = { ...out[childId], unlocked: true, unlockedFrom: parentId }
     }
