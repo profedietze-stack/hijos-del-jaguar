@@ -141,10 +141,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Service Worker ────────────────────────────────────
 
+/*
+  El worker se pide contra la base con la que el juego se publica, no contra la raiz.
+
+  `vite.config.ts` publica bajo `/hijos-del-jaguar/` salvo en Vercel, donde va en la raiz. Con
+  `/sw.js` y `scope: '/'` fijos, en Vercel acertaba por casualidad y en cualquier otro sitio
+  daba 404: cero service workers registrados, y por lo tanto cero modo offline.
+
+  `BASE_URL` la escribe Vite con el valor de `base`, asi que las dos publicaciones aciertan sin
+  que nadie tenga que acordarse. El `scope` va contra la misma base porque un worker no puede
+  reclamar un alcance por encima de su propia ruta.
+*/
 function _registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) return
-  navigator.serviceWorker.register('/sw.js', { scope: '/' })
-    .catch(() => { /* silencioso en dev o sin HTTPS */ })
+
+  const base = import.meta.env.BASE_URL
+  navigator.serviceWorker.register(`${base}sw.js`, { scope: base })
+    .catch((err) => {
+      // Nada de tragarselo: el `catch` vacio que habia hizo que un 404 pareciera «no hay
+      // soporte» durante meses. Sin HTTPS tambien falla, y ahi tambien conviene verlo.
+      console.warn('[sw] no se pudo registrar el service worker', err)
+    })
 }
 
 // ══════════════════════════════════════════════════════
