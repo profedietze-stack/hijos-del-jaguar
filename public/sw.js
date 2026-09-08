@@ -3,12 +3,10 @@
 // Estrategia por tipo de recurso:
 //   - Install:     pre-cachea fuentes, iconos y manifest
 //   - Same-origin: cache-first (assets con hash de Vite)
-//   - CDN jsdelivr (GeoJSON world-atlas): network-first + fallback cache
-//   - Unsplash (imágenes de eventos): network-only (CORS)
 //   - Otros fetch: stale-while-revalidate
 // ══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'jaguar-v3'
+const CACHE_NAME = 'jaguar-v4'
 
 // Activos estaticos sin hash: fuentes, iconos, manifest.
 //
@@ -22,6 +20,7 @@ const STATIC_PRECACHE = [
   './icons/icon-512.png',
   './icons/icon.svg',
   './images/menu-bg.jpg',
+  './geo/countries-110m.json',
   './fonts/cinzel-decorative-700.woff2',
   './fonts/cinzel-decorative-700-ext.woff2',
   './fonts/cinzel-400.woff2',
@@ -64,28 +63,10 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url)
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return
 
-  // Unsplash: network-only (CORS + variación dinámica, no cacheable)
-  if (url.hostname.includes('unsplash.com')) return
-
-  // CDN jsdelivr (GeoJSON world-atlas): network-first, guardar en cache
-  if (url.hostname === 'cdn.jsdelivr.net') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone()
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone))
-          }
-          return response
-        })
-        .catch(() =>
-          caches.match(request).then(cached =>
-            cached ?? new Response(null, { status: 503 })
-          )
-        )
-    )
-    return
-  }
+  // Ya no hay ramas para terceros: ni Unsplash ni el CDN de jsdelivr. Las imágenes
+  // están en `images/events/`, el GeoJSON del mapa en `geo/` y html2canvas en
+  // `vendor/`, así que todo entra por la rama de mismo origen de acá abajo y el
+  // juego funciona igual sin red.
 
   // Same-origin: cache-first (Vite hashea assets, son inmutables)
   if (url.origin === self.location.origin) {

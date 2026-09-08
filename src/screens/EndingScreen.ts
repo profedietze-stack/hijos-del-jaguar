@@ -334,7 +334,7 @@ function buildEndingRouteMap(gs: GameState): void {
     } catch (_) { /* sin storage */ }
   }
   if (_topoCache) { render(); return }
-  const fetchPromise = fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+  const fetchPromise = fetch(`${import.meta.env.BASE_URL}geo/countries-110m.json`)
     .then(r => r.json()).then((w: unknown) => {
       _topoCache = w
       try { sessionStorage.setItem('jaguar_topo_v1', JSON.stringify(w)) } catch (_) { /* sin storage */ }
@@ -461,7 +461,7 @@ function loadHtml2Canvas(): Promise<Html2CanvasFn> {
   if (win.html2canvas) return Promise.resolve(win.html2canvas)
   return new Promise((res, rej) => {
     const s = document.createElement('script')
-    s.src     = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'
+    s.src     = `${import.meta.env.BASE_URL}vendor/html2canvas.min.js`
     s.onload  = () => res((window as unknown as { html2canvas: Html2CanvasFn }).html2canvas)
     s.onerror = () => rej(new Error('No se pudo cargar html2canvas'))
     document.head.appendChild(s)

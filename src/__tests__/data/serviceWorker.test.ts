@@ -100,6 +100,9 @@ describe('el pre-cacheo del service worker', () => {
    * arreglo de rutas no llegue nunca a quien más lo necesita.
    */
   it('el nombre de la caché acompaña al cambio de rutas', () => {
-    expect(sw).toMatch(/const CACHE_NAME = 'jaguar-v3'/)
+    // El número va fijo a propósito: obliga a subirlo a conciencia cada vez que
+    // cambia lo precacheado. v3 fue el arreglo de las rutas; v4, sacar las ramas
+    // de terceros y meter el GeoJSON del mapa en el pre-cacheo.
+    expect(sw).toMatch(/const CACHE_NAME = 'jaguar-v4'/)
   })
 })

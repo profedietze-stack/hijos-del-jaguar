@@ -1033,7 +1033,7 @@ function _buildMapFull(wrap: HTMLElement, W: number, H: number, gs: GameState, o
     }
     _topoFetchPromise = _topoCache
       ? Promise.resolve(_topoCache)
-      : fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+      : fetch(`${import.meta.env.BASE_URL}geo/countries-110m.json`)
           .then(r => r.json())
           .then((w: unknown) => {
             _topoCache = w
