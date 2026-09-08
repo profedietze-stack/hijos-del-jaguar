@@ -753,9 +753,12 @@ function _centerOnNextNodes(gs: GameState): void {
 
 const LABEL_OFFSET: Record<string, [number, number]> = {
   n00: [0, 22], n00b: [-28, 14], n01a: [-24, 16], n01b: [24, 16], n01c: [-28, 14],
-  n02a: [-24, 16], n02b: [24, 16], n02c: [24, 16], n02d: [24, 14], n02e: [28, 14],
+  n02a: [-24, 16], n02b: [-28, 14], n02c: [24, 16], n02d: [24, 14], n02e: [28, 14],
+  n_cocibolca: [-30, 14], n_talamanca: [-30, 14], n_mosquitia: [30, 14], n_guna: [30, 14],
   n03: [0, 22],
   n04a: [-28, 14], n04b: [28, 14], n04c: [28, 14],
+  n_maranon: [-30, 14], n_andes_sur: [-30, 14], n_orinoco: [30, 14], n_tepui: [30, 14], n_llanos_mojos: [30, 14],
+  n_valles_cal: [-30, 14], n_alto_neuquen: [-30, 14], n_sie_ventana: [30, 14], n_banados: [30, 14], n_mesopotamia: [30, 14], n_pampas_sur: [-30, 14],
   n05a: [-28, 14], n05b: [0, 22], n05c: [28, 14], n05d: [28, 14], n05e: [28, 14],
   n06a: [-28, 14], n06b: [28, 14], n06c: [28, 14],
   n07a: [-28, 14], n07b: [28, 14], n07c: [28, 14], n07d: [28, 14],

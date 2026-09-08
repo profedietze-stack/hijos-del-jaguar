@@ -73,6 +73,7 @@ import { initSettingsModal, openSettings }              from './ui/SettingsModal
 
 // ── Debug (DEV only — tree-shaken en producción) ──────
 import { log, initErrorBoundary }                       from './debug/logger.js'
+import { initErrorBanner }                               from './ui/error-banner.js'
 
 // ── Data ──────────────────────────────────────────────
 // EVENTS_DEF eliminado: events.ts y claseData.ts se cargan de forma diferida
@@ -99,6 +100,7 @@ let _inCatchEvent = false
 // ══════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
+  initErrorBanner()
   initErrorBoundary()
   initSettings()
   initSettingsModal()
@@ -668,3 +670,4 @@ function openPedOverlay(): void {
 
   document.getElementById('ped-overlay')?.classList.add('open')
 }
+

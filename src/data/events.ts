@@ -302,6 +302,124 @@ Ofrece guiar al grupo hasta Panamá por caminos interiores. A cambio, solo pide 
     ],
   },
 
+  // ── ACTO I — Nodos nuevos (corredores profundos) ─────────────
+
+  e_cocibolca: {
+    title: 'El Mar Dulce',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=1200&q=80',
+    cap:   'Lago Cocibolca — el mar de agua dulce',
+    narr:  `El agua no termina nunca. Es un lago tan grande que tiene horizonte, olas y su propio temperamento. Los <span class="tt" data-tip="Chorotega: pueblo de origen mesoamericano que migró desde el sur de México siglos antes de la conquista. Hablaban una lengua mangue y dejaron miles de petroglifos en la isla de Ometepe. Eran agricultores, alfareros y comerciantes que dominaban las rutas del lago.">chorotegas</span> que pescan en sus orillas lo llaman Cocibolca: el mar dulce.<br><br>
+En el centro se levanta <span class="tt" data-tip="Ometepe: isla formada por dos volcanes (Concepción y Maderas) unidos por un istmo. Era un santuario indígena cubierto de petroglifos y estatuas de basalto. Su nombre náhuatl significa 'dos cerros'.">Ometepe</span>, una isla de dos volcanes que los chorotegas tienen por sagrada. Cruzar el lago en canoa acorta días de camino — pero el agua guarda <span class="tt" data-tip="El Lago de Nicaragua tiene tiburones toro, una especie capaz de adaptarse al agua dulce remontando el río San Juan desde el Caribe. Durante siglos se creyó que eran una especie única de 'tiburón de lago'.">tiburones que viven donde ningún tiburón debería</span>.<br><br>
+Un pescador chorotega ofrece guiar las canoas. Pide a cambio que el chamán bendiga su isla.`,
+    decisions: [
+      { text: 'Cruzar el lago de noche con las canoas chorotegas. Rápido, pero el agua es traicionera.', allianceKey: 'chorotega', effects: { food: +8,  moral: +10, salud: -5,  union: +8,  civilians: -1 } },
+      { text: 'Rodear la orilla a pie. Más lento y más hambre, pero tierra firme bajo los pies.',         effects: { food: -12, moral: 0,   salud: +3,  union: +3 } },
+      { text: 'Detenerse en Ometepe a ofrendar. El pueblo necesita sentir que los dioses siguen con ellos.', effects: { food: -6,  moral: +18, salud: +2,  union: +12 } },
+    ],
+  },
+
+  e_cocibolca_b: {
+    title: 'La Piedra que Mira',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1518457607834-6e8d80c183c5?w=1200&q=80',
+    cap:   'Petroglifos de Ometepe — la memoria en piedra',
+    narr:  `En una playa de la isla, medio enterradas, hay <span class="tt" data-tip="Los petroglifos y estatuas de Ometepe representan figuras humanas, animales y seres duales. Algunas estatuas muestran a una persona con un segundo ser (jaguar, ave) sobre la cabeza: el alter ego o 'nahual' del chamán. Datan de entre el 800 y el 1500 d.C.">estatuas de piedra con rostros humanos y, encima de cada cabeza, un segundo ser</span>: un jaguar, un águila. El chamán mayor se arrodilla. Reconoce lo que ve.<br><br>
+<em>"Es el doble del alma"</em>, murmura. <em>"Este pueblo sabía lo mismo que nosotros, en otra lengua."</em><br><br>
+Hay comida enterrada como ofrenda junto a las piedras — maíz seco, semillas. Tomarla sería sobrevivir un día más. Dejarla intacta sería respetar a quienes la pusieron ahí.`,
+    decisions: [
+      { text: 'Dejar la ofrenda. No se roba a los muertos de otro pueblo, aunque se tenga hambre.',  effects: { food: -4,  moral: +20, union: +15 } },
+      { text: 'Tomar parte de la ofrenda y dejar algo propio a cambio. Un trueque con los antiguos.', effects: { food: +10, moral: +5,  union: +2 } },
+    ],
+  },
+
+  e_talamanca: {
+    title: 'La Montaña que Nadie Cruzó',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=1200&q=80',
+    cap:   'Bosque nuboso de Talamanca',
+    narr:  `La cordillera se levanta envuelta en nubes que nunca se van. El bosque gotea. Cada paso es barro y raíz. Pero es justo por eso que aquí están a salvo: <span class="tt" data-tip="La Cordillera de Talamanca, entre Costa Rica y Panamá, fue una de las regiones que España nunca logró someter por completo. Su geografía abrupta y la resistencia de sus pueblos mantuvieron el territorio fuera del control colonial durante siglos.">ningún ejército con caballos y armaduras cruzó jamás estas montañas</span>.<br><br>
+Los <span class="tt" data-tip="Bribri: pueblo originario de Talamanca. Su sociedad es matrilineal —el clan se hereda por la madre— y está organizada en clanes. Su figura espiritual es el 'awá', médico-sacerdote. Veneran a Sibö, el dios creador. Resistieron la conquista durante todo el período colonial.">bribri</span> aparecen sin ruido entre los árboles. Su mundo se hereda por las madres, y su médico — el awá — lee las enfermedades como quien lee el cielo. Una mujer mayor, cabeza de su clan, observa al grupo largo rato antes de hablar.<br><br>
+<em>"Pueden pasar. Pero la montaña pide algo a cambio de dejarlos pasar."</em>`,
+    decisions: [
+      { text: 'Pedir guía bribri por los pasos secretos. Aliarse con quien nunca fue vencido.', allianceKey: 'bribri', effects: { food: +6,  moral: +15, salud: +5,  union: +12, warriors: +1 } },
+      { text: 'Cruzar solos para no deber nada. El bosque nuboso castiga al apurado.',          effects: { food: -10, moral: -5,  salud: -12, union: -3 } },
+      { text: 'Quedarse unos días con el awá a curar a los enfermos antes de seguir.',          effects: { food: -8,  moral: +8,  salud: +18, union: +8 } },
+    ],
+  },
+
+  e_talamanca_b: {
+    title: 'Lo que Sabe el Awá',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
+    cap:   'El awá bribri — médico y guardián del saber',
+    narr:  `El <span class="tt" data-tip="El awá es el médico tradicional bribri, depositario de un saber que se transmite oralmente durante años de aprendizaje. Conoce cientos de plantas, los cantos curativos y la genealogía de los clanes. Su rol es a la vez espiritual y práctico.">awá</span> se sienta frente a la chamana del grupo. No comparten lengua, pero comparten oficio. Durante una noche entera intercambian lo que saben: ella le enseña a tratar la fiebre de los españoles que ya vio matar; él le muestra plantas de altura que cortan el dolor y cierran heridas.<br><br>
+Cuando amanece, el awá entrega un atado de cortezas y hojas. <em>"Esto no cura todo. Pero te dará días. Y los días, ahora, son todo lo que tienen."</em><br><br>
+A cambio, mira a los ojos de la chamana: <em>"Enséñame a reconocer la enfermedad de hierro antes de que llegue a mi montaña."</em>`,
+    decisions: [
+      { text: 'Compartir todo el saber sobre la peste. El conocimiento no se acapara entre pueblos hermanos.', effects: { food: +4,  moral: +18, salud: +10, union: +12 } },
+      { text: 'Recibir las plantas pero guardar algún secreto. La cautela también es supervivencia.',         effects: { food: +2,  moral: +5,  salud: +8,  union: -3 } },
+    ],
+  },
+
+  e_mosquitia: {
+    title: 'El Pueblo que No Se Arrodilla',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=1200&q=80',
+    cap:   'Lagunas y manglares de La Mosquitia',
+    narr:  `El bosque se abre en un laberinto de lagunas, manglares y canales donde el agua dulce y el mar se confunden. Aquí viven los <span class="tt" data-tip="Miskito (o misquito): pueblo de la costa caribe de Nicaragua y Honduras. Nunca fueron conquistados por España. Se aliaron con ingleses y holandeses, obtuvieron armas de fuego y llegaron a formar un reino reconocido. Su territorio permaneció fuera del control colonial español durante todo el período.">misquitos</span>, y caminan como quien nunca tuvo amo.<br><br>
+Tienen armas de fuego — conseguidas de los ingleses, enemigos de España — y conocen cada canal de este laberinto de agua donde ningún galeón puede entrar. Entre ellos hay rostros africanos: <span class="tt" data-tip="Los 'sambos' o misquitos-zambos surgieron de la unión entre indígenas misquitos y africanos sobrevivientes de naufragios de barcos esclavistas. Reforzaron la resistencia armada de la costa contra los españoles.">descendientes de esclavos que naufragaron y se hicieron libres aquí</span>.<br><br>
+Su líder evalúa al grupo. <em>"Los que huyen de los españoles son bienvenidos. Pero esta costa se defiende. ¿Saben pelear?"</em>`,
+    decisions: [
+      { text: 'Sellar una alianza guerrera con los misquitos. Aprender a moverse y luchar en el agua.', allianceKey: 'misquito', effects: { food: +10, moral: +15, salud: 0,  union: +10, warriors: +3 } },
+      { text: 'Pedir solo paso silencioso por los canales. No buscar más guerras de las necesarias.',   effects: { food: +4,  moral: +5,  salud: +2,  union: +3 } },
+      { text: 'Conseguir canoas y partir rápido. El tiempo perdido es ventaja para el conquistador.',  effects: { food: -3,  moral: -3,  salud: +5,  union: -2 } },
+    ],
+  },
+
+  e_mosquitia_b: {
+    title: 'Los Que Cazan el Agua',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=1200&q=80',
+    cap:   'Manatíes en las lagunas — el sustento de la costa',
+    narr:  `El hambre aprieta. Los misquitos ofrecen enseñar lo que mejor saben hacer: cazar <span class="tt" data-tip="El manatí era una fuente clave de alimento en La Mosquitia. Los misquitos eran cazadores expertos con arpón desde canoas. Hoy el manatí antillano está en peligro de extinción, pero entonces sostenía a poblaciones enteras de la costa.">manatíes</span>, los grandes animales mansos de las lagunas, con arpón desde la canoa.<br><br>
+Es comida abundante — pero la cacería lleva días, y el chamán mayor mira el agua con respeto: <em>"Estos animales nos dan de comer. No los matemos más de lo que el hambre pide."</em><br><br>
+Mientras tanto, un vigía misquito trae noticia: una partida de cazadores de esclavos españoles ronda el borde sur del manglar.`,
+    decisions: [
+      { text: 'Cazar lo justo y partir antes de que lleguen los españoles. Comida medida, riesgo medido.', effects: { food: +14, moral: +5,  salud: +5,  union: +5 } },
+      { text: 'Quedarse a llenar las reservas pese al peligro. El hambre mata más seguro que el español.', effects: { food: +24, moral: -8,  salud: +3,  union: -5,  warriors: -1 } },
+    ],
+  },
+
+  e_guna: {
+    title: 'Las Islas de la Ley Propia',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=1200&q=80',
+    cap:   'Archipiélago de Guna Yala — cientos de islas de coral',
+    narr:  `Cientos de islas de arena y coral salpican el mar, tan bajas que parecen flotar. Son el territorio <span class="tt" data-tip="Guna (o kuna): pueblo del Caribe panameño. Su sociedad es matrilineal y se gobierna por congresos comunales donde los 'saglas' (jefes) cantan la historia y las decisiones se toman en común. Siglos después, en 1925, protagonizaron una revolución que les valió autonomía dentro de Panamá: la comarca de Guna Yala.">guna</span>, y aquí no manda un rey ni un español: manda el <span class="tt" data-tip="El congreso guna es la asamblea donde la comunidad delibera. El 'sagla' no ordena: conduce y canta. Las decisiones importantes se toman colectivamente, escuchando a todos. Es una de las formas de autogobierno indígena más duraderas de América.">congreso</span>, donde todos hablan y el jefe canta.<br><br>
+Esa misma noche el grupo es invitado a la casa grande. En la penumbra, el sagla guna entona la historia de su pueblo — horas de canto — y al terminar pide que el cacique cuente la suya: el incendio, la huida, el sur.<br><br>
+Las mujeres guna cosen <span class="tt" data-tip="Las molas son textiles de capas de tela cosidas a mano por las mujeres guna, con diseños geométricos y figurativos. Cada una cuenta algo. Son arte, identidad y memoria a la vez.">molas</span>: telas que cuentan historias en figuras de colores.`,
+    decisions: [
+      { text: 'Contar toda la historia ante el congreso. Que otro pueblo guarde la memoria del incendio.', effects: { food: +6,  moral: +20, salud: +3,  union: +15 } },
+      { text: 'Aceptar refugio unos días entre las islas para recuperar fuerzas antes del istmo.',        effects: { food: +12, moral: +8,  salud: +12, union: +6,  civilians: +1 } },
+      { text: 'Agradecer y partir al alba. Las islas son seguras, pero el sur llama.',                    effects: { food: +3,  moral: +3,  salud: +4,  union: +2 } },
+    ],
+  },
+
+  e_guna_b: {
+    title: 'La Tela que Recuerda',
+    act:   'Acto I · Huida',
+    img:   'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=1200&q=80',
+    cap:   'Molas guna — la memoria cosida a mano',
+    narr:  `Una anciana guna se sienta junto a la chamana y, sin mediar palabra, empieza a coser. Capa sobre capa de tela, va recortando y revelando figuras: un jaguar, un río, una fila de personas caminando hacia abajo, hacia el sur.<br><br>
+Está cosiendo la historia del grupo en una <span class="tt" data-tip="Cada mola es única y narra algo: un mito, un sueño, un hecho. Que la anciana guna cosiera la historia del grupo es un gesto de acogida profundo: significa que ese pueblo pasajero quedará en la memoria visual de los guna.">mola</span>. Cuando termina, la entrega. <em>"Ahora su camino también vive en nuestras manos. Si se pierden, esta tela recordará que existieron."</em><br><br>
+El gesto deja al grupo en silencio. Por primera vez desde el incendio, alguien promete recordarlos.`,
+    decisions: [
+      { text: 'Recibir la mola y entregar a cambio un objeto sagrado del pueblo. Memorias intercambiadas.', effects: { food: 0,   moral: +22, salud: +2,  union: +18 } },
+      { text: 'Agradecer y pedir aprender a leer las molas, para llevar el arte al sur.',                   effects: { food: -2,  moral: +14, salud: 0,   union: +10 } },
+    ],
+  },
+
   // ── ACTO II — TRAVESÍA (primarios) ───────────────────────────
 
   e_istmo: {
@@ -568,6 +686,154 @@ Más allá puede haber comida, agua, refugio. O puede haber solo la voluntad de 
       { text: 'Respetar el límite. Rodear por el norte. Su elección de aislamiento es sagrada.',        effects: { food: -15, moral: +25, salud: -8,  union: +20 } },
       { text: 'Dejar una ofrenda junto a la barrera y retroceder. Que decidan ellos si quieren contacto.', effects: { food: -8, moral: +20, union: +15 } },
       { text: 'Cruzar con cuidado y manos visibles. La necesidad es mayor que el protocolo.',           effects: { food: +20, moral: -10, salud: +10, union: -10 } },
+    ],
+  },
+
+  // ── ACTO II — Nodos nuevos (corredores profundos) ────────────
+
+  e_maranon: {
+    title: 'El Padre del Amazonas',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1559827291-72ee739d0d9a?w=1200&q=80',
+    cap:   'Río Marañón — el primer Amazonas',
+    narr:  `El río aparece de golpe al bajar la última cuesta andina: café y furioso, tan ancho que la orilla opuesta apenas se distingue. Lleva troncos enteros como si fueran palitos. El chamán lo mira largo tiempo antes de hablar:<br><br>
+<em>"Los <span class="tt" data-tip="Los quechuas llaman al Marañón 'Amaru Mayu' — el río serpiente. Durante siglos fue considerado el verdadero nacimiento del Amazonas, porque sus fuentes están más arriba que las del Ucayali. Los exploradores modernos siguen debatiendo cuál rama es la principal.">quechuas dicen que este río es el abuelo del Amazonas</span>. Que los otros ríos grandes del sur son sus hijos."</em><br><br>
+En la orilla hay piraguas y, junto a ellas, hombres y mujeres <span class="tt" data-tip="Shipibo-Conibo: pueblo indígena del Perú amazónico. Sus mujeres son reconocidas por sus diseños geométricos kené — bordados y pintados — que representan visiones chamánicas y mapas del cosmos. Su chamán (onanya) trabaja con ayahuasca para curar enfermedades del alma.">shipibo</span> con diseños geométricos en la ropa que el chamán del grupo no puede dejar de mirar. Los diseños se curvan y se bifurcan como ríos vistos desde arriba.<br><br>
+Uno de los shipibo señala hacia abajo, hacia donde el río baja: <em>"El agua los llevará más rápido que sus piernas. Pero hay que saber leer el río."</em>`,
+    decisions: [
+      { text: 'Aceptar la guía shipibo. Navegar el Marañón y aprender a leer sus corrientes.', allianceKey: 'shipibo', effects: { food: +14, moral: +18, salud: +5,  union: +12 } },
+      { text: 'Cruzar el río y seguir por tierra hacia el sur. El río es impredecible.',        effects: { food: -10, moral: +5,  salud: -8,  union: +3  } },
+      { text: 'Quedarse unos días para aprender los diseños kené con la chamana. El conocimiento viaja.', effects: { food: -4, moral: +22, salud: +2, union: +10 } },
+    ],
+  },
+
+  e_maranon_b: {
+    title: 'Las Manos en el Barro',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&q=80',
+    cap:   'Cerámica shipibo — el cosmos en las manos',
+    narr:  `Una mujer shipibo trabaja el barro junto al río con una concentración que no admite interrupciones. La chamana se sienta cerca, mirando. Después de un rato la mujer le habla sin dejar de trabajar:<br><br>
+<em>"¿Ves este patrón? No lo inventé yo. Lo vi en el río cuando me enseñaron a mirar. El río ya lo sabe todo — nosotros solo lo <span class="tt" data-tip="El kené shipibo es un sistema visual que reproduce los patrones que los chamanos ven durante las ceremonias con ayahuasca. No es decoración: es un mapa del cosmos, una cura, un mensaje. Cada mujer aprende el kené de su madre y lo interpreta en cerámica, telas y pinturas corporales.">copiamos en barro y en tela</span>."</em><br><br>
+Le da a la chamana un trozo de arcilla sin forma y espera. Los niños del grupo se acercan. Alguien en el grupo sabe trabajar el barro — no con estos patrones, pero sí con las manos. Pueden intercambiar lo que saben.`,
+    decisions: [
+      { text: 'Sentarse todos a aprender. El arte del barro es también el arte de la paciencia.',         effects: { food: -4,  moral: +20, salud: +3,  union: +14 } },
+      { text: 'Agradecer e intercambiar técnicas de cultivo por diseños. Conocimiento por conocimiento.', effects: { food: +8,  moral: +15, salud: 0,   union: +10 } },
+    ],
+  },
+
+  e_andes_sur: {
+    title: 'El Último Paso',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1200&q=80',
+    cap:   'Abra andina — el paso entre dos mundos',
+    narr:  `El paso está a más de cuatro mil metros. El aire es tan delgado que los pulmones trabajan el doble para hacer la mitad. Los niños lloran sin razón clara. Un anciano se marea y tiene que sentarse. El chamán distribuye sin decir nada hojas de <span class="tt" data-tip="La hoja de coca (Erythroxylum coca) ha sido usada en los Andes durante más de 4.000 años. Masticar hojas de coca con una pequeña cantidad de cal activa sus alcaloides, que reducen el cansancio, el hambre, el frío y el mal de altura. Los misioneros españoles intentaron prohibirla, pero como dependía de ella la mano de obra de las minas de plata, la Corona la toleró.">coca</span> y hace señas para que todos mastiquen.<br><br>
+Desde el paso, los dos mundos: al norte la Amazonía verde e infinita de donde vienen. Al sur el altiplano abierto, azul de frío, con el Titicaca brillando a lo lejos como un espejo. Un grupo de hombres <span class="tt" data-tip="Collas (o kollas): denominación que usaban los incas para los pueblos aimaras del altiplano boliviano-peruano. Fueron incorporados al Tawantinsuyu pero mantuvieron identidad propia. Su territorio incluía las orillas del Titicaca, el lago más alto del mundo navegable.">collas</span> los observa desde abajo, desde el primer tambo del altiplano.`,
+    decisions: [
+      { text: 'Bajar directo al tambo colla. El altiplano frío necesita ropa y guía antes que comida.', effects: { food: -6,  moral: +12, salud: -8,  union: +8  } },
+      { text: 'Acampar en el paso una noche para que los enfermos se aclimaten gradualmente.',          effects: { food: -10, moral: +8,  salud: +15, union: +5  } },
+      { text: 'Enviar guerreros adelante a pedir hospitalidad antes de bajar todos.',                   effects: { food: -4,  moral: +10, salud: +5,  warriors: -2 } },
+    ],
+  },
+
+  e_andes_sur_b: {
+    title: 'Las Llamas del Cielo',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=1200&q=80',
+    cap:   'Llamas en el altiplano andino',
+    narr:  `Los animales aparecen al doblar una roca y nadie del grupo sabe qué son. Son grandes como venados pero de cuello largo y mirada tranquila, y el hombre que los guía camina entre ellos como si fueran amigos viejos. Cuando el grupo se paraliza, el hombre se ríe.<br><br>
+<em>"Son <span class="tt" data-tip="La llama (Lama glama) fue domesticada en los Andes hace unos 6.000 años a partir del guanaco. Es el único animal de carga grande que América tuvo — los Andes no contaban con bueyes, caballos ni asnos. Una llama puede cargar 30 kg durante horas a gran altitud. También provee lana, carne y cuero. Sin llamas, el Imperio Inca no habría podido abastecer sus ciudades de altura.">llamas</span>"</em>, dice. <em>"No muerden. Solo escupen cuando están muy molestas."</em><br><br>
+El hombre es un <span class="tt" data-tip="Aymara: pueblo indígena del altiplano peruano-boliviano, uno de los más numerosos de América del Sur. Hablaban y hablan aimara, lengua distinta del quechua. Fueron incorporados al Imperio Inca pero mantuvieron su identidad. Hoy son entre 2 y 3 millones de personas en Bolivia, Perú y Chile.">aymara</span> que pastorea un rebaño de treinta. Ofrece vender dos llamas — carne y carga — a precio razonable: trabajo durante tres días.`,
+    decisions: [
+      { text: 'Aceptar el trato. Dos llamas cambian por completo la capacidad de carga del grupo.', effects: { food: +20, moral: +12, salud: +8,  union: +8  } },
+      { text: 'Trabajar los tres días y aprender también a pastorear. El conocimiento vale más.',    effects: { food: +14, moral: +18, salud: +5,  union: +12 } },
+    ],
+  },
+
+  e_orinoco: {
+    title: 'El Río que Nace Dos Veces',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=1200&q=80',
+    cap:   'Delta del Orinoco — laberinto de bocas',
+    narr:  `El Orinoco no termina — se multiplica. En su delta se divide en cincuenta brazos que avanzan entre manglares tan altos que bloquean el horizonte. Sin guía es imposible distinguir qué caño lleva al mar abierto y qué caño termina en pantano sin salida.<br><br>
+Los <span class="tt" data-tip="Warao (Guarao): pueblo indígena del delta del Orinoco. Su nombre en su propia lengua significa 'gente de la canoa' o 'gente del agua'. Construyen palafitos sobre el agua y navegan el delta desde hace miles de años. Hoy son unos 36.000. El delta es uno de los ecosistemas más ricos de América del Sur, con más de 1.500 especies de vegetales.">warao</span> viven en casas sobre el agua, construidas sobre pilotes de madera dura que el río no consume. Han vivido así tanto tiempo que el agua ya no les parece extraña — es el suelo de su mundo.<br><br>
+Una mujer warao en canoa los intercepta sin miedo y pregunta, en un español rudimentario que aprendió de misioneros: <em>"¿Adónde quieren llegar? Hay cien caminos en este delta. Solo dos no mueren."</em>`,
+    decisions: [
+      { text: 'Confiar en la mujer warao. Dejar que guíe por los brazos seguros del delta.',  allianceKey: 'warao', effects: { food: +12, moral: +15, salud: +8,  union: +10 } },
+      { text: 'Seguirla pero enviar guerreros adelante a explorar. No confiar ciegamente.',   effects: { food: +6,  moral: +8,  salud: +5,  warriors: -1 } },
+      { text: 'Pedir que enseñe al grupo a leer el delta. Aprender a orientarse solos.',      effects: { food: +3,  moral: +18, salud: +3,  union: +12 } },
+    ],
+  },
+
+  e_orinoco_b: {
+    title: 'Los Palafitos del Fin del Mundo',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+    cap:   'Palafitos warao — casas sobre el agua',
+    narr:  `La aldea entera flota. Los niños corren por tablones que se balancean sobre el río y no se caen. Un abuelo teje una canoa nueva con la misma naturalidad con que otro anciano tallaría madera en tierra firme. La comunidad vive en ciclos que el delta determina: temporada seca, temporada de agua, temporada de peces, temporada de fruta de moriche.<br><br>
+El chamán warao muestra al grupo la planta que lo sostiene todo: la <span class="tt" data-tip="El moriche (Mauritia flexuosa) es una palmera que los warao llaman el árbol de la vida. Da fruta, savia fermentable, fibras para tejer, madera para construcción y larvas comestibles (gusano de moriche) de alto valor proteico. Los warao extraen también una harina de su tronco.">palma de moriche</span>. La llama el árbol de la vida y no es exageración: da comida, fibra, madera y algo más que el chamán muestra con una larva blanca en la palma de la mano.<br><br>
+Algunos del grupo abren bien los ojos. Otros apartan la mirada.`,
+    decisions: [
+      { text: 'Probar el gusano de moriche. Si es alimento para ellos, puede serlo para nosotros también.', effects: { food: +18, moral: +10, salud: +5,  union: +8  } },
+      { text: 'Aprender a recolectar la fruta de moriche. Es menos dramático y también alimenta.',          effects: { food: +12, moral: +12, salud: +3,  union: +6  } },
+    ],
+  },
+
+  e_tepui: {
+    title: 'El Mundo de Arriba',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&q=80',
+    cap:   'Tepuyes — mesetas en el cielo',
+    narr:  `Las paredes de roca suben verticales desde la selva hasta perderse en las nubes. Son demasiado rectas para ser naturales, pero lo son. Los <span class="tt" data-tip="Los tepuyes del Escudo Guayanés son formaciones de arenisca de entre 1.000 y 3.000 metros de altura. Tienen más de 1.800 millones de años — algunas de las rocas más antiguas del planeta. Cada cumbre es un ecosistema aislado con especies que evolucionaron allí sin contacto con el mundo de abajo. El Roraima sirvió de inspiración para 'El Mundo Perdido' de Arthur Conan Doyle.">tepuyes tienen más de mil millones de años</span>. Lo que vive arriba nunca estuvo abajo.<br><br>
+Los <span class="tt" data-tip="Pemón: pueblo indígena de la Gran Sabana venezolana y la Guayana. Los tepuyes son parte central de su cosmología. Para los pemón, los tepuyes son el hogar de seres espirituales llamados 'makunaima' — el trickster cultural que creó el mundo actual. La Gran Sabana es un territorio sagrado que los pemón habitaron por siglos.">pemón</span> que viven al pie de los tepuyes los reciben con curiosidad real: no muchos grupos pasan por aquí. Su chamán es joven — apenas veinte años — pero habla con la seguridad de quien conoce algo que el resto del mundo ignora.<br><br>
+<em>"Arriba hay plantas que curan enfermedades que abajo no tienen nombre. Pero el tepuy no deja subir a cualquiera."</em>`,
+    decisions: [
+      { text: 'Pedir que el chamán pemón suba con la chamana del grupo a buscar medicinas.',       allianceKey: 'pemon', effects: { food: -8,  moral: +20, salud: +22, union: +12 } },
+      { text: 'Descansar al pie del tepuy unos días. El lugar tiene una calma que el grupo necesita.', effects: { food: -5,  moral: +18, salud: +10, union: +10 } },
+      { text: 'Seguir camino y pedir solo información sobre la ruta al sur. El tiempo no espera.',    effects: { food: -2,  moral: +8,  salud: +3,  union: +5  } },
+    ],
+  },
+
+  e_tepui_b: {
+    title: 'La Lluvia que Nace Arriba',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80',
+    cap:   'Tepuy — nubes que generan su propia lluvia',
+    narr:  `Las nubes no vienen del horizonte: nacen de la cima misma del tepuy, se forman y llueven sobre su pie con una regularidad que los pemón conocen de memoria. Cada mañana la cascada crece. Cada tarde mengua. El agua es limpia y fría como nada que el grupo haya probado antes.<br><br>
+En la pared del tepuy, a la altura de los ojos, hay pinturas. No talladas: pintadas en rojo y negro sobre la roca, protegidas del agua por una saliente de piedra. Figuras humanas, animales, formas que podrían ser mapas o podrían ser otra cosa.<br><br>
+El chamán pemón explica sin ser preguntado: <em>"Los hicieron los <span class="tt" data-tip="Los petroglifos y pinturas rupestres de la Guayana tienen entre 2.000 y 4.000 años. Los pemón los atribuyen a los 'makunaima', seres anteriores al mundo actual. Representan visiones chamánicas, rutas de migración y mapas del territorio. Muchos están siendo dañados por la humedad y el turismo no controlado.">makunaima</span>. Son los primeros del mundo. Nos dejaron instrucciones en las piedras."</em>`,
+    decisions: [
+      { text: 'Copiar las pinturas en cuero. Llevar las instrucciones más allá de este lugar.', effects: { food: -2, moral: +22, union: +15 } },
+      { text: 'Observar y recordar. Lo que se memoriza no se pierde si el cuero se moja.',      effects: { food: 0,  moral: +15, union: +10 } },
+    ],
+  },
+
+  e_llanos_mojos: {
+    title: 'El Mar que Viene y Va',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=1200&q=80',
+    cap:   'Llanos de Mojos — el mar interior boliviano',
+    narr:  `La sabana se inunda. No de golpe, sino despacio, como si el suelo respirara agua hacia afuera. En el horizonte no hay tierra firme — solo la línea donde el agua termina y el cielo empieza. En este mar interior que dura meses, la única tierra seca son las <span class="tt" data-tip="Las lomas de los Llanos de Mojos son montículos artificiales construidos por los mojos para vivir sobre el agua durante las inundaciones anuales. Algunos tienen hasta 300 metros de diámetro y 6 metros de altura. La red de lomas y canales artificiales que construyeron es uno de los sistemas de ingeniería hidráulica precolombinos más extensos de América del Sur.">lomas</span> — montículos de tierra que alguien construyó hace siglos exactamente para esto.<br><br>
+Los <span class="tt" data-tip="Mojos (Moxos): pueblo indígena de la Amazonía boliviana. Construyeron entre los siglos IV y XIV una red de canales, lomas artificiales y campos elevados que les permitía vivir en una sabana que se inunda el 70% del año. Los jesuitas establecieron misiones entre ellos en el siglo XVII.">mojos</span> los ven llegar desde las lomas y los reciben como a gente que llegó en buen momento: el agua sube, no baja, y la tierra seca es valiosa.<br><br>
+<em>"Sigan la cadena de lomas hacia el sur"</em>, dice el jefe, <em>"o el agua los lleva a donde ustedes no quieren ir."</em>`,
+    decisions: [
+      { text: 'Seguir la cadena de lomas bajo guía mojos. Caminar donde ellos indican.',           allianceKey: 'mojos', effects: { food: +10, moral: +15, salud: +8,  union: +12 } },
+      { text: 'Pedir canoas y cruzar el mar interior. Más rápido, aunque el agua asusta.',         effects: { food: +4,  moral: +8,  salud: -5,  union: +4  } },
+      { text: 'Quedarse en la loma hasta que el agua baje. El tiempo perdido puede ser descanso.', effects: { food: -8,  moral: +12, salud: +15, union: +8  } },
+    ],
+  },
+
+  e_llanos_mojos_b: {
+    title: 'Las Lomas que No Tienen Nombre',
+    act:   'Acto II · Travesía',
+    img:   'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
+    cap:   'Lomas artificiales — ingeniería del agua',
+    narr:  `Un anciano mojo lleva al chamán a la cima de la loma más alta y le muestra el horizonte. Desde arriba, lo que parecía tierra al azar tiene una forma: canales rectos, lomas en cadena, campos de cultivo elevados sobre el agua. Una ciudad de agua y tierra que nadie construyó de una vez, sino generación por generación.<br><br>
+<em>"Esto no lo hizo un rey"</em>, dice el anciano. <em>"Lo hizo cada familia. Cada familia, su parte. Y así, en cien años, esto."</em><br><br>
+El chamán lo traduce para el cacique después, en voz baja: <em>"Dice que cuando un pueblo trabaja sin que nadie ordene, hace cosas que ningún rey puede ordenar."</em><br><br>
+La frase queda en el aire sobre el mar interior de Bolivia, donde el agua brilla y no hay ningún conquistador a la vista.`,
+    decisions: [
+      { text: 'Aprender el sistema de canales. Un pueblo que maneja el agua puede vivir donde otros no pueden.', effects: { food: +5,  moral: +25, union: +18 } },
+      { text: 'Descansar en la loma y escuchar más historias. Este pueblo guarda mucho para enseñar.',          effects: { food: -4,  moral: +20, union: +14 } },
     ],
   },
 
@@ -893,6 +1159,178 @@ Una chamana guaraní mayor visita el campamento con regalos: peces ahumados, mie
     decisions: [
       { text: 'Agradecer el mapa y el aviso. La información sobre los conquistadores es oro.', effects: { food: +8,  moral: +28, salud: +5,  warriors: +2 } },
       { text: 'Pedir que la chamana los guíe hasta la salida sur del humedal.', effects: { food: +5,  moral: +20, salud: +10, union: +8  } },
+    ],
+  },
+
+  // ── ACTO III — Nodos nuevos (corredores profundos) ───────────
+
+  e_valles_cal: {
+    title: 'El Valle de los Señores',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1200&q=80',
+    cap:   'Valles Calchaquíes — cañones rojos del noroeste',
+    narr:  `Los cañones son rojos. No es metáfora — la roca tiene ese color, oxidada durante millones de años, y con la luz del atardecer el mundo parece estar en llamas tranquilas. El grupo lleva dos días sin ver un conquistador. Aquí los españoles tardaron más de un siglo en entrar, y cuando entraron, los <span class="tt" data-tip="Diaguitas calchaquíes: confederación de pueblos del noroeste argentino que resistió la conquista española durante más de 130 años, hasta 1665. Las llamadas 'Guerras Calchaquíes' fueron tres ciclos de resistencia. Sus líderes más conocidos son Juan Calchaquí y el cacique Bohórquez. Cuando finalmente fueron derrotados, los españoles realizaron una deportación masiva para separar las comunidades.">diaguitas calchaquíes</span> los recibieron con flechas durante décadas.<br><br>
+Los calchaquíes actuales los observan desde las ruinas de <span class="tt" data-tip="Quilmes: ciudad diaguita de hasta 3.000 habitantes, construida en terrazas sobre un cerro. Fue sitiada y rendida en 1665. Los sobrevivientes fueron deportados a pie hasta Buenos Aires — una marcha de 1.300 km que mató a la mitad. El 'Barrio de los Quilmes', al sur de Buenos Aires, lleva su nombre hoy.">Quilmes</span>: una ciudad en terrazas que todavía se sostiene sobre el cerro como desafiando al tiempo. Su líder, una mujer de mirada directa, habla sin rodeos: <em>"Vinieron a quedarse o a pasar?"</em>`,
+    decisions: [
+      { text: 'Quedarse unas semanas. Este pueblo resistió tanto que tiene mucho para enseñar.',   allianceKey: 'calchaqui', effects: { food: +8,  moral: +20, salud: +8,  union: +15 } },
+      { text: 'Pedir guía por los pasos andinos hacia el sur. La resistencia calchaquí les ganó ventaja.', effects: { food: +5,  moral: +12, salud: +5,  union: +8  } },
+      { text: 'Solo reabastecerse y seguir. El tiempo de los parones ya pasó.',                    effects: { food: +12, moral: +5,  salud: 0,   union: +3  } },
+    ],
+  },
+
+  e_valles_cal_b: {
+    title: 'El Viento del Este',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1562408590-e32931084e23?w=1200&q=80',
+    cap:   'Quebradas del noroeste — el viento zonda',
+    narr:  `El viento llega sin aviso desde el este, caliente y seco como un horno. Los calchaquíes lo llaman <span class="tt" data-tip="Zonda: viento cálido y seco del norte argentino, similar al foehn europeo. Cae de los Andes después de perder humedad. Los pueblos originarios del noroeste lo asociaban con cambios de humor colectivos — y no sin razón: estudios modernos vinculan los vientos zonda con aumentos de tensión social.">zonda</span>. Cuando sopla, los animales se agitan y los niños lloran sin saber por qué.<br><br>
+Una calchaquí anciana le dice a la chamana que en los días de zonda no se toman decisiones importantes. <em>"El viento revuelve los pensamientos antes de que lleguen a la boca."</em><br><br>
+Pero la chamana siente algo distinto: el zonda trae un olor que reconoce. Humo de campamento — y no el de ellos.`,
+    decisions: [
+      { text: 'Moverse de noche aunque el zonda dificulte la marcha. El humo no espera.',  effects: { food: -8,  moral: +8,  salud: -5,  warriors: +1 } },
+      { text: 'Esperar que el viento pase. La anciana calchaquí tiene razón sobre el zonda.', effects: { food: -6,  moral: +12, salud: +5,  union: +8  } },
+    ],
+  },
+
+  e_alto_neuquen: {
+    title: 'El Árbol que Alimenta',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80',
+    cap:   'Araucarias del norte patagónico',
+    narr:  `Los árboles son distintos a todo lo anterior: gruesos como torres, con ramas que crecen en espiral y una corteza de escamas que parece armadura. Son <span class="tt" data-tip="Araucaria araucana (pehuén): árbol sagrado del pueblo mapuche-pehuenche. Sus piñones (piñas) contienen semillas grandes y nutritivas que pueden comerse crudas, cocidas o fermentadas. Un bosque de araucarias puede sostener a una comunidad durante el invierno entero. El árbol puede vivir más de 1.000 años.">araucarias</span> — el pueblo pehuenche les llama pehuén y les debe la vida.<br><br>
+Los <span class="tt" data-tip="Pehuenches: pueblo mapuche del norte neuquino. Su nombre significa literalmente 'gente del pehuén'. Vivían nomádicamente entre la cordillera y el piedemonte, siguiendo los ciclos de los piñones. Fueron conocidos por su fiereza ante cualquier invasión y por su profundo conocimiento del terreno andino.">pehuenches</span> están recolectando piñones cuando el grupo llega. No se alarman — en su territorio, son ellos los que deciden quién entra. Un hombre joven se acerca con un puñado de piñas y las ofrece sin decir palabra. El chamán lo acepta.<br><br>
+<em>"Los que dan sin que se lo pidan suelen querer algo"</em>, murmura un guerrero. El pehuenche se ríe — entendió.`,
+    decisions: [
+      { text: 'Unirse a la recolección de piñones. Ayudar a cambio de quedarse unos días.',  allianceKey: 'pehuenche', effects: { food: +22, moral: +15, salud: +8,  union: +12 } },
+      { text: 'Aceptar los piñones de regalo y seguir. No deben más tiempo del necesario.',   effects: { food: +12, moral: +8,  salud: +5,  union: +5  } },
+      { text: 'Pedir que los guíen por los pasos andinos de invierno. El conocimiento pehuenche vale más que la comida.', effects: { food: +6, moral: +18, salud: +3, warriors: +1 } },
+    ],
+  },
+
+  e_alto_neuquen_b: {
+    title: 'La Noche sin Fin',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1518457607834-6e8d80c183c5?w=1200&q=80',
+    cap:   'Cielo del sur patagónico — el cruce del firmamento',
+    narr:  `Nadie del grupo había visto el cielo así. Sin luz de ciudad, sin humo de incendio, sin nada entre los ojos y las estrellas. El chamán se sienta en el suelo y no dice nada durante mucho tiempo.<br><br>
+Un pehuenche anciano se sienta junto a él. Señala al sur: <em>"Por ahí, el camino del cielo va derecho."</em> Señala una banda blanca que cruza el firmamento — la <span class="tt" data-tip="La Vía Láctea fue usada como mapa celeste por muchos pueblos originarios del sur. Los mapuches y pehuenches conocían el eje norte-sur de la Vía Láctea como guía de orientación nocturna, y sus estrellas más brillantes tenían nombres y roles en la cosmología. El Cruce del Sur (Cruz del Sur) era la brújula del hemisferio austral.">Vía Láctea</span>. <em>"Eso que ven es el camino de las almas. También es el camino hacia donde van."</em><br><br>
+Los niños más pequeños se quedan dormidos mirando arriba.`,
+    decisions: [
+      { text: 'Aprender a navegar de noche por las estrellas del sur. Conocimiento que no pesa.',  effects: { food: -3,  moral: +22, salud: +2,  union: +14 } },
+      { text: 'Descansar esa noche bajo las estrellas. El grupo necesita paz tanto como comida.',   effects: { food: -5,  moral: +18, salud: +10, union: +12 } },
+    ],
+  },
+
+  e_sie_ventana: {
+    title: 'El Ojo del Sur',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1586348943529-beaae6c28db9?w=1200&q=80',
+    cap:   'Sierra de la Ventana — la roca agujereada',
+    narr:  `En medio de las pampas infinitas, una sierra. No es enorme — los Andes la harían pequeña — pero su presencia en tanta llanura la hace imposible de ignorar. Y en la cima del cerro más alto, una roca con un agujero perfecto: la <span class="tt" data-tip="El Cerro de la Ventana (1.243 m) en la sierra bonaerense homónima tiene en su cima una perforación natural en la roca de unos 5 metros de ancho. Fue lugar sagrado para los pueblos pampeanos. Los tehuelches y luego los ranqueles conocían perfectamente la sierra como punto de referencia en la pampa.">ventana</span> que da nombre a todo el lugar — un arco natural por el que se ve el cielo.<br><br>
+El chamán insiste en subir. Nadie lo detiene — hay algo en su manera de mirar esa roca que no acepta discusión.<br><br>
+Desde el agujero, el horizonte de la pampa se ve en las cuatro direcciones a la vez. <em>"Este es el centro"</em>, dice cuando baja. <em>"No el geográfico. El que necesitábamos encontrar."</em>`,
+    decisions: [
+      { text: 'Hacer una ofrenda en la ventana de roca. El chamán dice que este lugar escucha.',        effects: { food: -4,  moral: +25, salud: +3,  union: +18 } },
+      { text: 'Usar la sierra como atalaya y orientarse definitivamente hacia el destino final.',        effects: { food: -2,  moral: +12, salud: 0,   union: +8,  warriors: +1 } },
+      { text: 'Acampar al pie de la sierra unos días. El grupo lleva meses sin lugar estable.',         effects: { food: -8,  moral: +15, salud: +15, union: +12 } },
+    ],
+  },
+
+  e_sie_ventana_b: {
+    title: 'Las Pinturas Bajo la Roca',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1200&q=80',
+    cap:   'Arte rupestre — cuevas de la sierra bonaerense',
+    narr:  `Una cueva al pie del cerro que nadie vería si no supiera que existe: pequeña, baja, con el techo negro de humo de miles de fuegos. Y en las paredes: pinturas. Manos negativas — manos que alguien puso sobre la roca y sopló pintura alrededor — y figuras de animales que el grupo ya no reconoce. <span class="tt" data-tip="Las pinturas rupestres de la Sierra de la Ventana y la pampa bonaerense tienen entre 3.000 y 8.000 años de antigüedad. Los guanacos, ñandúes y felinos son los animales más representados. La técnica de manos en negativo (soplando pigmento rojo sobre la mano apoyada en la roca) aparece en cuevas de los cinco continentes.">Guanacos y ñandúes</span>, sobre todo. Animales de la pampa que estas pinturas conocen desde antes de que hubiera palabras para nombrarlos.<br><br>
+Un guerrero pone su mano sobre una de las manos pintadas — del mismo tamaño exacto — y se queda así un momento que nadie interrumpe.`,
+    decisions: [
+      { text: 'Agregar la mano del grupo a las pinturas. Que la cueva sepa que pasaron.',           effects: { food: -2,  moral: +22, union: +16 } },
+      { text: 'Solo observar. No modificar lo que no les pertenece — solo entrar en contacto.',      effects: { food: 0,   moral: +18, union: +12 } },
+    ],
+  },
+
+  e_banados: {
+    title: 'El Jaguar No Pregunta',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=1200&q=80',
+    cap:   'Bañados del Izozog — el Chaco boliviano',
+    narr:  `Agua y barro y calor. El Chaco no tiene término medio — o es selva cerrada o es llanura sin agua. Pero aquí, en el Izozog, hay algo distinto: un sistema de lagunas que en la época seca se convierten en refugio de todo lo que vive entre el Chaco y la Amazonía.<br><br>
+Un jaguar cruza el sendero a cincuenta metros, sin apuro. Es el tercero en dos días. Los <span class="tt" data-tip="Chiquitanos: pueblo indígena de las tierras bajas de Bolivia, entre el Chaco y la Amazonía. Habitaron la región del Izozog durante siglos antes de ser reducidos en las misiones jesuíticas del siglo XVII. Su nombre viene del español 'chico' — por el tamaño de sus puertas — no de su propia lengua. Eran agricultores, cazadores y artesanos con una tradición musical que sobrevivió a la evangelización.">chiquitanos</span> que viven aquí lo miran cruzar con la misma expresión que el chamán usa para mirar el fuego: respeto sin miedo.<br><br>
+<em>"El jaguar no persigue — solo va"</em>, dice un chiquitano. <em>"El que tiene miedo es el que corre."</em>`,
+    decisions: [
+      { text: 'Aprender a moverse en el Chaco como los chiquitanos. Cazar y orientarse aquí.',  allianceKey: 'chiquitano', effects: { food: +15, moral: +18, salud: +5,  union: +12 } },
+      { text: 'Cruzar rápido el Izozog antes de la subida del agua. El tiempo chaqueño no espera.', effects: { food: -5,  moral: +8,  salud: -5,  union: +3  } },
+      { text: 'Descansar en una laguna alta. El grupo necesita bañarse, curar heridas y respirar.', effects: { food: +5,  moral: +12, salud: +18, union: +10 } },
+    ],
+  },
+
+  e_banados_b: {
+    title: 'El Venado del Agua',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1200&q=80',
+    cap:   'Ciervo de los pantanos — señor del bañado',
+    narr:  `El animal que sale del agua es demasiado grande para ser un ciervo y demasiado grácil para ser otra cosa. Tiene las patas traseras más largas que las delanteras — adaptación para caminar en pantanos — y cuernos que se ramifican como árboles desnudos. Es el <span class="tt" data-tip="El ciervo de los pantanos (Blastocerus dichotomus) es el cérvido más grande de Sudamérica, con hasta 150 kg y cuernos de 60 cm. Vive en bañados, pantanales y orillas de ríos desde Bolivia hasta Argentina. Es un indicador ecológico clave: donde hay ciervo de los pantanos, el humedal está sano. Hoy está amenazado por la caza y la pérdida de hábitat.">ciervo de los pantanos</span>. Los chiquitanos se detienen y no hablan mientras cruza.<br><br>
+El chamán también se detiene. Más tarde, cuando el ciervo se perdió en el junco, dice: <em>"Los animales que caminan en el agua llevan el mismo camino que nosotros. Los dos estamos entre dos mundos."</em>`,
+    decisions: [
+      { text: 'Cazar el ciervo. La carne durará días y el grupo lleva tiempo con hambre.',      effects: { food: +25, moral: -10, salud: +5,  union: -5  } },
+      { text: 'Dejarlo pasar. Hay otras formas de conseguir comida que no incluyen eso.',       effects: { food: -3,  moral: +20, salud: 0,   union: +12 } },
+    ],
+  },
+
+  e_mesopotamia: {
+    title: 'Entre Dos Ríos',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=1200&q=80',
+    cap:   'Mesopotamia argentina — el Paraná y el Uruguay',
+    narr:  `Dos ríos enormes encierran este territorio como brazos: el Paraná al oeste, el Uruguay al este. Entre ellos, una tierra tan fértil y húmeda que los árboles no saben parar de crecer. Los <span class="tt" data-tip="Chaná: pueblo indígena del delta del Paraná y el litoral argentino. Expertos navegantes en canoas de madera tallada. Vivían de la pesca, la caza y la recolección. Fueron diezmados rápidamente por el contacto europeo en el siglo XVI — su lengua ya es casi inaccesible. No deben confundirse con los charrúas uruguayos ni con los guaraníes.">chaná</span> que los reciben son hombres y mujeres del río: sus canoas tienen formas que el grupo nunca vio, talladas de un solo tronco con herramientas de piedra.<br><br>
+Un anciano chaná mide al cacique con la mirada y dice, a través de un joven que chapurrea guaraní: <em>"Hace dos años pasaron otros fugitivos. Iban más al sur. Encontraron lo que buscaban — o lo que los encontró a ellos."</em><br><br>
+La frase queda suspendida como el agua en el aire del Paraná.`,
+    decisions: [
+      { text: 'Preguntar todo lo que saben sobre los fugitivos anteriores. Pueden ser familia o guía.', effects: { food: +10, moral: +20, union: +15 } },
+      { text: 'Navegar con los chaná unos días. Aprender el río antes de cruzarlo.',                   allianceKey: 'chana', effects: { food: +15, moral: +15, salud: +8,  union: +12 } },
+      { text: 'Cruzar rápido hacia el sur. Las noticias de otros grupos son esperanza pero también trampa.', effects: { food: -5, moral: +8, union: +5 } },
+    ],
+  },
+
+  e_mesopotamia_b: {
+    title: 'Los Embalsados',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=1200&q=80',
+    cap:   'Islas flotantes del Paraná',
+    narr:  `La isla se mueve. No es ilusión — la corriente lleva consigo una masa de vegetación entretejida, árboles incluidos, que navega el Paraná como si tuviera voluntad propia. Los <span class="tt" data-tip="Embalsados: islas flotantes naturales formadas por la acumulación de plantas acuáticas (principalmente camalotes) en el Paraná. Pueden tener cientos de metros de largo y viajar decenas de kilómetros. Algunos son tan sólidos que soportan árboles grandes. Los chaná los usaban como refugios temporales y plataformas de pesca.">embalsados</span> del Paraná son tierra que viaja.<br><br>
+Un chaná le explica al chamán cómo reconocer los seguros de los peligrosos: <em>"Los que llevan camalote blanco van rápido — peligrosos. Los de camalote lila, despacio — esos se pueden subir."</em><br><br>
+Subirán más rápido que caminando, sin dejar rastro, sin gastar energía. El único problema: no controlan a dónde van.`,
+    decisions: [
+      { text: 'Subirse al embalsado lila. La corriente decide — y a veces decide bien.',  effects: { food: +5,  moral: +18, salud: +5,  union: +10 } },
+      { text: 'Seguir por tierra junto al río. Más lento, pero sin depender del camalote.', effects: { food: -8,  moral: +5,  salud: -3,  union: +3  } },
+    ],
+  },
+
+  e_pampas_sur: {
+    title: 'La Tierra que No Perdona',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=1200&q=80',
+    cap:   'Pampa interior — viento, horizonte y nada más',
+    narr:  `Tres días sin un árbol. El viento viene del sur sin nada que lo frene — ni una colina, ni un arbusto alto — y golpea de frente como si tuviera intención. Los niños aprenden a caminar inclinados. Los guerreros aprenden que el frío de la pampa no avisa: llega de golpe cuando el sol cae.<br><br>
+Los <span class="tt" data-tip="Ranqueles (Rankülche): pueblo mapuche de la pampa interior argentina. Su territorio incluía lo que hoy es La Pampa y San Luis. Eran jinetes expertos y conocían cada aguada, médano y bajo de la llanura. Resistieron la conquista militar hasta 1878-1879, cuando la Campaña del Desierto los sometió. El cacique Pincén fue el último en rendirse.">ranqueles</span> aparecen a caballo — con caballos tomados a los mismos españoles — y rodean al grupo sin atacar. Su cacique desmonta y camina hasta el cacique del grupo. Los mira de arriba abajo.<br><br>
+<em>"¿Cuántos son?"</em> No es una amenaza. Es una evaluación.`,
+    decisions: [
+      { text: 'Responder con honestidad y pedir paso. Los ranqueles respetan al que no miente.',  allianceKey: 'ranquel', effects: { food: +12, moral: +18, salud: +5,  union: +12 } },
+      { text: 'Pedir guía ranquel por los aguajes de la pampa. Sin agua, la llanura mata.',        effects: { food: +8,  moral: +12, salud: +12, union: +8  } },
+      { text: 'Ofrecer a los guerreros como aliados temporales. La fuerza también es moneda.',     effects: { food: +5,  moral: +8,  union: +5,  warriors: -2 } },
+    ],
+  },
+
+  e_pampas_sur_b: {
+    title: 'El Ñandú y la Luna',
+    act:   'Acto III · El Sur',
+    img:   'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
+    cap:   'Ñandúes en la pampa — los corredores del horizonte',
+    narr:  `Los <span class="tt" data-tip="El ñandú (Rhea americana) es el ave no voladora más grande de América, con hasta 1,5 metros de altura y 30 kg. Corre a 60 km/h. Los pueblos pampeanos lo cazaban con boleadoras — tres piedras unidas por tiras de cuero que se lanzaban para enredar las patas. Los huevos y la carne son alimento, las plumas sirven para todo. La caza del ñandú requería coordinación de varios cazadores formando un semicírculo.">ñandúes</span> corren en grupo hacia el este, asustados por algo que el grupo no ve todavía. Los ranqueles no necesitan discutir — cuatro de ellos salen al galope en formación de arco, con las <span class="tt" data-tip="Boleadoras: arma de caza y guerra pampeana, adoptada luego por los gauchos. Consiste en dos o tres bolas de piedra o plomo envueltas en cuero, unidas por tiras. Se lanza girando sobre la cabeza y envuelve las patas del animal al impactar. Origen precolombino: hay boleadoras en Argentina de más de 9.000 años.">boleadoras</span> girando sobre sus cabezas.<br><br>
+Cinco minutos después vuelven con dos ñandúes. El grupo come esa noche hasta saciarse por primera vez en semanas. Un niño ranquel le enseña a un niño del grupo a lanzar una boleadora pequeña. La primera vez falla. La segunda vez, no mucho.`,
+    decisions: [
+      { text: 'Aprender las boleadoras. Un arma de la pampa para un pueblo que viaja por la pampa.', effects: { food: +20, moral: +18, salud: +5,  union: +14 } },
+      { text: 'Solo agradecer la carne. No siempre hay tiempo para aprender todo.',                   effects: { food: +20, moral: +8,  salud: +5,  union: +5  } },
     ],
   },
 
