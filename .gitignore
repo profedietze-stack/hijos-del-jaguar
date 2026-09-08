@@ -27,3 +27,9 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Secretos / credenciales - nunca commitear
+*.pem
+*.key
+*.p12
+secrets.json
