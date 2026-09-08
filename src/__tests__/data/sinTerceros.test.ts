@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const leer = (rel: string): string =>
@@ -41,31 +41,55 @@ describe('el juego no le pide nada a terceros', () => {
   })
 
   /**
-   * Las imágenes, que es lo que falta.
+   * Las imágenes, que era la fuga más grande.
    *
-   * El juego trae 120 fotos de Unsplash: 119 en los eventos y una en el prólogo. Es la fuga
-   * más grande que le queda y la peor de las dos formas, porque no es una petición al abrir
-   * sino **una por escena**: el tercero no se entera de que un chico abrió el juego, se entera
-   * de qué escena está leyendo y cuánto tarda en pasarla. Y sin internet el juego se queda sin
-   * una sola imagen.
+   * El juego traía 120 fotos de Unsplash: 119 en los eventos y una en el prólogo. Era la peor
+   * de las dos formas de filtrar, porque no es una petición al abrir sino **una por escena**:
+   * el tercero no se enteraba de que un chico abrió el juego, se enteraba de qué escena estaba
+   * leyendo y cuánto tardaba en pasarla. Y sin internet el juego se quedaba sin una sola
+   * imagen.
    *
-   * Arreglarlo es bajarlas a `public/images/events/` —el directorio ya está creado y vacío,
-   * esperando— y cambiar las URL por rutas propias. Son unos 18 MB en el repositorio, así que
-   * la decisión es del dueño del repositorio y no mía.
-   *
-   * Mientras tanto esto es un trinquete: fija la deuda en el número de hoy para que no crezca
-   * sola. Un evento nuevo con una foto de afuera pone el test en rojo. Cuando las imágenes
-   * bajen, este número va a cero y el test de arriba se extiende al archivo entero.
+   * Ahora las cincuenta que quedaron vienen de Wikimedia Commons, con licencia libre, y se
+   * sirven desde `public/images/events/`. Cada una se miró una por una contra la ficha de su
+   * escena antes de entrar.
    */
-  it('la deuda de imágenes de terceros no crece', () => {
-    const eventos = leer('../../data/events.ts')
-    const enEventos = origenesEn(eventos).filter((u) => u.includes('images.unsplash.com'))
-    const enHtml = origenesEn(indexHtml).filter((u) => u.includes('images.unsplash.com'))
+  it('ninguna escena pide su imagen a un servidor ajeno', () => {
+    expect(origenesEn(leer('../../data/events.ts'))).toEqual([])
+  })
 
-    expect({ eventos: enEventos.length, prologo: enHtml.length }).toEqual({
-      eventos: 119,
-      prologo: 1,
-    })
+  it('ni el prólogo', () => {
+    expect(origenesEn(indexHtml)).toEqual([])
+  })
+
+  /**
+   * Y todas apuntan a un archivo que existe.
+   *
+   * Una ruta mal escrita no se ve al compilar —es una cadena— y en la partida deja la escena
+   * sin fondo, que es justo el fallo que nadie reporta porque parece decisión de diseño.
+   */
+  it('cada imagen que una escena nombra está en el repositorio', () => {
+    const eventos = leer('../../data/events.ts')
+    const nombradas = [...eventos.matchAll(/images\/events\/([a-z0-9-]+)\.jpg/g)]
+      .map((m) => m[1]!)
+    expect(nombradas.length).toBeGreaterThan(100)
+
+    const enDisco = new Set(
+      readdirSync(fileURLToPath(new URL('../../../public/images/events', import.meta.url)))
+        .map((f) => f.replace(/\.jpg$/, '')),
+    )
+    const rotas = [...new Set(nombradas)].filter((n) => !enDisco.has(n))
+    expect(rotas).toEqual([])
+  })
+
+  /** Y toda imagen servida declara de dónde salió: las CC-BY piden atribución. */
+  it('cada imagen tiene su ficha de crédito', () => {
+    const creditos = leer('../../data/creditos.ts')
+    const enDisco = readdirSync(
+      fileURLToPath(new URL('../../../public/images/events', import.meta.url)),
+    ).map((f) => f.replace(/\.jpg$/, ''))
+
+    const sinFicha = enDisco.filter((n) => !creditos.includes(`archivo: "${n}"`))
+    expect(sinFicha).toEqual([])
   })
 
   it('ni la hoja que define las tipografías', () => {

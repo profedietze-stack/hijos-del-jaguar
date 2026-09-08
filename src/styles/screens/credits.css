@@ -185,3 +185,19 @@
   .cr-section { padding: .9rem 1rem 1rem; }
   .cr-wrap { width: 95%; }
 }
+
+/* ── Créditos de imágenes ──────────────────────────────
+   Una línea por archivo, con su autor y su licencia: las CC-BY lo exigen, y el juego ya cita
+   la fuente de cada dato histórico. */
+.cr-img-list {
+  list-style: none;
+  margin: .6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: .35rem;
+}
+.cr-img-item { font-size: .78rem; line-height: 1.35; opacity: .85; }
+.cr-img-item a { color: var(--oro, #c9a227); text-decoration: none; }
+.cr-img-item a:hover,
+.cr-img-item a:focus-visible { text-decoration: underline; }
+.cr-img-meta { opacity: .7; }
