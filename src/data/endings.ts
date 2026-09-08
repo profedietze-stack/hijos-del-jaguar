@@ -17,7 +17,7 @@ export const ENDINGS_DEF: Record<string, EndingDef> = {
     badge: 'FINAL ÉPICO · AMAZONAS',
     title: 'Los Hijos del Río Grande',
     dest:  'amazonas',
-    cond:  (m, a, s) => m >= 30 && a.length >= 4 && (s?.moral ?? 0) >= 60,
+    cond:  () => true,   // los umbrales de dificultad deciden (ver resolveEnding)
     narr:  `Generaciones después, los ancianos contarán que vinieron del fuego y encontraron el agua. Su pueblo mezcló palabras de seis lenguas distintas. Aprendieron a leer el río como otros leen el cielo. Los españoles nunca supieron que existían.<br><br>
 El chamán que sobrevivió la huida fundó una escuela de memoria: cada niño aprende las historias del norte antes de aprender a nadar. La lengua original vive mezclada con la nueva — un idioma híbrido que ningún conquistador podría entender.<br><br>
 En el corazón de la selva, un pueblo encontró la manera de seguir siendo pueblo. Y de enseñar a sus hijos que vinieron del fuego y no lo olvidaron.`,
@@ -29,7 +29,7 @@ En el corazón de la selva, un pueblo encontró la manera de seguir siendo puebl
     badge: 'AMAZONAS · RESISTENCIA',
     title: 'Raíces en el Agua Verde',
     dest:  'amazonas',
-    cond:  (m, a) => m >= 20 && a.length >= 2,
+    cond:  () => true,   // idem: good.m sale de la dificultad
     narr:  `Un asentamiento pequeño pero real, en un meandro del río que pocos conocen. Algunos jóvenes aprendieron las lenguas del río. Las tradiciones se mezclan con las del pueblo que los acogió. Pero el nombre propio sobrevivió.<br><br>
 Los niños nacidos en el Amazonas ya no recuerdan Guatemala — solo conocen las historias que sus padres les cuentan por las noches, junto al río que nunca para. El río se volvió su nueva memoria.`,
     refl:  'La integración cultural no es siempre pérdida: puede ser también transformación. ¿Cuándo una cultura "cambia" y cuándo "desaparece"?',
@@ -64,7 +64,7 @@ En cincuenta años, los nietos no sabrán de dónde vino su abuelo. Solo sabrán
     badge: 'FINAL ÉPICO · PATAGONIA ARG.',
     title: 'El Pueblo del Viento Libre',
     dest:  'patagonia_arg',
-    cond:  (m, a, s) => m >= 30 && a.length >= 4 && (s?.moral ?? 0) >= 60,
+    cond:  () => true,   // los umbrales de dificultad deciden (ver resolveEnding)
     narr:  `El viento patagónico se convirtió en su hogar más que cualquier estructura. Aprendieron a leer el tiempo tres días por adelantado, a cazar el guanaco sin perderlo, a encontrar agua donde nadie buscaba.<br><br>
 Los tehuelches los adoptaron como hermanos. Dos pueblos distintos se volvieron uno nuevo, con un nombre que ninguno tenía antes. El chamán mayor vivió hasta los noventa años — lo suficiente para ver nietos nacidos ya en la estepa, que nunca conocieron otra patria que el viento.<br><br>
 Cuando los españoles enviaron expediciones al sur, encontraron tierra vacía. El pueblo era invisible porque se había vuelto parte del paisaje.`,
@@ -76,7 +76,7 @@ Cuando los españoles enviaron expediciones al sur, encontraron tierra vacía. E
     badge: 'PATAGONIA ARG. · RESISTENCIA',
     title: 'La Aldea del Viento',
     dest:  'patagonia_arg',
-    cond:  (m, a) => m >= 20 && a.length >= 1,
+    cond:  () => true,   // idem: good.m sale de la dificultad
     narr:  `Un asentamiento en el borde de la laguna turquesa. El viento lo golpea todos los días. Pero también los protege: nadie que no sepa caminar en este viento puede llegar hasta ellos.<br><br>
 Los tehuelches les enseñaron a cazar con boleadoras. A cambio, el grupo compartió sus técnicas de cultivo de las tierras altas — nada que funcionara en la estepa, pero sí en los valles protegidos del viento. La alianza fue práctica antes de ser espiritual.`,
     refl:  'La Patagonia fue el último refugio real de los pueblos indígenas del cono sur. Su aislamiento geográfico fue a la vez su desventaja y su salvación. ¿Qué rol juega el territorio en la supervivencia cultural?',
@@ -111,7 +111,7 @@ El viento patagónico borra las huellas. También borra los nombres, si nadie lo
     badge: 'FINAL ÉPICO · PATAGONIA CHL.',
     title: 'Los Hijos del Canal',
     dest:  'patagonia_chi',
-    cond:  (m, a, s) => m >= 30 && a.length >= 4 && (s?.moral ?? 0) >= 60,
+    cond:  () => true,   // los umbrales de dificultad deciden (ver resolveEnding)
     narr:  `Aprendieron a navegar los canales como los kawésqar: de memoria, sin mapa, guiados por el color del agua y la forma de las nubes. Su pueblo se convirtió en pueblo del mar.<br><br>
 Los bosques milenarios los cubrieron. El musgo creció sobre sus primeras construcciones de piedra. El tiempo aquí tiene otra velocidad — una que los conquistadores, siempre con prisa, nunca supieron habitar.<br><br>
 El chamán mayor aprendió a leer el cielo de los canales. Antes de morir, enseñó ese saber a doce discípulos. Cada uno enseñó a doce más. La cadena no se cortó.`,
@@ -123,7 +123,7 @@ El chamán mayor aprendió a leer el cielo de los canales. Antes de morir, ense�
     badge: 'PATAGONIA CHL. · RESISTENCIA',
     title: 'Entre el Bosque y el Mar',
     dest:  'patagonia_chi',
-    cond:  (m, a) => m >= 20 && a.length >= 1,
+    cond:  () => true,   // idem: good.m sale de la dificultad
     narr:  `Un asentamiento en la costa, donde el bosque llega hasta el agua. Aprendieron a cazar el lobo marino y a reconocer cuándo el canal se pone peligroso. No son kawésqar, pero tampoco son ya exactamente lo que eran.<br><br>
 La primera generación nacida en los canales no tuvo miedo al agua. La segunda no recordó el miedo al caballo. La tercera ya no supo bien de dónde vinieron sus abuelos — solo que vinieron de lejos, huyendo de algo que nunca alcanzó.`,
     refl:  'La Patagonia chilena fue el último lugar del mundo en ser colonizado. Su geografía laberíntica protegió a sus pueblos por siglos. ¿Puede el territorio ser también una forma de resistencia?',
@@ -165,9 +165,12 @@ En los canales, la niebla borra todo: las costas, los horizontes, los nombres. S
 
 }
 
-// Orden de evaluación por destino (épico → bueno → sombrío → amargo)
+// Orden de evaluacion por destino: el DESGARRO va primero a proposito.
+// Un pueblo que llega con la moral rota no tiene un final epico por mucha
+// gente que traiga; ese es el sentido del desenlace. Despues si mandan los
+// umbrales de la dificultad.
 export const ENDING_PRIORITY: Record<string, string[]> = {
-  amazonas:      ['amazonas_excelente',      'amazonas_bueno',      'amazonas_sombrío',      'amazonas_amargo'],
-  patagonia_arg: ['patagonia_arg_excelente', 'patagonia_arg_bueno', 'patagonia_arg_sombrío', 'patagonia_arg_amargo'],
-  patagonia_chi: ['patagonia_chi_excelente', 'patagonia_chi_bueno', 'patagonia_chi_sombrío', 'patagonia_chi_amargo'],
+  amazonas:      ['amazonas_sombrío',      'amazonas_excelente',      'amazonas_bueno',      'amazonas_amargo'],
+  patagonia_arg: ['patagonia_arg_sombrío', 'patagonia_arg_excelente', 'patagonia_arg_bueno', 'patagonia_arg_amargo'],
+  patagonia_chi: ['patagonia_chi_sombrío', 'patagonia_chi_excelente', 'patagonia_chi_bueno', 'patagonia_chi_amargo'],
 }
