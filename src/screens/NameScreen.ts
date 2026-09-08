@@ -25,7 +25,14 @@ let _selectedToken = TRIBE_TOKENS[0].emoji   // default: Cóndor
 
 export function mountNameScreen(): void {
   // Generar 8 sugerencias aleatorias
-  const shuffled = [...CACIQUE_NAMES].sort(() => Math.random() - 0.5).slice(0, 8)
+  // Fisher-Yates: `sort(() => Math.random() - 0.5)` no reparte parejo y
+  // proponía casi siempre los mismos ocho nombres de la lista.
+  const barajados = [...CACIQUE_NAMES]
+  for (let i = barajados.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[barajados[i], barajados[j]] = [barajados[j]!, barajados[i]!]
+  }
+  const shuffled = barajados.slice(0, 8)
   const sugEl = document.getElementById('name-suggestions')
   if (sugEl) {
     sugEl.innerHTML = shuffled
