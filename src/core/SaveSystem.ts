@@ -2,6 +2,7 @@ import type { GameState }    from './GameState.js'
 import type { FinishedGame } from './GameState.js'
 import { NODES_DEF, CONQ_BRIDGE } from '../data/nodes.js'
 import { DIFF_CONFIG } from '../data/difficultyConfig.js'
+import { normalizarAlianzas } from './alliances.js'
 
 // ══════════════════════════════════════════════════════
 // SAVE SYSTEM — abstracción de localStorage
@@ -163,7 +164,7 @@ export function sanitizeSave(raw: unknown): GameState | null {
     stats,
     nodes,
     history,
-    alliances:   (raw.alliances as string[] | undefined) ?? [],
+    alliances:   normalizarAlianzas((raw.alliances as string[] | undefined) ?? []),
     currentNode: cur,
     finalTag:    typeof raw.finalTag === 'string' ? raw.finalTag : null,
     conq,

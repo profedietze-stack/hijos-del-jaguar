@@ -10,6 +10,7 @@ import { DIFF_CONFIG }                 from '../data/difficultyConfig.js'
 import { ENDINGS_DEF, ENDING_PRIORITY } from '../data/endings.js'
 import { LOGROS_DEF }                  from '../data/achievements.js'
 import { CONQ_BRIDGE }                 from '../data/nodes.js'
+import { aliadoCanonico }             from './alliances.js'
 
 // ══════════════════════════════════════════════════════
 // GAME ENGINE — orquestador puro
@@ -50,9 +51,10 @@ export function applyDecision(gs: GameState, decision: Decision): TurnResult {
   const notifs: Notif[] = []
 
   // — Registrar alianza
-  if (decision.allianceKey && !next.alliances.includes(decision.allianceKey)) {
-    next.alliances = [...next.alliances, decision.allianceKey]
-    notifs.push({ msg: `🤝 Alianza forjada: ${decision.allianceKey.replace(/_/g, ' ')}`, kind: 'info' })
+  const pueblo = decision.allianceKey ? aliadoCanonico(decision.allianceKey) : null
+  if (pueblo && !next.alliances.includes(pueblo)) {
+    next.alliances = [...next.alliances, pueblo]
+    notifs.push({ msg: `🤝 Alianza forjada: ${pueblo.replace(/_/g, ' ')}`, kind: 'info' })
   }
 
   // — Registrar finalTag (destino elegido en la encrucijada)
