@@ -20,7 +20,7 @@ Cinco hallazgos más importantes:
 | Balance | 🔴 | Histórico/Legendario inalcanzables; sesgo a la primera opción |
 | Contenido | 🟡 | Hechos a revisar con fuente; anacronismos; alianzas duplicadas |
 | UI/UX | 🟡 | Mute fuera de pantalla ≤ 812 px, mapa ilegible a 360 px |
-| Rendimiento | ⚪ | **No medido** (ver §9) |
+| Rendimiento | 🟡 | Rápido en escritorio; 40 fps a CPU ×4; memoria en reposo por confirmar |
 | Robustez | 🟢 | Guardado campo por campo, SW red-primero, offline verificado |
 | Accesibilidad | 🟡 | Contraste y aria-labels pendientes, reduced-motion parcial |
 | Código | 🟢 | tsc y build limpios, 182 tests; sin lint configurado |
@@ -99,7 +99,31 @@ Ortografía: sin corrector automático disponible; no se revisó sistemáticamen
 
 ## 6. Rendimiento
 
-**No medido** (ver §9). Observaciones de código: `drawNodes` redibuja todo; la cinemática de apertura no es cancelable; hay doble rAF en el arranque. Bundle inicial: JS 193 KB (62 KB gzip) + d3 80 KB + tone 262 KB; `events` (173 KB) y `claseData` se cargan diferidos.
+Medido en el build de producción (`vite preview`), Chromium real, escritorio, sin throttling salvo donde se indica. Una sola máquina: son órdenes de magnitud, no garantías para una tablet de aula.
+
+| Medida | Resultado |
+|---|---|
+| Carga (con red local) | DOMContentLoaded 142 ms, load 197 ms, first paint 264 ms |
+| Peso del arranque (gzip) | JS 62,5 KB (juego) + 27,3 KB (d3) + 65,6 KB (Tone.js) + CSS 15,4 KB + 12 fuentes `.woff2` (280 KB sin comprimir) |
+| Diferido | `events` 56,7 KB y `claseData` 6,7 KB gzip, solo al jugar; imágenes de eventos bajo demanda (50 archivos, 11 MB, media 243 KB, máx. 630 KB) |
+| Mapa construido | 304 ms desde «Liderar la Huida» hasta que aparecen los nodos |
+| Tamaño del mapa | 646 elementos SVG, 163 KB serializado, 1 283 elementos DOM en total |
+| Zoom/pan (90 eventos de rueda) | 51 fps medios, p95 33 ms, máx. 50 ms |
+| Igual con CPU ×4 (tablet vieja) | 40 fps medios, p95 67 ms, máx. 84 ms, 14 de 153 cuadros sobre 50 ms |
+| Tareas largas al arrancar | 7 (51–118 ms) durante la construcción del mapa y la cinemática |
+
+**Redibujo del mapa:** `resize` y `orientationchange` hacen `resetMap()` + `buildMap()` completos (no solo `drawNodes`). 60 reconstrucciones seguidas: elementos SVG estables (648 → 597, sin elementos separados del DOM), `d3 transitions` y selecciones sin acumularse, ninguna tarea larga nueva. Con el recolector de basura forzado por la captura de heap, 40 reconstrucciones adicionales sumaron ≈ 1 MB (13,3 → 14,3 MB): unos 25 KB por reconstrucción, sin fuga de DOM. Los listeners de elementos que se agregan y se descartan con el DOM (≈ 28 por reconstrucción) no se acumulan en `window` ni `document` (5 y 4 constantes).
+
+**Crecimiento de memoria en reposo (a verificar):** sin tocar nada durante ≈ 50 s la memoria subió de 14,7 a 16,5 MB (≈ 35 KB/s, ≈ 2 MB/min), con `AudioParam` y objetos de Tone.js creciendo. En una clase de 40 minutos serían ≈ 80 MB. **No lo confirmé como fuga real:** en mi prueba el `AudioContext` nunca arrancó (clics sintéticos, sin gesto de usuario) y el juego estaba silenciado, y no quise activar el sonido con el usuario delante. Hay que repetirlo con un clic real y mirar `Tone.getContext().state` y los nodos que crean `triggerAttackRelease` en `audio.ts` (hoy se crean fuentes de ruido por cada disparo de `NoiseSynth`).
+
+**No medí:** Lighthouse (la herramienta devolvió categorías vacías; no tengo puntajes), Core Web Vitals en red lenta, consumo de batería, ni el costo de una partida larga completa.
+
+**Propuestas (no aplicadas):**
+1. `resize`: reconstruir solo si cambió el ancho (hoy un teclado virtual en móvil dispara `resize` y reconstruye el mapa entero).
+2. Cargar Tone.js recién al primer gesto de audio (son 65,6 KB gzip y un `AudioContext` bloqueado al arrancar; hoy el aviso de autoplay sale en cada carga).
+3. `font-display` y precarga solo de las 4–5 fuentes de la primera pantalla; el resto, diferidas.
+4. Actualización incremental de nodos en `drawNodes` (hoy borra y recrea `.ng`, `.el`, capas de conquistador y token).
+5. Confirmar o descartar el crecimiento en reposo de Tone.js antes de una clase larga.
 
 ## 7. Deuda técnica y riesgos
 
@@ -124,7 +148,7 @@ Ortografía: sin corrector automático disponible; no se revisó sistemáticamen
 
 ## 9. Qué NO se pudo verificar
 
-- **Rendimiento (Fase 4):** no medí FPS, heap, fugas de listeners ni Lighthouse. Quedó sin hacer.
+- **Rendimiento (Fase 4):** medido en §6 con las limitaciones allí dichas: sin Lighthouse, una sola máquina, y el crecimiento de memoria en reposo sin confirmar.
 - **Pestaña en segundo plano, redimensionar en vivo, botón atrás, touch real:** el agente no pudo probarlos con sus herramientas.
 - **Ruta atlántica completa:** el agente la jugó hasta n04c (murió en Histórico); no la terminó.
 - **Playwright:** no disponible desde este entorno; usé chrome-devtools (Chromium real).
