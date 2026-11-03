@@ -179,6 +179,7 @@ const CONTENT: Record<TabId, string> = {
       <div class="did-sec-title">Después del juego — profundización</div>
       <ul class="did-list">
         <li><strong>Comparar con fuentes:</strong> Buscar una fuente histórica primaria o secundaria sobre un evento del juego (ej. la conquista de Guatemala, las misiones jesuitas). ¿Qué coincide? ¿Qué falta?</li>
+        <li><strong>Licencia histórica:</strong> el viaje de 1524 reúne hechos de épocas distintas (por ejemplo, las misiones jesuitas guaraníes empiezan en 1609). Pedí a los estudiantes que ubiquen cada pueblo y cada lugar del mapa en su época real.</li>
         <li><strong>Cambio de perspectiva:</strong> Reescribir una escena del juego desde el punto de vista de un conquistador, de un aliado local o de un niño del grupo.</li>
         <li><strong>Investigá uno:</strong> Cada estudiante elige un pueblo mencionado (pipiles, cunas, mapuches, garífunas, kawésqar…) y presenta en 3 minutos qué pasó con ese pueblo después del período del juego.</li>
         <li><strong>Carta al futuro:</strong> El cacique/cacica escribe una carta a sus bisnietos contando el viaje: qué perdieron, qué aprendieron, qué preservaron.</li>

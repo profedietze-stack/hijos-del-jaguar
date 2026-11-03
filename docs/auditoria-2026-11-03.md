@@ -60,7 +60,7 @@ Cinco hallazgos más importantes:
 | F3-22 | Baja | «v3.0» fijo | **Corregido** (muestra v0.2.0, verificado) |
 | F3-24 | Baja | «Visitado ✓» sin check | **Corregido**: ✓ en el nodo y nombre accesible; verificado |
 | F3-26 | Baja | No se guarda hasta el primer nodo | **Corregido**, verificado (`jaguar_save` existe a los 2,5 s de empezar) |
-| F3-23, F3-25, F3-27 | Baja | Nota docente vacía; tutorial; tuteo/voseo mezclados | Pendiente (el tuteo/voseo es contenido de todo el texto: propuesta) |
+| F3-23, F3-25, F3-27 | Baja | Nota docente vacía; tutorial; tuteo/voseo mezclados | F3-27 **corregido** (`244b839`); F3-23 y F3-25 pendientes |
 | — | Media | `drawTribePath` tiraba TypeError con GameState armado a mano | **Corregido `6f46f02`** (el test cubre el helper nuevo, no la versión vieja) |
 | — | Media | `initErrorBanner()` dentro de `DOMContentLoaded` | **Corregido**: primera llamada del módulo (test) |
 | — | Baja | Doble `requestAnimationFrame` en `startNewGame` | **Corregido** con respaldo de 300 ms (`trasPintar`); no probé una pestaña en segundo plano real |
@@ -126,7 +126,9 @@ Criterio (supuesto mío, a confirmar): Histórico y Legendario son difíciles pe
 | Tooltip mapuches | «único pueblo que derrotó militarmente a España» | Afirmación fuerte y discutida | sin fuente verificada |
 | Cifras de población | 50 M → 5 M (tooltip); 60 M → 6 M (main.ts) | Unificar y citar | — |
 
-Ortografía: sin corrector automático disponible; no se revisó sistemáticamente. Voseo/tuteo: README y menú voseando («Sos», «Podés»), eventos y cinemática en tuteo («Eres», «Huye»).
+Ortografía: sin corrector automático disponible; no se revisó sistemáticamente. Voseo/tuteo: **unificado a voseo** (`244b839`): la intro, el selector de símbolo, la meta description, dos eventos y la guía docente tuteaban; `voseo.test.ts` barre `src/` e `index.html` y falla con el texto viejo.
+
+**Hechos corregidos (nov-2026):** edad de los tepuyes («casi 2.000 millones de años», coherente con el tooltip), Izozog (guaraníes izoceños y vecinos chiquitanos; el tooltip ya no dice que los chiquitanos habitaron el Izozog) y una nota «Licencia histórica» en la guía docente (el viaje de 1524 reúne hechos de épocas distintas: misiones jesuitas desde 1609). `historia.test.ts`, rojo con el texto viejo. **Siguen sin verificar:** fechas de fundación de Tucumán/Mendoza/Córdoba, caballo en la pampa, «único pueblo que derrotó a España», cifras 50 M vs 60 M de población.
 
 ## 6. Rendimiento
 
