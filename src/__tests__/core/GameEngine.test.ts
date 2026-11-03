@@ -411,3 +411,18 @@ describe('captura del conquistador por dificultad', () => {
     expect(30 - applyDecision(gs, { text: 'x', effects: { warriors: -10 } }).state.stats.warriors).toBe(10)
   })
 })
+
+describe('final «Desgarro»: cuenta cómo llegó el pueblo', () => {
+  const final = (moralAntes: number) => {
+    let gs = createInitialState('legendario', 'T')
+    gs = { ...gs, currentNode: 'n11a', finalTag: 'dest_amazonas', alliances: ['a', 'b'],
+      stats: { ...gs.stats, moral: moralAntes, food: 80, salud: 80, union: 80, warriors: 15, shamans: 5, civilians: 15 } }
+    return applyDecision(gs, { text: 'fundar', effects: { moral: +40 } }).ending?.badge
+  }
+  it('llegar con la moral rota da el desgarro aunque el último evento sume moral', () => {
+    expect(final(25)).toContain('DESGARRO')
+  })
+  it('llegar con buena moral no lo da', () => {
+    expect(final(80)).not.toContain('DESGARRO')
+  })
+})

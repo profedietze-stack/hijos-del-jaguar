@@ -104,7 +104,10 @@ export function applyDecision(gs: GameState, decision: Decision): TurnResult {
   const finished = isFinalNode(nodeId)
   if (finished) {
     const dest   = resolveDestination(next.finalTag)
-    const ending = resolveEnding(totalM(next.stats), next.alliances, dest, next.diff, next.stats)
+    // El desgarro mira cómo LLEGÓ el pueblo, no cómo salió del último evento: todos los eventos
+    // finales suman +25 a +40 de moral y el final «Desgarro» (moral < 35) era inalcanzable.
+    const llegada = { ...next.stats, moral: Math.min(next.stats.moral, gs.stats.moral) }
+    const ending = resolveEnding(totalM(next.stats), next.alliances, dest, next.diff, llegada)
     next.pendingGame = buildFinishedGame(next, ending)
     return { state: next, notifs, defeated: false, finished: true, ending }
   }
