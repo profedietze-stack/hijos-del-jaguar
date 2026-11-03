@@ -1110,11 +1110,12 @@ export function waitForMapThenCinematic(
   gs:           GameState,
   onSelectNode: ((id: string) => void) | undefined,
   onGsUpdate:   (newGs: GameState) => void,
+  onDone?:      () => void,
 ): void {
   const _wait = (attempts: number) => {
-    if (attempts > 60) { runOpeningCinematic(gs, onSelectNode, onGsUpdate); return }
+    if (attempts > 60) { runOpeningCinematic(gs, onSelectNode, onGsUpdate, onDone); return }
     if (_mapInitialized && mapSvg && mapProj && mapZoom) {
-      setTimeout(() => runOpeningCinematic(gs, onSelectNode, onGsUpdate), 200)
+      setTimeout(() => runOpeningCinematic(gs, onSelectNode, onGsUpdate, onDone), 200)
     } else {
       setTimeout(() => _wait(attempts + 1), 50)
     }
@@ -1127,14 +1128,15 @@ export function runOpeningCinematic(
   gs:           GameState,
   onSelectNode: ((id: string) => void) | undefined,
   onGsUpdate:   (newGs: GameState) => void,
+  onDone?:      () => void,
 ): void {
-  if (!mapSvg || !mapProj || !mapZoom || !mapG) return
+  if (!mapSvg || !mapProj || !mapZoom || !mapG) { onDone?.(); return }
 
   sfxCinematic()
 
   const TENOCHTITLAN = CONQ_BRIDGE[0]  // lon:-99.1, lat:19.4
   const wrap = document.getElementById('map-canvas-wrap')
-  if (!wrap) return
+  if (!wrap) { onDone?.(); return }
   const W = wrap.clientWidth || 900
   const H = wrap.clientHeight || 580
 
@@ -1385,7 +1387,7 @@ export function runOpeningCinematic(
                   onGsUpdate(newGs)
                   _animConqCinematic(fromWp, toWp, newGs, onSelectNode, () => {
                     // PASO 7: Pan a Guatemala
-                    _panToGuatemala(newGs, onSelectNode)
+                    _panToGuatemala(newGs, onSelectNode, onDone)
                   })
                 }
               )
@@ -1445,10 +1447,10 @@ function _animConqCinematic(
 }
 
 /** Pan final a Guatemala — donde empieza el jugador */
-function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void): void {
-  if (!mapSvg || !mapProj || !mapZoom) return
+function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void, onDone?: () => void): void {
+  if (!mapSvg || !mapProj || !mapZoom) { onDone?.(); return }
   const wrap = document.getElementById('map-canvas-wrap')
-  if (!wrap) return
+  if (!wrap) { onDone?.(); return }
   const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
   const GUATEMALA = { lon: -90.3, lat: 15.5 }
   const s2 = 3.2
@@ -1460,6 +1462,7 @@ function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void): vo
       drawNodes(gs, onSelectNode)
       drawConquistador(gs)
       // Listo — el jugador puede interactuar
+      onDone?.()
     })
 }
 

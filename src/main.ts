@@ -95,6 +95,10 @@ let _selectNodeFn: ((id: string) => void) | undefined
 // Flag: estamos en el evento del conquistador (para flujo especial)
 let _inCatchEvent = false
 
+// Entrada bloqueada mientras el juego anima (cinemática, token, conquistador). Sin esto un doble
+// clic montaba el evento dos veces, y un clic en la cinemática pisaba el estado.
+let _busy = false
+
 // ══════════════════════════════════════════════════════
 // BOOTSTRAP
 // ══════════════════════════════════════════════════════
@@ -312,6 +316,7 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   log('ENGINE', `nueva partida diff=${diff} name="${name}" token=${tribeToken}`)
   gs = createInitialState(diff, name, tribeToken)
   _inCatchEvent = false
+  _busy = true          // la cinemática de apertura lo libera (onDone)
   clearSavedGame()
   resetMap()
 
@@ -331,12 +336,12 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
       // Primera partida: mostrar tutorial primero, lanzar cinemática al cerrar
       setTimeout(() => {
         showTutorial(() => {
-          waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
+          waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs }, () => { _busy = false })
         })
       }, 2200)
     } else {
       // Partidas siguientes: cinemática directa
-      waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs })
+      waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs }, () => { _busy = false })
     }
   }))
 }
@@ -358,6 +363,7 @@ function continueGame(): void {
   if (!gs.caciqueName) gs = { ...gs, caciqueName: 'el cacique' }
   if (!gs.tribeToken)  gs = { ...gs, tribeToken: '🦅' }
   _inCatchEvent = false
+  _busy = false
   _selectNodeFn = onSelectNode
 
   resetMap()
@@ -382,6 +388,8 @@ function continueGame(): void {
 // ══════════════════════════════════════════════════════
 
 function onSelectNode(nodeId: string): void {
+  if (_busy || gs.currentNode) return
+  _busy = true
   sfxNodeSelect()
 
   // Posición actual del token: último nodo completado, o n00 al inicio
@@ -411,7 +419,7 @@ function onSelectNode(nodeId: string): void {
 function onDecision(_decisionIndex: number, decision: import('./data/types.js').Decision): void {
   // La decision ya viene del callback de EventScreen (que tiene EVENTS_DEF cargado).
   // main.ts ya no necesita importar EVENTS_DEF -- split del bundle.
-  if (!decision) return
+  if (!decision || !gs.currentNode) return   // sin evento pendiente: un segundo clic no vuelve a decidir
 
   // Guardar el acto actual ANTES de aplicar la decision (para detectar cambio de acto)
   const prevAct = gs.history.length > 0
@@ -462,6 +470,7 @@ function _afterAftermath(prevAct: number): void {
       ),
       conq: { ...gs.conq, caught: false, reorgTurns: 2 },
     }
+    _busy = false
     saveGame(gs)
     flashSaveIndicator()
     drawNodes(gs, _selectNodeFn)
@@ -494,6 +503,7 @@ function _afterAftermath(prevAct: number): void {
 
   // Callback: despues del conquistador, cinematica de acto + marcadores
   const afterConq = () => {
+    _busy = false
     if (newAct > prevAct) {
       showActTransition(newAct, () => {
         if (newMarkers.length > 0) {
