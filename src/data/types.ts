@@ -122,6 +122,8 @@ export interface DifficultyConfig {
   alliancePenaltyActFrom?:  number
   alliancePenaltyIfNone?:   { food: number; moral: number }
   defeatThreshold:  number
+  /** Probabilidad por turno de que el conquistador salte hasta el jugador (captura). */
+  conqJumpProb:     number
   endingThresholds: {
     epic:  { m: number; a: number }
     good:  { m: number }

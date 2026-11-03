@@ -19,6 +19,7 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
     lowUnionMoralPenalty: -4,
     lowUnionDeathProb:   0.12,
     defeatThreshold:     8,
+    conqJumpProb:        0.12,
     endingThresholds: {
       epic: { m: 28, a: 2 },
       good: { m: 18 },
@@ -45,6 +46,7 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
     alliancePenaltyActFrom:  3,
     alliancePenaltyIfNone:   { food: -5, moral: -8 },
     defeatThreshold:     12,
+    conqJumpProb:        0.32,
     endingThresholds: {
       epic: { m: 30, a: 3 },
       good: { m: 20 },
@@ -71,6 +73,7 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
     alliancePenaltyActFrom:  2,
     alliancePenaltyIfNone:   { food: -8, moral: -12 },
     defeatThreshold:     15,
+    conqJumpProb:        0.48,
     endingThresholds: {
       epic: { m: 34, a: 4 },
       good: { m: 24 },

@@ -7,12 +7,23 @@ import { applyDecision, advanceConquistador, selectNode } from '../src/core/Game
 import { applyDecisionFX } from '../src/core/StatSystem'
 import { NODES_DEF } from '../src/data/nodes'
 import { EVENTS_DEF } from '../src/data/events'
+import { DIFF_CONFIG } from '../src/data/difficultyConfig'
 import type { Decision, Difficulty, NodeState } from '../src/data/types'
 
 type Politica = 'azar' | 'primera' | 'codiciosa' | 'optima' | 'desgarro'
 // SOLO=desgarro  -> corre unicamente la politica que busca el final «desgarro» (moral < 35)
-const POLITICAS: Politica[] = process.env.SOLO === 'desgarro' ? ['desgarro'] : ['azar', 'primera', 'codiciosa', 'optima']
-const DIFFS: Difficulty[] = ['educativo', 'historico', 'legendario']
+const POLITICAS: Politica[] = process.env.SOLO === 'desgarro' ? ['desgarro'] : process.env.POL ? (process.env.POL.split(',') as Politica[]) : ['azar', 'primera', 'codiciosa', 'optima']
+const DIFFS: Difficulty[] = process.env.DIF ? (process.env.DIF.split(',') as Difficulty[]) : ['educativo', 'historico', 'legendario']
+
+// ── Variantes de balance, sin tocar el repo ─────────
+// OVR='{"historico":{"conqJumpProb":0.2,"decay":{"1":{"food":-4,"salud":-2}}}}'  mezcla sobre DIFF_CONFIG
+// CATCH_SCALE=0.5  multiplica las perdidas del evento _conq_catch
+function mezclar(dst: any, src: any) { for (const k of Object.keys(src)) { if (src[k] && typeof src[k] === 'object' && !Array.isArray(src[k])) mezclar(dst[k] ??= {}, src[k]); else dst[k] = src[k] } }
+if (process.env.OVR) mezclar(DIFF_CONFIG, JSON.parse(process.env.OVR))
+if (process.env.CATCH_SCALE) {
+  const f = Number(process.env.CATCH_SCALE)
+  for (const d of EVENTS_DEF['_conq_catch']!.decisions) for (const k of Object.keys(d.effects) as (keyof typeof d.effects)[]) if ((d.effects[k] ?? 0) < 0) d.effects[k] = Math.round(d.effects[k]! * f)
+}
 
 // ── rutas n00 -> n09 (9) ─────────────────────────────
 function rutas(): string[][] {
