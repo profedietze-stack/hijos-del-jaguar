@@ -9,6 +9,10 @@ import { NODES_DEF } from '../src/data/nodes'
 import { EVENTS_DEF } from '../src/data/events'
 import { DIFF_CONFIG } from '../src/data/difficultyConfig'
 import type { Decision, Difficulty, NodeState } from '../src/data/types'
+import { shuffle } from '../src/core/shuffle'
+// SHUF=0 reproduce el juego anterior (opciones siempre en el orden escrito)
+const BARAJAR = process.env.SHUF !== '0'
+const orden = (d: Decision[]) => (BARAJAR ? shuffle(d) : d)
 
 type Politica = 'azar' | 'primera' | 'codiciosa' | 'optima' | 'desgarro'
 // SOLO=desgarro  -> corre unicamente la politica que busca el final «desgarro» (moral < 35)
@@ -168,8 +172,9 @@ function jugar(diff: Difficulty, ruta: string[] | null, pol: Politica, profundid
     idx++
     gs = selectNode(gs, nodo.id)
     const ev = EVENTS_DEF[gs.nodes[nodo.id]!.eventId!]!
-    const di = elegir(gs, ev.decisions, pol, rolloutFn)
-    const r = applyDecision(gs, ev.decisions[di]!)
+    const decs = orden(ev.decisions)
+    const di = elegir(gs, decs, pol, rolloutFn)
+    const r = applyDecision(gs, decs[di]!)
     gs = r.state
     chequear(gs, nodo.id, an)
     curva.push({ food: gs.stats.food, moral: gs.stats.moral, salud: gs.stats.salud, union: gs.stats.union, m: totalM(gs.stats) })

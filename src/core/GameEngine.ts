@@ -1,4 +1,4 @@
-import type { Decision, ActNumber }   from '../data/types.js'
+import type { Decision, DecisionEffect, ActNumber } from '../data/types.js'
 import type { EndingDef }              from '../data/types.js'
 import type { GameState, FinishedGame, Notif } from './GameState.js'
 import {
@@ -66,7 +66,11 @@ export function applyDecision(gs: GameState, decision: Decision): TurnResult {
   const act     = (node?.act ?? 1) as ActNumber
 
   // — Aplicar efectos completos del turno
-  const turn = resolveTurn(next.stats, decision.effects, act, next.diff, next.alliances)
+  // La captura cuesta menos en las dificultades donde ocurre más seguido (ver DIFF_CONFIG).
+  const fx = nodeId === '_conq_catch_node'
+    ? scaleLosses(decision.effects, DIFF_CONFIG[next.diff].catchLossMult)
+    : decision.effects
+  const turn = resolveTurn(next.stats, fx, act, next.diff, next.alliances)
   next.stats = turn.stats
   notifs.push(...turn.notifs)
 
@@ -104,6 +108,17 @@ export function applyDecision(gs: GameState, decision: Decision): TurnResult {
   }
 
   return { state: next, notifs, defeated: false, finished: false }
+}
+
+/** Multiplica solo los efectos negativos (redondeo al entero más cercano). */
+export function scaleLosses(fx: DecisionEffect, mult: number): DecisionEffect {
+  if (mult === 1) return fx
+  const out: DecisionEffect = { ...fx }
+  for (const k of Object.keys(out) as (keyof DecisionEffect)[]) {
+    const v = out[k]
+    if (v !== undefined && v < 0) out[k] = Math.round(v * mult)
+  }
+  return out
 }
 
 // ── 2. MOVER AL CONQUISTADOR ──────────────────────────

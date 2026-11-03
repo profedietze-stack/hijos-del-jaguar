@@ -390,3 +390,24 @@ describe('conqPosition', () => {
     expect(pos?.lat).toBe(gs.nodes[nodeId].lat)
   })
 })
+
+describe('captura del conquistador por dificultad', () => {
+  const perdidas = (diff: 'educativo' | 'historico' | 'legendario') => {
+    let gs = createInitialState(diff, 'T')
+    const nodo = { ...gs.nodes['n00']!, id: '_conq_catch_node', completed: false, unlocked: true, next: [] as string[] }
+    gs = { ...gs, nodes: { ...gs.nodes, _conq_catch_node: nodo }, currentNode: '_conq_catch_node', stats: { ...gs.stats, warriors: 40, civilians: 40, shamans: 10, food: 90, salud: 90, moral: 90 } }
+    const antes = gs.stats.warriors + gs.stats.civilians + gs.stats.shamans
+    const r = applyDecision(gs, { text: 'x', effects: { warriors: -8, civilians: -6, shamans: -2 } })
+    return antes - (r.state.stats.warriors + r.state.stats.civilians + r.state.stats.shamans)
+  }
+  it('educativo paga la captura completa; histórico y legendario, el 60 %', () => {
+    expect(perdidas('educativo')).toBe(16)
+    expect(perdidas('historico')).toBe(5 + 4 + 1)   // round(8*.6)+round(6*.6)+round(2*.6)
+    expect(perdidas('legendario')).toBe(10)
+  })
+  it('un evento común no se escala', () => {
+    let gs = createInitialState('historico', 'T')
+    gs = { ...gs, currentNode: 'n00', stats: { ...gs.stats, warriors: 30 } }
+    expect(30 - applyDecision(gs, { text: 'x', effects: { warriors: -10 } }).state.stats.warriors).toBe(10)
+  })
+})

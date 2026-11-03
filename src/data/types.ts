@@ -124,6 +124,8 @@ export interface DifficultyConfig {
   defeatThreshold:  number
   /** Probabilidad por turno de que el conquistador salte hasta el jugador (captura). */
   conqJumpProb:     number
+  /** Multiplica las PÉRDIDAS del evento de captura (1 = valores escritos en el evento). */
+  catchLossMult:    number
   endingThresholds: {
     epic:  { m: number; a: number }
     good:  { m: number }
