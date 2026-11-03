@@ -102,7 +102,20 @@ describe('el pre-cacheo del service worker', () => {
   it('el nombre de la caché acompaña al cambio de rutas', () => {
     // El número va fijo a propósito: obliga a subirlo a conciencia cada vez que
     // cambia lo precacheado. v3 fue el arreglo de las rutas; v4, sacar las ramas
-    // de terceros y meter el GeoJSON del mapa en el pre-cacheo.
-    expect(sw).toMatch(/const CACHE_NAME = 'jaguar-v4'/)
+    // de terceros y meter el GeoJSON del mapa en el pre-cacheo; v5, HTML red primero.
+    expect(sw).toMatch(/const CACHE_NAME = 'jaguar-v5'/)
+  })
+})
+
+/** F3-05: el HTML salía cache-first y con el nombre de caché fijo, así que nunca llegaba una versión nueva. */
+describe('actualizaciones del service worker', () => {
+  const codigo = sinComentarios(sw)
+  it('las navegaciones (HTML) van red primero', () => {
+    const bloque = codigo.slice(codigo.indexOf("request.mode === 'navigate'"), codigo.indexOf('Same-origin: cache-first') > 0 ? undefined : undefined)
+    expect(bloque.indexOf('fetch(request)')).toBeGreaterThan(-1)
+    expect(bloque.indexOf('fetch(request)')).toBeLessThan(bloque.indexOf('c.match(request)'))
+  })
+  it('no se registra en desarrollo', () => {
+    expect(mainTs).toMatch(/import\.meta\.env\.DEV\)\s*return/)
   })
 })

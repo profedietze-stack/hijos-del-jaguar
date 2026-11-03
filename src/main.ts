@@ -158,6 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
 */
 function _registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) return
+  // En desarrollo el worker cacheaba los modulos fuente de src y servia versiones viejas.
+  if (import.meta.env.DEV) return
 
   const base = import.meta.env.BASE_URL
   navigator.serviceWorker.register(`${base}sw.js`, { scope: base })

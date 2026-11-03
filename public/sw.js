@@ -2,11 +2,12 @@
 // SERVICE WORKER — Hijos del Jaguar v2
 // Estrategia por tipo de recurso:
 //   - Install:     pre-cachea fuentes, iconos y manifest
+//   - HTML (navegacion): red primero, cache de respaldo, para que llegue cada version nueva
 //   - Same-origin: cache-first (assets con hash de Vite)
 //   - Otros fetch: stale-while-revalidate
 // ══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'jaguar-v4'
+const CACHE_NAME = 'jaguar-v5'
 
 // Activos estaticos sin hash: fuentes, iconos, manifest.
 //
@@ -67,6 +68,28 @@ self.addEventListener('fetch', (event) => {
   // están en `images/events/`, el GeoJSON del mapa en `geo/` y html2canvas en
   // `vendor/`, así que todo entra por la rama de mismo origen de acá abajo y el
   // juego funciona igual sin red.
+
+  // HTML: red primero. Con cache-first el index.html quedaba congelado: quien ya habia abierto el
+  // juego seguia cargando los assets con hash viejos y ningun arreglo nuevo le llegaba.
+  if (url.origin === self.location.origin && (request.mode === 'navigate' || request.destination === 'document')) {
+    event.respondWith(
+      fetch(request).then(response => {
+        if (response.ok && response.type === 'basic') {
+          const copia = response.clone()
+          event.waitUntil(caches.open(CACHE_NAME).then(c => c.put(request, copia)))
+        }
+        return response
+      }).catch(() =>
+        caches.open(CACHE_NAME).then(c => c.match(request)).then(cached =>
+          cached ?? new Response(
+            '<html><body style="font-family:serif;color:#f0e2c0;background:#080604;text-align:center;padding:4rem"><h2>Sin conexión</h2><p>Recargá cuando tengas internet para continuar la huida.</p></body></html>',
+            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+          )
+        )
+      )
+    )
+    return
+  }
 
   // Same-origin: cache-first (Vite hashea assets, son inmutables)
   if (url.origin === self.location.origin) {
