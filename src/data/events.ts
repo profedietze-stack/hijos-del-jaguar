@@ -66,7 +66,7 @@ Son <span class="tt" data-tip="Pueblo Pipil: grupo indígena de origen nahua est
 Su líder da un paso al frente. Habla en una lengua cercana a la que usa el chamán — no igual, pero comprensible: <em>"Podemos ayudarlos a cruzar hacia el sur. Si ustedes nos enseñan algo que valga la pena saber."</em><br><br>
 Es la primera vez desde el incendio que alguien les ofrece ayuda en lugar de quitarles algo.`,
     decisions: [
-      { text: 'Aceptar. Compartir los conocimientos de curación del chamán a cambio de guía y comida.', effects: { food: +20, moral: +15, salud: +8,  union: +10 }, allianceKey: 'pipil' },
+      { text: 'Aceptar. Compartir los conocimientos de curación del chamán a cambio de guía y comida.', effects: { food: +9, moral: +15, salud: +8,  union: +10 }, allianceKey: 'pipil' },
       { text: 'Tomar comida sin comprometerse. No hay tiempo para alianzas.',                           effects: { food: +10, moral: +5,  union: -5 } },
       { text: 'Rechazar. No pueden cargar con más personas en peligro.',                               effects: { food: -5,  moral: -10, union: -5 } },
     ],
@@ -357,7 +357,7 @@ Los <span class="tt" data-tip="Bribri: pueblo originario de Talamanca. Su socied
 Cuando amanece, el awá entrega un atado de cortezas y hojas. <em>"Esto no cura todo. Pero te dará días. Y los días, ahora, son todo lo que tienen."</em><br><br>
 A cambio, mira a los ojos de la chamana: <em>"Enséñame a reconocer la enfermedad de hierro antes de que llegue a mi montaña."</em>`,
     decisions: [
-      { text: 'Compartir todo el saber sobre la peste. El conocimiento no se acapara entre pueblos hermanos.', effects: { food: +4,  moral: +18, salud: +10, union: +12 } },
+      { text: 'Compartir todo el saber sobre la peste. El conocimiento no se acapara entre pueblos hermanos.', effects: { food: +1,  moral: +18, salud: +10, union: +12 } },
       { text: 'Recibir las plantas pero guardar algún secreto. La cautela también es supervivencia.',         effects: { food: +2,  moral: +5,  salud: +8,  union: -3 } },
     ],
   },
@@ -415,7 +415,7 @@ Las mujeres guna cosen <span class="tt" data-tip="Las molas son textiles de capa
 Está cosiendo la historia del grupo en una <span class="tt" data-tip="Cada mola es única y narra algo: un mito, un sueño, un hecho. Que la anciana guna cosiera la historia del grupo es un gesto de acogida profundo: significa que ese pueblo pasajero quedará en la memoria visual de los guna.">mola</span>. Cuando termina, la entrega. <em>"Ahora su camino también vive en nuestras manos. Si se pierden, esta tela recordará que existieron."</em><br><br>
 El gesto deja al grupo en silencio. Por primera vez desde el incendio, alguien promete recordarlos.`,
     decisions: [
-      { text: 'Recibir la mola y entregar a cambio un objeto sagrado del pueblo. Memorias intercambiadas.', effects: { food: 0,   moral: +22, salud: +2,  union: +18 } },
+      { text: 'Recibir la mola y entregar a cambio un objeto sagrado del pueblo. Memorias intercambiadas.', effects: { food: 0,   moral: +22, salud: +2,  union: +9 } },
       { text: 'Agradecer y pedir aprender a leer las molas, para llevar el arte al sur.',                   effects: { food: -2,  moral: +14, salud: 0,   union: +10 } },
     ],
   },
@@ -445,7 +445,7 @@ Un anciano del grupo conoce un paso de montaña que los españoles no descubrier
 En el quinto día, un guerrero encuentra marcas en un árbol: talladas con precisión, geométricas. No españolas. Son de los <span class="tt" data-tip="Cunas / Guna: pueblo indígena del Darién panameño y las islas San Blas. Resistieron la colonización española y europea durante siglos. En 1925 protagonizaron la Revolución de Tule, estableciendo una comarca semi-autónoma reconocida por Panamá. Hoy mantienen una de las estructuras de autogobierno indígena más sólidas de América.">cunas</span>.<br><br>
 La chamana las estudia y dice en voz baja: <em>"Conozco algo de su lengua. Alguien nos está indicando por dónde ir."</em>`,
     decisions: [
-      { text: 'Seguir las marcas y buscar a los cunas. Pueden ser aliados.', effects: { food: +18, moral: +12, salud: +10, union: +8 }, allianceKey: 'cunas' },
+      { text: 'Seguir las marcas y buscar a los cunas. Pueden ser aliados.', effects: { food: +18, moral: +12, salud: +10, union: +8, warriors: -1 }, allianceKey: 'cunas' },
       { text: 'Ignorar las marcas. No hay tiempo para riesgos.',             effects: { food: -10, moral: 0,   salud: -8 } },
     ],
   },
@@ -458,7 +458,7 @@ La chamana las estudia y dice en voz baja: <em>"Conozco algo de su lengua. Algui
     narr:  `El océano al oeste brilla con una intensidad que ninguno del grupo tiene palabras para describir. Es el primer mar que la mayoría ve en su vida. Un pueblo de pescadores los observa desde las rocas — tienen piraguas enormes y algo que el pueblo de la selva nunca tiene suficiente: sal.<br><br>
 Antes de que nadie hable, un pescador señala al norte. En la distancia, una nube de polvo que se mueve demasiado rápido para ser natural. <span class="tt" data-tip="Caballos en América: extinguidos en el continente hace 10.000 años, regresaron con los españoles en 1492. Para los pueblos indígenas que veían uno por primera vez, la experiencia era aterradora: jinete y animal parecían un ser único sobrenatural. Los aztecas los llamaron venados gigantes. La ventaja táctica que otorgaban era devastadora.">Caballos</span>.`,
     decisions: [
-      { text: 'Pedir una piragua. Navegar pegados a la costa hacia el sur.',     effects: { food: +15, moral: +20, salud: +5, union: +5 } },
+      { text: 'Pedir una piragua. Navegar pegados a la costa hacia el sur.',     effects: { food: +15, moral: +20, salud: +5, union: +5, civilians: -1 } },
       { text: 'Internarse en el bosque costero. Más lento pero más seguro.',     effects: { food: -8,  moral: -5,  salud: -5, warriors: -1 } },
     ],
   },
@@ -471,7 +471,7 @@ Antes de que nadie hable, un pescador señala al norte. En la distancia, una nub
     narr:  `Al este de los Andes la tierra se desploma en una llanura que no tiene fin visible. El cielo ocupa más espacio que el suelo. El pasto llega a la cintura. Por primera vez en semanas, el grupo puede ver lejos — lo que también significa que pueden ser vistos.<br><br>
 Al tercer día aparecen en el horizonte: treinta jinetes inmóviles. <span class="tt" data-tip="Caribes de los llanos: distintos a los caribes del Caribe, estos pueblos adoptaron el caballo español con asombrosa velocidad. En menos de una generación se convirtieron en jinetes expertos, usando contra los españoles la misma tecnología que estos usaban contra ellos. La palabra caníbal en español deriva de caribe — nombre que los europeos usaron para justificar su esclavización.">Caribes</span> a caballo, caballos tomados a los propios españoles. Observan sin hostilidad aparente. Su líder cabalga sola hacia adelante y pregunta: <em>"¿Adónde van los que no tienen tierra?"</em>`,
     decisions: [
-      { text: 'Decir la verdad: huimos hacia el sur. Pedir permiso para cruzar.',           effects: { food: +10, moral: +15, union: +12, salud: 0 }, allianceKey: 'caribes' },
+      { text: 'Decir la verdad: huimos hacia el sur. Pedir permiso para cruzar.',           effects: { food: +10, moral: +15, union: +12, salud: -3 }, allianceKey: 'caribes' },
       { text: 'Decir que somos comerciantes. Pagar con lo que tenemos.',                    effects: { food: -15, moral: +5,  union: +5  } },
       { text: 'Correr. Los llanos son anchos, no pueden alcanzarnos a todos.',              effects: { food: -10, moral: -15, salud: -10, warriors: -1, civilians: -1 } },
     ],
@@ -515,7 +515,7 @@ Pero entre las sombras del dosel, figuras inmóviles: los <span class="tt" data-
 El <span class="tt" data-tip="Soroche (mal de montaña): por encima de 3.000 metros el oxígeno escasea. El cuerpo no adaptado responde con dolores de cabeza, náuseas, fatiga extrema y dificultad para pensar con claridad. Los pueblos andinos tenían mayor capacidad pulmonar por adaptación genética milenaria, y usaban hojas de coca, que ayuda a oxigenar la sangre. Los españoles sufrían soroche gravemente en sus primeras expediciones andinas.">soroche</span> llega sin aviso. Tres ancianos no pueden seguir. Dos niños vomitan sin haber comido.<br><br>
 Y desde lo alto de una roca, figuras que los miran. Detrás, lo que parece una ciudad construida dentro de la montaña. Son <span class="tt" data-tip="Quechuas: pueblo central del Tawantinsuyu (Imperio Inca). Su idioma es hablado hoy por entre 8 y 10 millones de personas. Construyeron 40.000 km de caminos pavimentados, más que el Imperio Romano. Su sistema de terrazas agrícolas transformó los Andes en tierra cultivable.">quechuas</span>. Y te observan sin pestañear.`,
     decisions: [
-      { text: 'Presentarse con honestidad. Somos fugitivos del mismo enemigo.',     effects: { food: +25, moral: +25, salud: +20, union: +15 }, allianceKey: 'inca' },
+      { text: 'Presentarse con honestidad. Somos fugitivos del mismo enemigo.',     effects: { food: +25, moral: +25, salud: +20, union: +15, warriors: -1 }, allianceKey: 'inca' },
       { text: 'Presentarse como guerreros libres. No mostrar debilidad.',           effects: { food: +10, moral: +10, salud: +8  } },
       { text: 'Continuar de noche, evitando la ciudad. Ya no confían en nadie.',   effects: { food: -10, moral: -10, salud: -10 } },
     ],
@@ -546,7 +546,7 @@ El chamán se detiene de golpe y levanta la mano. Todos se quedan quietos. Él e
 <em>"Estamos siendo guiados"</em>, dice finalmente. <em>"No perseguidos — guiados. Alguien preparó este camino."</em><br><br>
 Las plantas están dispuestas de manera demasiado regular para ser natural. Y entre los árboles aparece sin hacer ruido un anciano de ojos pintados de negro que los mira como si llevara toda la mañana esperándolos.`,
     decisions: [
-      { text: 'Seguir al anciano. El que preparó el camino no tiene malas intenciones.',  effects: { food: +25, moral: +30, salud: +15, union: +20 }, allianceKey: 'guardianes' },
+      { text: 'Seguir al anciano. El que preparó el camino no tiene malas intenciones.',  effects: { food: +14, moral: +30, salud: +15, union: +20 }, allianceKey: 'guardianes' },
       { text: 'Agradecer y apartarse. Este lugar tiene dueños que no eligieron esto.',    effects: { food: -5,  moral: +10, salud: 0   } },
       { text: 'Preguntar si es posible quedarse. Esta selva puede ser el destino.',       effects: { food: +15, moral: +20, salud: +10, union: +15 } },
     ],
@@ -563,7 +563,7 @@ Las plantas están dispuestas de manera demasiado regular para ser natural. Y en
 Viste ropa española pero habla sin acento en tres lenguas indígenas. Se presenta: <em>"Soy intérprete de los españoles. Llevo cuatro años sirviendo de puente entre dos mundos que se odian. Ya no quiero seguir."</em><br><br>
 Los <span class="tt" data-tip="Intérpretes coloniales (lenguas o trujamanes): muchos indígenas fueron capturados específicamente para aprender español. La Malinche (Malintzin), intérprete de Hernán Cortés, es el caso más conocido y debatido: ¿traidora o superviviente que usó las herramientas disponibles? Los intérpretes conocían los planes españoles antes que los propios capitanes.">intérpretes coloniales</span> saben lo que ningún espía puede descubrir: los planes mientras todavía se discuten.`,
     decisions: [
-      { text: 'Confiar en él. Alguien que traiciona a los españoles merece una oportunidad.', effects: { food: +10, moral: +15, union: +15 }, allianceKey: 'interprete' },
+      { text: 'Confiar en él. Alguien que traiciona a los españoles merece una oportunidad.', effects: { food: +10, moral: +15, union: +15, warriors: -1 }, allianceKey: 'interprete' },
       { text: 'Tomar su información pero no llevarlo. Es un riesgo que no pueden asumir.',    effects: { food: +5,  moral: +5,  union: +5  } },
       { text: 'Rechazarlo. Quien traicionó una vez puede traicionar de nuevo.',               effects: { food: -5,  moral: +5,  union: -5  } },
     ],
@@ -623,7 +623,7 @@ El chamán camina entre las estructuras con una expresión que el cacique nunca 
 <em>"La abandonaron para que los españoles no la encontraran. No porque no valiera nada — porque valía demasiado para arriesgarse a perderla."</em><br><br>
 Es posible quedarse aquí sin ser visto. Es posible que ya haya alguien más aquí sin ser visto.`,
     decisions: [
-      { text: 'Instalarse aquí unos días. La ciudad invisible es el refugio perfecto.',       effects: { food: +15, moral: +28, salud: +20, union: +18 } },
+      { text: 'Instalarse aquí unos días. La ciudad invisible es el refugio perfecto.',       effects: { food: +4, moral: +28, salud: +20, union: +18 } },
       { text: 'Registrar la ubicación exacta y seguir. Este lugar merece ser recordado.',     effects: { food: +5,  moral: +20, union: +12 } },
       { text: 'Seguir inmediatamente. Una ciudad abandonada puede tener razones para estar vacía.', effects: { food: -5, moral: +5, salud: -3 } },
     ],
@@ -651,7 +651,7 @@ Un pueblo ribereño los observa desde sus canoas enormes. Proponen cruzarlos al 
     narr:  `El camino de piedra aparece entre la maleza como algo que no debería poder existir en la montaña: perfectamente construido, perfectamente ancho, con drenaje lateral que lo mantiene seco. Cada cierta distancia, una estructura de piedra pequeña con la puerta orientada al este y comida almacenada dentro — maíz seco, papa, charqui. Todavía comestible.<br><br>
 Es el <span class="tt" data-tip="Qhapaq Ñan (Camino Real Inca): red de 40.000 km de caminos pavimentados que conectaba el Tawantinsuyu desde Colombia hasta Chile. Más extenso que las vías romanas en su apogeo. Los españoles lo destruyeron sistemáticamente porque facilitaba la coordinación de la resistencia indígena. Declarado Patrimonio de la Humanidad en 2014.">Qhapaq Ñan</span> — el camino real inca. Y el problema es que también es la ruta de los mensajeros españoles que reemplazaron a los chasquis.`,
     decisions: [
-      { text: 'Usar el camino y los depósitos. La comida inca los puede sostener semanas.',       effects: { food: +35, moral: +15, salud: +15 } },
+      { text: 'Usar el camino y los depósitos. La comida inca los puede sostener semanas.',       effects: { food: +35, moral: +15, salud: +15, union: -5 } },
       { text: 'Tomar comida de los depósitos y apartarse del camino inmediatamente.',             effects: { food: +20, moral: +8,  salud: +8  } },
       { text: 'Ignorar el camino. Es demasiado visible. La seguridad vale más que la comodidad.', effects: { food: -8,  moral: +5,  salud: -5  } },
     ],
@@ -832,7 +832,7 @@ Los <span class="tt" data-tip="Mojos (Moxos): pueblo indígena de la Amazonía b
 El chamán lo traduce para el cacique después, en voz baja: <em>"Dice que cuando un pueblo trabaja sin que nadie ordene, hace cosas que ningún rey puede ordenar."</em><br><br>
 La frase queda en el aire sobre el mar interior de Bolivia, donde el agua brilla y no hay ningún conquistador a la vista.`,
     decisions: [
-      { text: 'Aprender el sistema de canales. Un pueblo que maneja el agua puede vivir donde otros no pueden.', effects: { food: +5,  moral: +25, union: +18 } },
+      { text: 'Aprender el sistema de canales. Un pueblo que maneja el agua puede vivir donde otros no pueden.', effects: { food: -5,  moral: +25, union: +18 } },
       { text: 'Descansar en la loma y escuchar más historias. Este pueblo guarda mucho para enseñar.',          effects: { food: -4,  moral: +20, union: +14 } },
     ],
   },
@@ -889,7 +889,7 @@ Tienen comida almacenada para meses y canales navegables que ningún caballo pue
     narr:  `El valle se abre de golpe después de días de quebradas angostas. Ancho, verde, con agua que corre entre piedras. El <span class="tt" data-tip="Huarpes: pueblo indígena de la región de Cuyo (Mendoza, San Juan). Vivían de la agricultura en el árido piedemonte andino con sistemas de riego sofisticados, y de la pesca en las lagunas de Guanacache. Fueron repartidos en encomiendas a partir de 1551. En pocas generaciones su población colapsó por el trabajo forzado y las enfermedades.">pueblo huarpe</span> los observa desde la distancia sin atacar, con esa mirada de quien aprendió a no fiarse pero tampoco a atacar sin razón.<br><br>
 Es la primera vez en meses que nadie los persigue activamente. El chamán lo dice en voz alta y suena extraño: <em>"Estamos solos. Solo nosotros."</em> La tentación de quedarse en este valle se siente en todos.`,
     decisions: [
-      { text: 'Descansar dos semanas. La tribu necesita recuperarse antes del último tramo.', effects: { food: +25, moral: +25, salud: +20, union: +15 } },
+      { text: 'Descansar dos semanas. La tribu necesita recuperarse antes del último tramo.', effects: { food: +11, moral: +25, salud: +20, union: +15 } },
       { text: 'Descansar solo unos días y seguir. El sur todavía está muy lejos.',           effects: { food: +12, moral: +12, salud: +10 } },
     ],
   },
@@ -902,7 +902,7 @@ Es la primera vez en meses que nadie los persigue activamente. El chamán lo dic
     narr:  `Las ruinas de piedra roja emergen de la selva — cruces enormes, campanas con su cadena todavía puesta. Entre las estructuras, <span class="tt" data-tip="Guaraníes en las misiones: las reducciones jesuitas (1609-1767) fueron un experimento único: ciudades-estado indígenas autogobernadas que combinaban cultura guaraní con tecnología europea. Los guaraníes mantenían su lengua, su música y sus estructuras sociales. Cuando los jesuitas fueron expulsados por Carlos III en 1767, las misiones colapsaron en meses y sus habitantes fueron esclavizados o dispersados.">guaraníes</span> vestidos con ropas que mezclan lo propio con lo ajeno.<br><br>
 Un sacerdote jesuita sale solo, con las manos visibles y abiertas. Se detiene a distancia prudente: <em>"Los soldados del rey no entran aquí. Solo los de Dios. Y Dios tiene mucho espacio para los que huyen."</em>`,
     decisions: [
-      { text: 'Entrar a la misión. Descansar, comer, curar. El sacerdote parece honesto.',  effects: { food: +30, moral: +15, salud: +25, union: +10 } },
+      { text: 'Entrar a la misión. Descansar, comer, curar. El sacerdote parece honesto.',  effects: { food: +30, moral: +15, salud: +25, union: -3 } },
       { text: 'Quedarse en los límites. Aceptar comida pero no entrar.',                   effects: { food: +18, moral: +5,  salud: +12 } },
       { text: 'Rechazar. Un refugio que depende de extranjeros no es un refugio real.',    effects: { food: -5,  moral: -5,  salud: -5  } },
     ],
@@ -915,7 +915,7 @@ Un sacerdote jesuita sale solo, con las manos visibles y abiertas. Se detiene a 
     cap:   'La Pampa — llanura sin fin',
     narr:  `La llanura no termina. El pasto llega a la cintura. No hay un árbol en el horizonte. El cielo ocupa tres cuartas partes de lo que se puede ver. Y en ese horizonte sin accidentes: una línea de puntos oscuros que se mueven. Los <span class="tt" data-tip="Ranqueles: pueblo indígena pampeano que adoptó el caballo en el siglo XVII, transformando radicalmente su modo de vida. Se convirtieron en jinetes formidables que resistieron la colonización hasta la llamada Conquista del Desierto de 1879 — la campaña militar argentina que los diezmó y desplazó de sus tierras para entregárselas a terratenientes europeos.">ranqueles</span> a caballo observan desde lejos, sin atacar, esperando ver qué hacen los recién llegados.`,
     decisions: [
-      { text: 'Acercarse a los ranqueles. Llevan a los niños al frente para mostrar que no son guerreros.', effects: { food: +20, moral: +15, union: +15, salud: +5 }, allianceKey: 'ranqueles' },
+      { text: 'Acercarse a los ranqueles. Llevan a los niños al frente para mostrar que no son guerreros.', effects: { food: +20, moral: +15, union: +15, salud: +5, civilians: -1 }, allianceKey: 'ranqueles' },
       { text: 'Intentar capturar caballos. Cambiaría todo si pudieran montarlos.',                         effects: { food: +5,  moral: +10, salud: -5, warriors: -1 } },
       { text: 'Continuar sin detenerse. Los ranqueles son impredecibles.',                                 effects: { food: -8,  moral: -5,  salud: -5  } },
     ],
@@ -961,7 +961,7 @@ Los <span class="tt" data-tip="Mapuches: única civilización indígena de Amér
 Por primera vez en meses, los guerreros ríen. Los niños bailan. El chamán llora viendo el ceremonial que no veía desde su propia infancia en Guatemala.<br><br>
 Quedarse significa ser visto. Ser visto puede llegar a oídos que no conviene.`,
     decisions: [
-      { text: 'Quedarse tres días completos. El pueblo lo necesita más que la prudencia.',        effects: { food: +30, moral: +35, salud: +25, union: +25 } },
+      { text: 'Quedarse tres días completos. El pueblo lo necesita más que la prudencia.',        effects: { food: +17, moral: +35, salud: +25, union: +25 } },
       { text: 'Quedarse solo una noche. Comer, descansar, y partir antes del alba.',             effects: { food: +18, moral: +20, salud: +15, union: +15 } },
       { text: 'Observar desde lejos y seguir. La cautela es la única razón por la que llegaron hasta aquí.', effects: { food: -5, moral: +10, union: +5 } },
     ],
@@ -1006,7 +1006,7 @@ Un <span class="tt" data-tip="Frailes dominicos como Bartolomé de las Casas den
 El chamán prueba uno y frunce el gesto. Pero los guerreros jóvenes los prueban también, uno tras otro, y hay una discusión genuina sobre si el sabor es malo o simplemente nuevo.<br><br>
 <em>"Los europeos fermentan esto"</em>, dice uno que lo escuchó en algún lugar. <em>"Lo convierten en bebida."</em> Nadie sabe exactamente cómo, pero hay semanas de comida disponible si saben qué hacer con estas plantas.`,
     decisions: [
-      { text: 'Dedicar una semana a estudiar las plantas. El conocimiento nunca sobra.',   effects: { food: +20, moral: +22, salud: +15, union: +18 } },
+      { text: 'Dedicar una semana a estudiar las plantas. El conocimiento nunca sobra.',   effects: { food: +14, moral: +22, salud: +15, union: +18 } },
       { text: 'Tomar fruta suficiente para el camino y seguir.',                           effects: { food: +15, moral: +10, salud: +8  } },
       { text: 'Quemar las vides. Son símbolo de ocupación en tierra ajena.',               effects: { food: +5,  moral: +15, union: +8  } },
     ],
@@ -1053,7 +1053,7 @@ El chamán se sienta frente a ellas y no habla por un tiempo largo. Cuando lo ha
 <em>"Diez mil años. Antes de los incas. Antes de los mayas. Antes de nosotros. Alguien ponía su mano en la roca y la pintaba para decir una sola cosa: estuve aquí. Existí. No me olviden."</em><br><br>
 Los niños del grupo se acercan y ponen las suyas al lado, sin que nadie se los pida.`,
     decisions: [
-      { text: 'Dejar que los niños pinten sus propias manos. Este lugar lo merece.',        effects: { food: -3, moral: +35, union: +30 } },
+      { text: 'Dejar que los niños pinten sus propias manos. Este lugar lo merece.',        effects: { food: -6, moral: +35, union: +30 } },
       { text: 'Registrar el lugar pero no agregar nada. No alterar lo que tiene diez mil años.', effects: { food: -3, moral: +25, union: +20 } },
       { text: 'Agregar una marca del pueblo entero. Así otros sabrán que pasaron.',         effects: { food: -5, moral: +28, union: +25 } },
     ],
@@ -1129,7 +1129,7 @@ A medio metro de profundidad: agua limpia, fría. Una aguada subterránea que el
 El guía explica, por señas y algunas palabras en castellano roto, que hay docenas de estas aguadas ocultas en el Chaco. Los tobas las conocen todas. Los españoles no encontraron ninguna todavía — por eso enviaron expediciones que murieron de sed. <em>"El Chaco no los mata"</em>, dice el guía. <em>"La ignorancia los mata."</em><br><br>
 Ofrece trazar un mapa de las aguadas. Pero pide algo a cambio: que el grupo lleve un mensaje a los guaraníes del sur.`,
     decisions: [
-      { text: 'Aceptar el mapa y el encargo. Los mensajes entre pueblos son sagrados.', allianceKey: 'tobas_agua', effects: { food: +10, moral: +25, salud: +10, union: +18 } },
+      { text: 'Aceptar el mapa y el encargo. Los mensajes entre pueblos son sagrados.', allianceKey: 'tobas_agua', effects: { food: +7, moral: +25, salud: +10, union: +18 } },
       { text: 'Aceptar el mapa pero no el encargo. El grupo no puede comprometerse con más.', effects: { food: +8,  moral: +10, salud: +10, union: +5  } },
     ],
   },
@@ -1301,7 +1301,7 @@ La frase queda suspendida como el agua en el aire del Paraná.`,
 Un chaná le explica al chamán cómo reconocer los seguros de los peligrosos: <em>"Los que llevan camalote blanco van rápido — peligrosos. Los de camalote lila, despacio — esos se pueden subir."</em><br><br>
 Subirán más rápido que caminando, sin dejar rastro, sin gastar energía. El único problema: no controlan a dónde van.`,
     decisions: [
-      { text: 'Subirse al embalsado lila. La corriente decide — y a veces decide bien.',  effects: { food: +5,  moral: +18, salud: +5,  union: +10 } },
+      { text: 'Subirse al embalsado lila. La corriente decide — y a veces decide bien.',  effects: { food: +5,  moral: +18, salud: +5,  union: +10, civilians: -1 } },
       { text: 'Seguir por tierra junto al río. Más lento, pero sin depender del camalote.', effects: { food: -8,  moral: +5,  salud: -3,  union: +3  } },
     ],
   },
@@ -1329,7 +1329,7 @@ Los <span class="tt" data-tip="Ranqueles (Rankülche): pueblo mapuche de la pamp
     narr:  `Los <span class="tt" data-tip="El ñandú (Rhea americana) es el ave no voladora más grande de América, con hasta 1,5 metros de altura y 30 kg. Corre a 60 km/h. Los pueblos pampeanos lo cazaban con boleadoras — tres piedras unidas por tiras de cuero que se lanzaban para enredar las patas. Los huevos y la carne son alimento, las plumas sirven para todo. La caza del ñandú requería coordinación de varios cazadores formando un semicírculo.">ñandúes</span> corren en grupo hacia el este, asustados por algo que el grupo no ve todavía. Los ranqueles no necesitan discutir — cuatro de ellos salen al galope en formación de arco, con las <span class="tt" data-tip="Boleadoras: arma de caza y guerra pampeana, adoptada luego por los gauchos. Consiste en dos o tres bolas de piedra o plomo envueltas en cuero, unidas por tiras. Se lanza girando sobre la cabeza y envuelve las patas del animal al impactar. Origen precolombino: hay boleadoras en Argentina de más de 9.000 años.">boleadoras</span> girando sobre sus cabezas.<br><br>
 Cinco minutos después vuelven con dos ñandúes. El grupo come esa noche hasta saciarse por primera vez en semanas. Un niño ranquel le enseña a un niño del grupo a lanzar una boleadora pequeña. La primera vez falla. La segunda vez, no mucho.`,
     decisions: [
-      { text: 'Aprender las boleadoras. Un arma de la pampa para un pueblo que viaja por la pampa.', effects: { food: +20, moral: +18, salud: +5,  union: +14 } },
+      { text: 'Aprender las boleadoras. Un arma de la pampa para un pueblo que viaja por la pampa.', effects: { food: +15, moral: +18, salud: +5,  union: +14 } },
       { text: 'Solo agradecer la carne. No siempre hay tiempo para aprender todo.',                   effects: { food: +20, moral: +8,  salud: +5,  union: +5  } },
     ],
   },
@@ -1383,7 +1383,7 @@ El sol está cayendo sobre el horizonte patagónico. Hay tres caminos. Y el peso
 Al amanecer convoca a todos: <em>"En sueños escuché algo. No palabras — un sentido. Este lugar es el del recuerdo. El río que no olvida de dónde viene es más fuerte que el que llega más lejos."</em><br><br>
 Hay gente que quiere quedarse. Hay gente que siente que el destino real está más adentro. La chamana joven que casi nunca habla dice por primera vez en semanas: <span class="tt" data-tip="El Encuentro de las Aguas es un fenómeno real y visible del Amazonas: el Río Negro y el río Solimões corren paralelos 6 km antes de mezclarse, por diferencias de temperatura, velocidad y densidad. Es uno de los fenómenos naturales más impresionantes de América del Sur, visible incluso desde el espacio."><em>"El río que no olvida su origen es más fuerte que el que llega más lejos."</em></span>`,
     decisions: [
-      { text: 'Fundar aquí, en la confluencia. Que el pueblo sea como estas aguas: recuerda de dónde viene y sigue fluyendo.',                  effects: { food: +12, moral: +30, salud: +10, union: +28 } },
+      { text: 'Fundar aquí, en la confluencia. Que el pueblo sea como estas aguas: recuerda de dónde viene y sigue fluyendo.',                  effects: { food: +7, moral: +30, salud: +10, union: +28 } },
       { text: 'Seguir río arriba. Llegar hasta donde ningún río viene de ningún otro. Al principio.',                                          effects: { food: -8,  moral: +25, salud: -5,  union: +15 } },
       { text: 'Aprender de ambos ríos: construir dos grupos que vivan separados pero próximos, y se mezclen con el tiempo.',                   effects: { food: +8,  moral: +22, salud: +8,  union: +20 } },
     ],
@@ -1398,7 +1398,7 @@ Hay gente que quiere quedarse. Hay gente que siente que el destino real está m�
 El chamán escucha el nombre y se queda muy quieto. Es una palabra de la lengua antigua — la que ya casi nadie usa — que significa algo parecido a <em>"el lugar donde las cosas distintas aprenden a ser una"</em>.<br><br>
 Los <span class="tt" data-tip="Ribereños amazónicos: comunidades que organizan su vida entera alrededor del ritmo del río. Sus casas se construyen sobre palafitos para adaptarse a las crecidas anuales de hasta 15 metros. Conocen el calendario del río mejor que cualquier almanaque: cuándo subirá, cuánto, cuándo bajará.">pueblos del río</span> cercanos oyen el nombre y lo reconocen. Dicen que ese lugar siempre tuvo ese nombre — que solo esperaba que alguien lo recordara en voz alta.`,
     decisions: [
-      { text: 'Aceptar el nombre como señal. Este lugar los estaba esperando.',                                          effects: { food: +10, moral: +35, salud: +8,  union: +32 } },
+      { text: 'Aceptar el nombre como señal. Este lugar los estaba esperando.',                                          effects: { food: +7, moral: +35, salud: +8,  union: +32 } },
       { text: 'Consultar con los ancianos si el nombre tiene consecuencias. Nombrar un lugar es también reclamarlo.',    effects: { food: +5,  moral: +28, salud: +5,  union: +25 } },
       { text: 'Registrar el nombre y seguir. El lugar merece una ceremonia que todavía no pueden hacer.',                effects: { food: +8,  moral: +22, salud: +5,  union: +18 } },
     ],
@@ -1476,7 +1476,7 @@ Al décimo día encuentran algo que detiene al grupo entero: un árbol enorme co
 Alguien de su pueblo, o de un pueblo hermano, estuvo aquí. No saben cuándo. No saben si volvió.<br><br>
 <em>"Este árbol"</em>, dice el chamán con una voz rara, <em>"tiene la misma edad que nuestra escritura."</em>`,
     decisions: [
-      { text: 'Detenerse aquí. El árbol es una señal. Este es el lugar.',            effects: { food: +10, moral: +35, salud: +10, union: +25 } },
+      { text: 'Detenerse aquí. El árbol es una señal. Este es el lugar.',            effects: { food: +10, moral: +35, salud: +10, union: +25, civilians: -1 } },
       { text: 'Seguir río arriba. Si alguien pasó antes, el lugar real está más adentro.', effects: { food: -10, moral: +20, salud: -5,  union: +10 } },
     ],
   },
@@ -1489,7 +1489,7 @@ Alguien de su pueblo, o de un pueblo hermano, estuvo aquí. No saben cuándo. No
     narr:  `Navegan río arriba y el mundo cambia gradualmente. El río se angosta, el agua se aclara, la selva se vuelve más antigua. Los animales son menos cautelosos — no aprendieron todavía a temerle a los humanos que llegan desde abajo.<br><br>
 En el séptimo día, otra canoa los alcanza remando con velocidad notable. Son una familia de <span class="tt" data-tip="Shipibo-Conibo: pueblo indígena del alto Amazonas peruano. Conocidos por sus diseños geométricos que representan visiones del cosmos. Son expertos en medicina botánica. Su conocimiento del río es considerado enciclopédico por los investigadores que lo estudiaron.">shipibos</span> — adultos, niños, un anciano. Llevan tres generaciones haciendo el mismo recorrido: subir el río cuando el mundo de abajo se vuelve peligroso.`,
     decisions: [
-      { text: 'Navegar juntos con los shipibos. Hay fuerza en los que comparten destino.',        effects: { food: +20, moral: +28, union: +22 }, allianceKey: 'shipibo' },
+      { text: 'Navegar juntos con los shipibos. Hay fuerza en los que comparten destino.',        effects: { food: +11, moral: +28, union: +22 }, allianceKey: 'shipibo' },
       { text: 'Aprender de ellos todo lo posible y luego seguir caminos distintos.',             effects: { food: +12, moral: +22, union: +15 } },
       { text: 'Dejarlos seguir su camino. Cada pueblo tiene su propio río.',                    effects: { food: +5,  moral: +15, union: +10 } },
     ],
@@ -1523,7 +1523,7 @@ Cuando levanta la vista, tiene los ojos húmedos. No de tristeza — de algo que
 Los <span class="tt" data-tip="Tehuelches (Aonikenk): cazadores-recolectores patagónicos. Los cronistas europeos los describieron como los más altos del mundo. Cazaban guanacos con bolas arrojadizas y arco. Los españoles nunca los sometieron. Fueron diezmados en el siglo XIX por las expediciones militares argentinas y las enfermedades.">tehuelches</span> los observan cruzar desde la orilla sur sin impedir el paso. Un anciano lanza hacia el grupo algo que cae cerca de los pies del cacique: un hueso con marcas, envuelto en cuero.<br><br>
 <em>"Es un saludo"</em>, dice el chamán. <em>"Dice: bienvenidos al sur del mundo. Y dice: han llegado más lejos de lo que creían posible."</em>`,
     decisions: [
-      { text: 'Cruzar el río y acercarse al anciano tehuelche con respeto.',                         effects: { food: +10, moral: +25, salud: +5,  union: +20 }, allianceKey: 'tehuelches' },
+      { text: 'Cruzar el río y acercarse al anciano tehuelche con respeto.',                         effects: { food: +10, moral: +25, salud: -3,  union: +20 }, allianceKey: 'tehuelches' },
       { text: 'Cruzar en silencio. Asentarse lejos del territorio tehuelche. No molestar.',          effects: { food: -5,  moral: +15, salud: 0,   union: +10 } },
       { text: 'Cruzar y buscar el punto más inhóspito. Donde nadie quiera vivir, estarán seguros.',  effects: { food: -15, moral: +10, salud: -10 } },
     ],
@@ -1637,7 +1637,7 @@ El chamán escucha esto y se queda muy quieto por un tiempo largo. Luego pregunt
 Los yagua consultan entre ellos. La respuesta llega en la misma tarde: <em>"El Ucayali conecta con todos los ríos. Lo que se le entrega aquí llega a todos los lugares al mismo tiempo."</em><br><br>
 Es la primera vez desde Guatemala que alguien les ofrece una manera de despedirse de los que perdieron.`,
     decisions: [
-      { text: 'Hacer el rito yagua por cada persona que perdieron en el camino. Es hora.',         effects: { food: +10, moral: +40, salud: +10, union: +35 } },
+      { text: 'Hacer el rito yagua por cada persona que perdieron en el camino. Es hora.',         effects: { food: +4, moral: +40, salud: +10, union: +35 } },
       { text: 'Observar el rito sin participar. Respetar sin apropiarse.',                        effects: { food: +5,  moral: +28, salud: +5,  union: +22 } },
       { text: 'Combinar el rito yagua con las propias tradiciones. Crear algo nuevo entre los dos.', effects: { food: +8, moral: +32, salud: +8, union: +30 } },
     ],
@@ -1654,7 +1654,7 @@ El chamán se arrodilla y moja la frente. Se levanta despacio.<br><br>
 <em>"Este agua no fue nunca tocada por mano española. Nunca. Nadie sabe que está aquí."</em><br><br>
 Los niños del grupo se acercan y ponen las manos bajo el hilo. El agua está fría con ese frío que solo tienen las cosas que vienen de muy adentro de la tierra.`,
     decisions: [
-      { text: 'Fundar aquí, en la fuente. Nadie busca en el origen de un río.',                    effects: { food: +18, moral: +42, salud: +18, union: +35 } },
+      { text: 'Fundar aquí, en la fuente. Nadie busca en el origen de un río.',                    effects: { food: +9, moral: +42, salud: +18, union: +35 } },
       { text: 'Construir un santuario en la fuente y seguir buscando el lugar definitivo.',        effects: { food: +10, moral: +35, salud: +12, union: +28 } },
       { text: 'Guardar silencio absoluto sobre este lugar. La fuente debe seguir siendo secreta.', effects: { food: +12, moral: +30, salud: +10, union: +25 } },
     ],
@@ -1669,7 +1669,7 @@ Los niños del grupo se acercan y ponen las manos bajo el hilo. El agua está fr
 No muestran sorpresa al ver al grupo. El anciano que parece ser el líder dice: <em>"Sabíamos que vendrían. El río siempre trae a los que el mundo de abajo ya no puede sostener."</em><br><br>
 Los <span class="tt" data-tip="Pueblos cabecera: en muchas cuencas amazónicas, los grupos que habitan las fuentes de los ríos son considerados guardianes del origen del agua. En cosmovisiones amazónicas, el agua viene de las montañas, que son el mundo de los ancestros.">guardianes de las fuentes</span> son pocos pero llevan una relación con el lugar que ningún ejército puede deshacer.`,
     decisions: [
-      { text: 'Pedirles vivir junto a ellos. Esta aldea es lo que buscaban.',                     effects: { food: +25, moral: +38, salud: +20, union: +32 }, allianceKey: 'guardianes_fuentes' },
+      { text: 'Pedirles vivir junto a ellos. Esta aldea es lo que buscaban.',                     effects: { food: +11, moral: +38, salud: +20, union: +32 }, allianceKey: 'guardianes_fuentes' },
       { text: 'Establecerse cerca pero separados. Cerca del refugio, lejos de la dependencia.',   effects: { food: +18, moral: +28, salud: +15, union: +22 } },
       { text: 'Intercambiar historias del norte a cambio de conocimiento del lugar.',             effects: { food: +12, moral: +32, salud: +10, union: +25 } },
     ],
@@ -1748,7 +1748,7 @@ Un niño kawésqar de no más de diez años aparece en la orilla observando. No 
 El chamán intenta comunicarse. El niño responde en su lengua y señala con seguridad hacia el norte del canal, luego al este, luego dibuja con el dedo en el agua algo que podría ser un mapa.<br><br>
 Hay algo universal en la urgencia que ambos comparten sin necesitar palabras.`,
     decisions: [
-      { text: 'Seguir al niño. Un kawésqar de diez años sabe más de estos canales que cualquier adulto del grupo.', effects: { food: +15, moral: +28, salud: +15, union: +25 }, allianceKey: 'kawesqar_nino' },
+      { text: 'Seguir al niño. Un kawésqar de diez años sabe más de estos canales que cualquier adulto del grupo.', effects: { food: +9, moral: +28, salud: +15, union: +25 }, allianceKey: 'kawesqar_nino' },
       { text: 'Pedir que lleve a los adultos de su comunidad. Necesitan guías más experimentados.',                  effects: { food: +10, moral: +22, salud: +10, union: +18 } },
       { text: 'Construir una balsa y explorar solos el primer canal. Aprender haciendo.',                             effects: { food: -8,  moral: +20, salud: -8,  union: +15, warriors: -1 } },
     ],
@@ -1764,7 +1764,7 @@ El chamán pasa tres días en una canoa kawésqar aprendiendo a mirar. Al final 
 <em>"El agua aquí habla. No en metáfora. En información real. Hay que aprender a escucharla."</em><br><br>
 Un guerrero mayor pregunta: <em>"¿Y cuánto tiempo lleva aprender?"</em> El kawésqar señala a sus hijos pequeños: <em>"Así de chicos empezamos."</em>`,
     decisions: [
-      { text: 'Dedicar meses a aprender. Vale más este conocimiento que la velocidad.',            effects: { food: +20, moral: +35, salud: +20, union: +30 }, allianceKey: 'kawesqar_canales' },
+      { text: 'Dedicar meses a aprender. Vale más este conocimiento que la velocidad.',            effects: { food: +11, moral: +35, salud: +20, union: +30 }, allianceKey: 'kawesqar_canales' },
       { text: 'Aprender lo esencial para no morir. El resto viene con la práctica.',               effects: { food: +15, moral: +25, salud: +15, union: +22 } },
       { text: 'Pedir a los kawésqar que naveguen con el grupo hasta el destino final.',            effects: { food: +12, moral: +30, salud: +12, union: +28 } },
     ],

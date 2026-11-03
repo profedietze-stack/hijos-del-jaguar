@@ -105,7 +105,9 @@ Criterio (supuesto mío, a confirmar): Histórico y Legendario son difíciles pe
 
 **Segunda pasada de balance:** las alianzas cuentan una vez por pueblo (`core/alliances.ts`, también en guardados viejos; tasas de victoria sin cambio) y el final Desgarro mira la moral con la que llegó el pueblo, no la del último evento (ahora aparece en Histórico y Legendario, de forma rara; no en Educativo).
 
-**Sin resolver en balance:** la economía de alimentos sigue en ≈ 0 hacia el turno 7 (tocarla rompería lo medido arriba); 31 eventos con una opción dominante (contenido).
+**Opciones dominantes (tercera pasada):** los 31 eventos con una opción que ganaba en todo ahora tienen un costo real en esa opción (comida por tiempo o raciones, unión, o 1 guerrero/civil/−3 salud por el riesgo del contacto); no se subió ninguna opción mala. Resultado: **0 eventos con opción dominante** (antes 31) y 79 pares dominados (antes 120). `contenido.test.ts` ahora exige 0 y tope 79; falla con el contenido viejo. Rebalance medido (300 partidas por celda, jugando bien = política «codiciosa»): Histórico 31 % → 27 %, Legendario 11 % → 9 %, Educativo 87 % sin cambio; al azar Histórico 5 %, Legendario 2 %. Quedó algo bajo el objetivo de 30 %/10 %: es un costo real, no se compensó. La política «óptima» (más ingenua que una persona) bajó más en Legendario (11 % → 5 %).
+
+**Sin resolver en balance:** la economía de alimentos sigue en ≈ 0 hacia el turno 7 y los costos nuevos en comida la empujan un poco más; es la siguiente decisión de diseño.
 
 ## 5. Contenido
 

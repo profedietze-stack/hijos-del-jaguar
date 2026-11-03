@@ -30,7 +30,7 @@ describe('decisiones: integridad numérica y de texto', () => {
 
 /**
  * Ratchet de dominancia: una opción igual o peor en TODO que otra no es una decisión.
- * Hoy hay 120 pares así (auditoría 2026-11-03). El test no obliga a arreglarlos de golpe pero
+ * Hoy hay 79 pares así (eran 120 en la auditoría 2026-11-03). El test no obliga a arreglarlos de golpe pero
  * impide que aparezcan más: si baja, bajar el tope.
  */
 describe('opciones dominadas (ratchet)', () => {
@@ -47,6 +47,18 @@ describe('opciones dominadas (ratchet)', () => {
         if (ge && gt && (!b.allianceKey || a.allianceKey)) pares++
       }))
     }
-    expect(pares).toBeLessThanOrEqual(120)
+    expect(pares).toBeLessThanOrEqual(79)
+  })
+
+  it('ninguna opción es mejor o igual que TODAS las demás (decisión sin decisión)', () => {
+    const triviales: string[] = []
+    for (const [id, ev] of Object.entries(EVENTS_DEF)) {
+      if (!enPool.has(id)) continue
+      const ds = ev.decisions
+      const domina = (a: typeof ds[number], b: typeof ds[number]) =>
+        K.every(k => (a.effects[k] ?? 0) >= (b.effects[k] ?? 0)) && K.some(k => (a.effects[k] ?? 0) > (b.effects[k] ?? 0)) && (!b.allianceKey || !!a.allianceKey)
+      if (ds.some((a, i) => ds.every((b, j) => i === j || domina(a, b)))) triviales.push(id)
+    }
+    expect(triviales).toEqual([])
   })
 })
