@@ -73,7 +73,7 @@ function _buildTokenPicker(): void {
     return `<button class="token-btn${sel}" data-emoji="${t.emoji}" title="${t.name}" aria-label="${t.name}"><span class="token-emoji">${t.emoji}</span><span class="token-name">${t.name}</span></button>`
   }).join('')
 
-  container.innerHTML = `<div class="token-picker-label">Elige el símbolo de tu tribu</div><div class="token-grid">${btns}</div>`
+  container.innerHTML = `<div class="token-picker-label">Elegí el símbolo de tu tribu</div><div class="token-grid">${btns}</div>`
 
   container.querySelectorAll<HTMLButtonElement>('.token-btn').forEach(btn => {
     btn.addEventListener('click', () => {

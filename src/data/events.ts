@@ -16,7 +16,7 @@ export const EVENTS_DEF: Record<string, GameEvent> = {
     img:   `${import.meta.env.BASE_URL}images/events/conquistadores.jpg`,
     cap:   'Fuego — el inicio de la huida',
     narr:  `El olor a madera quemada todavía está en la ropa de todos. Hace tres horas la aldea existía. Ahora solo existe el humo.<br><br>
-Eres el <span class="ct" data-modal="cacique">cacique</span>. Sobreviviste porque estabas en el río cuando llegaron. Cincuenta personas te rodean en el claro: guerreros con heridas que todavía sangran, chamanes que lograron salvar los objetos sagrados, niños que no entienden qué pasó, ancianos que sí entienden y por eso tiemblan.<br><br>
+Sos el <span class="ct" data-modal="cacique">cacique</span>. Sobreviviste porque estabas en el río cuando llegaron. Cincuenta personas te rodean en el claro: guerreros con heridas que todavía sangran, chamanes que lograron salvar los objetos sagrados, niños que no entienden qué pasó, ancianos que sí entienden y por eso tiemblan.<br><br>
 El chamán mayor pone su mano en tu hombro: <em>"No hay nada que volver a buscar. El sur es el único norte que nos queda."</em><br><br>
 Los <span class="tt" data-tip="Conquistadores: soldados profesionales enviados por la Corona española desde 1492. Usaban armadura de acero, arcabuces de chispa y caballos — tecnología que los pueblos indígenas nunca habían visto. Pero su arma más letal era invisible: las enfermedades europeas como la viruela, que mataron entre el 50 y el 90% de la población americana en pocas décadas.">conquistadores</span> saben que hay sobrevivientes. Vendrán al amanecer con perros de rastreo. El tiempo que hay para decidir se mide en minutos.`,
     decisions: [
@@ -171,7 +171,7 @@ Circula información: los españoles abrieron una ruta nueva al sur. Y un rumor 
     cap:   'Costa Rica — el chamán frente a lo desconocido',
     narr:  `El chamán mayor lleva tres días solo con los enfermos. Esta noche llama aparte al cacique, fuera del alcance del oído de los demás. Tarda en hablar.<br><br>
 <em>"No sé qué es. En cuarenta años de chamán, nunca vi esto. Los remedios que conozco no funcionan."</em><br><br>
-Es la primera vez en tu vida que lo escuchas admitir ignorancia completa. Cuatro personas murieron. En el borde del campamento hay una planta que el chamán nunca usó — solo la vio usar, hace años, en un pueblo del sur, en situación parecida. No conoce la dosis. No sabe si funciona aquí.<br><br>
+Es la primera vez en tu vida que lo escuchás admitir ignorancia completa. Cuatro personas murieron. En el borde del campamento hay una planta que el chamán nunca usó — solo la vio usar, hace años, en un pueblo del sur, en situación parecida. No conoce la dosis. No sabe si funciona aquí.<br><br>
 <em>"Podría matar o curar. No sé. No sé."</em>`,
     decisions: [
       { text: 'Autorizar al chamán a probar con la planta desconocida. El riesgo de no hacer nada es mayor.', effects: { food: -5, moral: +10, salud: +20, civilians: -1 } },
