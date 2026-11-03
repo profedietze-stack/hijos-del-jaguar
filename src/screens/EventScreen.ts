@@ -1,4 +1,5 @@
 import type { GameState }   from '../core/GameState.js'
+import { personalizeNarr }  from '../core/text.js'
 import type { GameEvent, Decision } from '../data/types.js'
 import type { ClaseInfo }    from '../data/claseData.js'
 import { showScreen, showLoadingOverlay, hideLoadingOverlay } from '../ui/dom.js'
@@ -38,23 +39,6 @@ export function preloadEventData(): void {
 
 /** Callback: índice de decisión + objeto Decision para que main.ts no necesite EVENTS_DEF */
 type DecisionCallback = (decisionIndex: number, decision: Decision) => void
-
-/** Personaliza la narrativa con el nombre del cacique */
-function personalizeNarr(narrHtml: string, name: string): string {
-  const n = name
-  return narrHtml
-    .replace('llama aparte al cacique,',         `llama aparte al cacique ${n},`)
-    .replace('Doce guaraníes miran al cacique.',  `Doce guaraníes miran al cacique ${n}.`)
-    .replace('Le ofrecen al cacique hablar',      `Le ofrecen al cacique ${n} hablar`)
-    .replace('Cuando el cacique se acerca,',      `Cuando ${n} se acerca,`)
-    .replace('una expresión que el cacique nunca le vio', `una expresión que ${n} nunca le vio`)
-    .replace('cerca de los pies del cacique:',    `cerca de los pies de ${n}:`)
-    .replace('ya no es solo tuya, cacique.',      `ya no es solo tuya, ${n}.`)
-    .replace(
-      '<span class="ct" data-modal="cacique">cacique</span>',
-      `<span class="ct" data-modal="cacique">cacique</span> <strong style="color:var(--ocre2)">${n}</strong>`,
-    )
-}
 
 /** Construye el HTML del hint de efectos para modo educativo */
 function buildHintHtml(fx: Decision['effects']): string {

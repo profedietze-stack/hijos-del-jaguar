@@ -1,6 +1,7 @@
 import type { FinishedGame } from '../core/GameState.js'
 import type { Difficulty }    from '../data/types.js'
 import { LOGROS_DEF }         from '../data/achievements.js'
+import { escapeHtml }         from '../core/text.js'
 import { CONQ_BRIDGE }        from '../data/nodes.js'
 import { loadHistory, loadUnlockedAchievements } from '../core/SaveSystem.js'
 import { showScreen }          from '../ui/dom.js'
@@ -209,7 +210,7 @@ function renderHsPartidas(h: FinishedGame[]): void {
       ? '<span class="hs-partida-mode-his">⚔️ Histórico</span>'
       : '<span class="hs-partida-mode-edu">📖 Educativo</span>'
     const caciqueLine = e.caciqueName
-      ? `<div style="font-family:'Cinzel',serif;font-size:.65rem;color:var(--ocre);opacity:.8;margin-bottom:.25rem;letter-spacing:.08em">Cacique ${e.caciqueName}</div>`
+      ? `<div style="font-family:'Cinzel',serif;font-size:.65rem;color:var(--ocre);opacity:.8;margin-bottom:.25rem;letter-spacing:.08em">Cacique ${escapeHtml(e.caciqueName)}</div>`
       : ''
     const dur      = Math.round(e.durationMs / 60000)
     const score    = calcScoreFromFG(e)

@@ -1,6 +1,7 @@
 import type { GameState } from '../core/GameState.js'
 import type { EndingDef, Difficulty }   from '../data/types.js'
 import { totalM }                        from '../core/GameState.js'
+import { escapeHtml }                    from '../core/text.js'
 import { DIFF_CONFIG }                   from '../data/difficultyConfig.js'
 import { LOGROS_DEF }                    from '../data/achievements.js'
 import { EDGES }                         from '../data/nodes.js'
@@ -541,7 +542,7 @@ export function mountEndingScreen(
   const nameEl   = document.getElementById('end-leader-label')
   if (nameEl) {
     nameEl.innerHTML = gs.caciqueName
-      ? `Cacique <span style="color:var(--ocre2);font-family:'Cinzel',serif;font-size:1rem">${gs.caciqueName}</span> — Tu título como líder`
+      ? `Cacique <span style="color:var(--ocre2);font-family:'Cinzel',serif;font-size:1rem">${escapeHtml(gs.caciqueName)}</span> — Tu título como líder`
       : 'Tu título como líder'
   }
   set('end-leader-title', lt.title)

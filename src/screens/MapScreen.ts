@@ -1,6 +1,7 @@
 import type { GameState } from '../core/GameState.js'
 import { NODES_DEF, EDGES, CONQ_BRIDGE } from '../data/nodes.js'
 import { showNotif } from '../ui/dom.js'
+import { escapeHtml } from '../core/text.js'
 import { sfxCinematic, sfxNodeHover } from '../ui/audio.js'
 import * as d3Lib from 'd3'
 import * as topojson from 'topojson-client'
@@ -323,7 +324,7 @@ export function drawPlayerToken(gs: GameState, overrideNd?: { lon: number; lat: 
   // Tooltip
   const cacique = gs.caciqueName ?? 'Cacique'
   pg.on('mouseenter', (ev: MouseEvent) => showGeoTip(ev,
-    `<strong style="color:#4fce60">${token} ${cacique}</strong><br>Aquí se encuentra tu pueblo`))
+    `<strong style="color:#4fce60">${escapeHtml(token)} ${escapeHtml(cacique)}</strong><br>Aquí se encuentra tu pueblo`))
     .on('mouseleave', hideGeoTip)
 }
 
