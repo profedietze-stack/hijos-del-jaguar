@@ -141,11 +141,11 @@ describe('applyDecay', () => {
     expect(stats.food).toBe(0)
   })
 
-  it('aplica decay de historico acto 2: food -10, salud -6', () => {
+  it('aplica decay de historico acto 2: food -10, salud -5', () => {
     const s = makeStats({ food: 50, salud: 55 })
     const { stats } = applyDecay(s, 2, 'historico')
     expect(stats.food).toBe(40)
-    expect(stats.salud).toBe(49)
+    expect(stats.salud).toBe(50)
   })
 })
 

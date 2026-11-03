@@ -35,7 +35,7 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
     dimCutoff: 55,
     decay: {
       1: { food: -6,  salud: -4 },
-      2: { food: -10, salud: -6 },
+      2: { food: -10, salud: -5 },
       3: { food: -13, salud: -8 },
       4: { food: -9,  salud: -5 },
     },
@@ -62,10 +62,10 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
     fxMult:    { pos: 0.65, neg: 1.55 },
     dimCutoff: 60,
     decay: {
-      1: { food: -7,  salud: -4  },
-      2: { food: -11, salud: -7  },
-      3: { food: -14, salud: -9  },
-      4: { food: -10, salud: -6  },
+      1: { food: -6,  salud: -4  },
+      2: { food: -10, salud: -7  },
+      3: { food: -13, salud: -9  },
+      4: { food: -9,  salud: -6  },
     },
     deathThreshold:      { food: 36, salud: 34 },
     deathProb:           { 1: 0.45, 2: 0.60, 3: 0.75, 4: 0.55 },
