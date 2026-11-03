@@ -64,3 +64,12 @@
   #ev-body { overflow-y: auto; }
   #ev-narr-wrap { flex: 0 0 auto; overflow: visible; }
 }
+
+/* Contraste (F3-15): las pistas de efecto, el pie de imagen y las etiquetas del HUD estaban
+   entre 2,2:1 y 3,7:1. El mínimo AA para texto chico es 4,5:1; subir la opacidad lo alcanza
+   sobre el fondo oscuro sin cambiar el diseño. */
+.dec-hint { opacity: .85; }
+.ev-img-cap { opacity: .85; }
+.dec-label { opacity: .8; }
+.sb-sname, .sb-tlabel { opacity: .75; }
+.leg-hint { opacity: .8; }

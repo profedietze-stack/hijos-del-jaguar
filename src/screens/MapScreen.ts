@@ -2,6 +2,7 @@ import type { GameState } from '../core/GameState.js'
 import { NODES_DEF, EDGES, CONQ_BRIDGE } from '../data/nodes.js'
 import { showNotif } from '../ui/dom.js'
 import { escapeHtml } from '../core/text.js'
+import { parchearTransicionesD3, congelarSmil } from '../ui/motion.js'
 import { tribeTrailSegments } from '../core/trail.js'
 import { sfxCinematic, sfxNodeHover } from '../ui/audio.js'
 import * as d3Lib from 'd3'
@@ -12,6 +13,14 @@ import * as topojson from 'topojson-client'
 // ══════════════════════════════════════════════════════
 
 type D3Lib = typeof d3Lib
+
+/** En pantallas angostas el zoom de juego se reduce: las etiquetas (7,5 px × zoom) se apilaban a 360 px. */
+function escalaPantalla(): number {
+  return (document.getElementById('map-canvas-wrap')?.clientWidth ?? 900) < 500 ? 0.62 : 1
+}
+
+// «Reducir movimiento»: toda transición de D3 pasa a 0 ms (ver ui/motion.ts)
+parchearTransicionesD3(d3Lib)
 
 // ── Estado del mapa ───────────────────────────────────
 
@@ -734,7 +743,7 @@ function _centerOnNextNodes(gs: GameState): void {
     lon = lons.reduce((a, b) => a + b, 0) / lons.length
     lat = lats.reduce((a, b) => a + b, 0) / lats.length
     const span = Math.max(Math.max(...lons) - Math.min(...lons), Math.max(...lats) - Math.min(...lats))
-    scale = span < 5 ? 3.2 : span < 12 ? 2.4 : 1.8
+    scale = (span < 5 ? 3.2 : span < 12 ? 2.4 : 1.8) * escalaPantalla()
   }
   const cWp = conqCurrentNode(gs)
   if (cWp) {
@@ -823,6 +832,7 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
   })
 
   // Nodos
+  const soloEtiquetasElegibles = escalaPantalla() < 1
   Object.values(nodes).forEach(nd => {
     if (nd.id === '_conq_catch_node') return
     const [x, y] = mapProj!([nd.lon, nd.lat]) as [number, number]
@@ -845,12 +855,23 @@ export function drawNodes(gs: GameState, onSelectNode?: (nodeId: string) => void
       .attr('font-size', locked && !unlockedOtherPath ? '8px' : '12px')
       .attr('opacity', locked && !unlockedOtherPath ? .2 : done ? 1 : reachable ? 1 : .35)
       .text(locked && !unlockedOtherPath ? '🔒' : nd.icon)
+    if (done) {
+      // «Visitado» no puede depender solo del color (daltonismo): marca ✓ y nombre accesible
+      g.append('circle').attr('cx', 8).attr('cy', -8).attr('r', 4.6).attr('fill', '#1e7a3a').attr('stroke', 'rgba(255,255,255,.85)').attr('stroke-width', .6)
+      g.append('text').attr('x', 8).attr('y', -8).attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+        .attr('font-size', '6.5px').attr('fill', '#fff').attr('pointer-events', 'none').text('✓')
+      g.append('title').text(`Visitado: ${nd.name}`)
+    }
     const [lx, ly] = LABEL_OFFSET[nd.id] ?? [0, 20]
     const label = nd.name.split('–')[0].trim()
     const lcolor = done ? 'rgba(196,136,42,.8)' : reachable ? 'rgba(235,218,185,.95)' : unlockedOtherPath ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.22)'
     const estW = Math.max(label.length * 5.2 + 8, 30)
-    g.append('rect').attr('x', lx - estW / 2).attr('y', ly - 8).attr('width', estW).attr('height', 11).attr('fill', 'rgba(6,4,2,.75)').attr('rx', 2).attr('opacity', locked && !unlockedOtherPath ? 0.3 : 1)
-    g.append('text').attr('text-anchor', 'middle').attr('x', lx).attr('y', ly).attr('font-size', '7.5px').attr('font-family', 'Cinzel,serif').attr('fill', lcolor).attr('pointer-events', 'none').text(label)
+    // En pantalla angosta solo llevan nombre los destinos que se pueden elegir: con 60 etiquetas
+    // de 7,5 px × zoom se apilaban a 360 px y no se leía ninguna.
+    if (!soloEtiquetasElegibles || reachable) {
+      g.append('rect').attr('x', lx - estW / 2).attr('y', ly - 8).attr('width', estW).attr('height', 11).attr('fill', 'rgba(6,4,2,.75)').attr('rx', 2).attr('opacity', locked && !unlockedOtherPath ? 0.3 : 1)
+      g.append('text').attr('text-anchor', 'middle').attr('x', lx).attr('y', ly).attr('font-size', '7.5px').attr('font-family', 'Cinzel,serif').attr('fill', lcolor).attr('pointer-events', 'none').text(label)
+    }
 
     if (reachable && onSelectNode) {
       g.style('cursor', 'pointer')
@@ -1013,6 +1034,8 @@ function _buildMapFull(wrap: HTMLElement, W: number, H: number, gs: GameState, o
   grat.lines().forEach((line: Parameters<typeof path>[0]) => {
     gratG.append('path').datum(line).attr('d', path).attr('fill', 'none').attr('stroke', 'rgba(60,140,200,.08)').attr('stroke-width', .3)
   })
+
+  congelarSmil(document.getElementById('map-svg'))   // pulsos <animate> quietos si el movimiento está reducido
 
   // Spinner de carga
   const spinner = document.createElement('div')
@@ -1453,7 +1476,7 @@ function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void, onD
   if (!wrap) { onDone?.(); return }
   const W = wrap.clientWidth || 900, H = wrap.clientHeight || 580
   const GUATEMALA = { lon: -90.3, lat: 15.5 }
-  const s2 = 3.2
+  const s2 = 3.2 * escalaPantalla()
   const [gx, gy] = mapProj([GUATEMALA.lon, GUATEMALA.lat]) as [number, number]
   const gtx = W / 2 - s2 * gx, gty = H / 2 - s2 * gy
   mapSvg.transition().duration(2000).ease(d3Lib.easeCubicInOut)

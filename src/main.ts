@@ -410,6 +410,14 @@ function continueGame(): void {
   } else {
     buildMap(gs, _selectNodeFn)
     showScreen('map-screen')
+    // Al continuar, el mapa abría mostrando todo el continente: encuadrar los próximos destinos
+    // en cuanto los nodos estén dibujados (buildMap termina de forma asíncrona).
+    let intentos = 0
+    const encuadrar = () => {
+      if (document.querySelector('#map-svg .ng') || intentos++ > 40) { centerOnNextNodes(gs); return }
+      setTimeout(encuadrar, 150)
+    }
+    setTimeout(encuadrar, 150)
   }
 }
 

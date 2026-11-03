@@ -1,6 +1,7 @@
 import { hasSavedGame }                    from '../core/SaveSystem.js'
 import { showScreen, hideStatsBar }        from '../ui/dom.js'
 import { startMenuEmbers, stopMenuEmbers } from '../fx/MenuEmbers.js'
+import { movimientoReducido } from '../ui/motion.js'
 
 // ══════════════════════════════════════════════════════
 // MENU SCREEN
@@ -23,7 +24,7 @@ export function mountMenu(): void {
   if (btnHistory) btnHistory.disabled = false
 
   // Brasas canvas — arranca (o reinicia) el sistema de partículas
-  startMenuEmbers('menu-particles')
+  if (!movimientoReducido()) startMenuEmbers('menu-particles')
 }
 
 export { stopMenuEmbers as stopMenuEmbers }

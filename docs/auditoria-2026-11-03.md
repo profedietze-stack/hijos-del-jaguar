@@ -46,17 +46,24 @@ Cinco hallazgos más importantes:
 | F3-07 | Alta | Guardado con tipos cambiados / historial / logros corruptos | **Corregido `8dee8e9`**, 12 tests en rojo con el código viejo; no re-probado en navegador |
 | F3-08 | Media | 🪟🪨🦬 (Emoji 13) vacíos en Windows 10 | **Corregido `38e8c3f`** |
 | F3-09 | Alta | `#btn-mute` fuera de pantalla a 360, 768 y 812 px | **Corregido** (commit de UI móvil); verificado a 360×640 (mute 306–350, 44×44) y 812×375; 768×1024 no re-medido |
-| F3-10 | Media | Mapa a 360 px | **Parcial:** cabecera en una fila de 62 px y leyenda compacta (111×86). Las etiquetas de nodos siguen apiladas con el zoom 3,2 de la cinemática: pendiente |
+| F3-10 | Media | Mapa a 360 px | **Corregido**, verificado a 360×640: cabecera en una fila, leyenda compacta, zoom ×0,62 en pantalla angosta y solo llevan nombre los destinos elegibles (3 etiquetas legibles en vez de ~60 apiladas). Al continuar, el mapa ahora encuadra los próximos destinos |
 | F3-11/12 | Media | «Educativo» cortado; narración de 1 línea apaisado | **Corregido**, verificado a 360×640 (botones en columna) y 812×375 (columna derecha desplazable) |
 | F3-13 | Media | Objetivos táctiles < 44 px | **Corregido** para mute, 📚, Menú, chips, continuar y cerrar (medido 44 px a 360); la dificultad quedó en 44 px por CSS, no re-medida |
-| F3-14 | Media | reduced-motion no frena D3, SMIL ni brasas | Pendiente |
-| F3-15 | Media | Contraste y aria-labels | **Parcial:** aria-labels, `aria-pressed` del mute y opacidad de Menú/📚 corregidos; contraste de las pistas de efecto y del pie de imagen pendiente |
-| F3-16 | Media | El aviso de consecuencias se cierra solo a los 3,2 s | Pendiente |
+| F3-14 | Media | reduced-motion no frena D3, SMIL ni brasas | **Corregido** (`ui/motion.ts`): transiciones de D3 a 0 ms, SMIL en pausa, sin brasas. Verificado con `prefers-reduced-motion: reduce`: SMIL pausado, sin canvas de brasas; la duración 0 de D3 la cubre el test unitario, no la vi en pantalla |
+| F3-15 | Media | Contraste y aria-labels | **Corregido en CSS** (opacidades de pistas, pie de imagen, etiquetas del HUD); **no re-medí las razones de contraste**, solo subí la opacidad. El diálogo oculto en el árbol de accesibilidad sigue pendiente |
+| F3-16 | Media | El aviso de consecuencias se cierra solo a los 3,2 s | **Corregido**: con cambios de stat o alianza solo se cierra con el botón; verificado (sigue visible a los 6 s) |
 | F3-17 | Media | Offline: imágenes de eventos no vistos rotas | Pendiente |
-| F3-18..27 | Baja | Escape en modales, mute no persiste, warnings de AudioContext, «v3.0» vs 0.2.0, tuteo/voseo mezclados, etc. | Pendiente (detalle en el informe del agente) |
+| F3-18 | Baja | Escape en modales | **Corregido** (confirmación, glosario, info didáctica); no probado en navegador |
+| F3-19 | Baja | El mute no persiste | **Corregido** y ajustes leídos campo por campo |
+| F3-20 | Baja | «✓ guardado» con almacenamiento lleno | **Corregido** (`saveGame` devuelve si pudo; aviso una vez por racha) |
+| F3-21 | Baja | Avisos de consola | **Parcial**: `requestFullscreen` sin rechazo; siguen 2 avisos de AudioContext y 1 de Tone.js (consola sin errores) |
+| F3-22 | Baja | «v3.0» fijo | **Corregido** (muestra v0.2.0, verificado) |
+| F3-24 | Baja | «Visitado ✓» sin check | **Corregido**: ✓ en el nodo y nombre accesible; verificado |
+| F3-26 | Baja | No se guarda hasta el primer nodo | **Corregido**, verificado (`jaguar_save` existe a los 2,5 s de empezar) |
+| F3-23, F3-25, F3-27 | Baja | Nota docente vacía; tutorial; tuteo/voseo mezclados | Pendiente (el tuteo/voseo es contenido de todo el texto: propuesta) |
 | — | Media | `drawTribePath` tiraba TypeError con GameState armado a mano | **Corregido `6f46f02`** (el test cubre el helper nuevo, no la versión vieja) |
-| — | Media | `initErrorBanner()` está dentro de `DOMContentLoaded`, no en la primera línea del módulo | Pendiente |
-| — | Baja | Doble `requestAnimationFrame` en `startNewGame`: en pestaña en segundo plano el mapa no se construye hasta volver | Pendiente (propuesta: `setTimeout` de respaldo) |
+| — | Media | `initErrorBanner()` dentro de `DOMContentLoaded` | **Corregido**: primera llamada del módulo (test) |
+| — | Baja | Doble `requestAnimationFrame` en `startNewGame` | **Corregido** con respaldo de 300 ms (`trasPintar`); no probé una pestaña en segundo plano real |
 
 ## 4. Simulación (motor real)
 
@@ -96,7 +103,9 @@ Resultado (150 partidas × 9 rutas por celda, opciones barajadas, mismo simulado
 
 Criterio (supuesto mío, a confirmar): Histórico y Legendario son difíciles pero ganables jugando bien (30 % y 10 %), y jugar sin pensar casi nunca gana (< 5 %). Educativo no se tocó. El «siempre la primera» dejó de funcionar porque las opciones se barajan. Las pantallas de dificultad leen el % de salto desde `DIFF_CONFIG` (antes el texto decía 32 % y 48 % a mano). Sigue habiendo 31 eventos con una opción dominante y 120 pares dominados: es contenido, no se tocó.
 
-**Sin resolver en balance:** los 3 finales DESGARRO siguen sin aparecer; la economía de alimentos sigue en ≈ 0 hacia el turno 7; las claves de alianza duplicadas (`tehuelches` ×5, `kawesqar` ×4, `ranquel`/`ranqueles`) siguen inflando el conteo.
+**Segunda pasada de balance:** las alianzas cuentan una vez por pueblo (`core/alliances.ts`, también en guardados viejos; tasas de victoria sin cambio) y el final Desgarro mira la moral con la que llegó el pueblo, no la del último evento (ahora aparece en Histórico y Legendario, de forma rara; no en Educativo).
+
+**Sin resolver en balance:** la economía de alimentos sigue en ≈ 0 hacia el turno 7 (tocarla rompería lo medido arriba); 31 eventos con una opción dominante (contenido).
 
 ## 5. Contenido
 
@@ -199,4 +208,5 @@ Todos en `qa/auditoria-completa`. Revertir uno: `git revert <hash>`.
 | `c062bd4` | UI móvil (HUD, dificultad, mapa, apaisado, aria) |
 | `fdb87dc` | `conqJumpProb` pasa a DIFF_CONFIG (sin cambio de valores) |
 | `e69c08d` | decisiones barajadas |
-| `d7c2dc6` + siguiente | balance de Histórico y Legendario |
+| `d7c2dc6`, `7cff670` | balance de Histórico y Legendario |
+| segunda pasada | alianzas por pueblo, Desgarro, `88d9739` (hallazgos menores), accesibilidad, movimiento reducido, mapa en móvil y al continuar (ver `git log`) |
