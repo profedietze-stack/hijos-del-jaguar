@@ -45,11 +45,12 @@ Cinco hallazgos más importantes:
 | F3-06 | Alta | No existe `#btn-credits` | **Corregido `6abf1d6`** (verificación visual pendiente) |
 | F3-07 | Alta | Guardado con tipos cambiados / historial / logros corruptos | **Corregido `8dee8e9`**, 12 tests en rojo con el código viejo; no re-probado en navegador |
 | F3-08 | Media | 🪟🪨🦬 (Emoji 13) vacíos en Windows 10 | **Corregido `38e8c3f`** |
-| F3-09 | Alta | `#btn-mute` fuera de pantalla a 360, 768 y 812 px | Pendiente |
-| F3-10..12 | Media | Mapa ilegible a 360 px; «Educativo» cortado; narración de 1 línea a 812×375 | Pendiente |
-| F3-13 | Media | Objetivos táctiles < 44 px (chips 29, Menú/📚 26, mute 37×21) | Pendiente |
+| F3-09 | Alta | `#btn-mute` fuera de pantalla a 360, 768 y 812 px | **Corregido** (commit de UI móvil); verificado a 360×640 (mute 306–350, 44×44) y 812×375; 768×1024 no re-medido |
+| F3-10 | Media | Mapa a 360 px | **Parcial:** cabecera en una fila de 62 px y leyenda compacta (111×86). Las etiquetas de nodos siguen apiladas con el zoom 3,2 de la cinemática: pendiente |
+| F3-11/12 | Media | «Educativo» cortado; narración de 1 línea apaisado | **Corregido**, verificado a 360×640 (botones en columna) y 812×375 (columna derecha desplazable) |
+| F3-13 | Media | Objetivos táctiles < 44 px | **Corregido** para mute, 📚, Menú, chips, continuar y cerrar (medido 44 px a 360); la dificultad quedó en 44 px por CSS, no re-medida |
 | F3-14 | Media | reduced-motion no frena D3, SMIL ni brasas | Pendiente |
-| F3-15 | Media | Contraste bajo (2.17:1 en pistas), botones sin aria-label | Pendiente |
+| F3-15 | Media | Contraste y aria-labels | **Parcial:** aria-labels, `aria-pressed` del mute y opacidad de Menú/📚 corregidos; contraste de las pistas de efecto y del pie de imagen pendiente |
 | F3-16 | Media | El aviso de consecuencias se cierra solo a los 3,2 s | Pendiente |
 | F3-17 | Media | Offline: imágenes de eventos no vistos rotas | Pendiente |
 | F3-18..27 | Baja | Escape en modales, mute no persiste, warnings de AudioContext, «v3.0» vs 0.2.0, tuteo/voseo mezclados, etc. | Pendiente (detalle en el informe del agente) |

@@ -1,0 +1,66 @@
+/* ── Móvil: HUD, objetivos táctiles y dificultad (auditoría 2026-11-03, F3-09/11/13) ── */
+
+/* El botón de silencio nunca puede quedar fuera de pantalla: no se encoge y va al borde. */
+#btn-mute {
+  flex-shrink: 0;
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  opacity: .55;
+  padding: .1rem .4rem;
+  line-height: 1;
+  transition: opacity .2s;
+}
+.sb-stats { min-width: 0; }
+
+@media (max-width: 900px) {
+  /* Con 812 px o menos la fila (tribu + 4 barras + acto + guardado + modo) no entra:
+     sobra lo accesorio, no el control. */
+  #stats-bar { gap: .6rem; padding: 0 .6rem; }
+  .sb-stats { gap: .5rem; }
+  .sb-stat { min-width: 0; flex: 1 1 0; }
+  .sb-breakdown, .sb-act, #sb-save-indicator, #sb-diff-badge { display: none; }
+}
+
+/* Objetivos táctiles de al menos 44 px en pantallas chicas o táctiles. */
+@media (max-width: 900px), (pointer: coarse) {
+  #map-ped-btn, #map-menu-btn, #ev-ped-btn, #ev-menu-btn,
+  #aftermath-continue, #hist-card-continue, .btn-reset-all,
+  #modal-close, #ped-close, .name-suggestions > * {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Dificultad a 360 px: en columna, para que ninguna opción quede cortada. */
+@media (max-width: 480px) {
+  .diff-wrap { flex-direction: column; align-items: stretch; }
+  .diff-btn { width: 100%; }
+}
+
+/* Mapa a 360 px: cabecera en una sola fila legible y leyenda compacta (F3-10). */
+@media (max-width: 600px) {
+  .diff-btn { min-height: 44px; }
+  #map-header { flex-wrap: wrap; gap: .25rem .5rem; padding: .4rem .6rem; justify-content: flex-start; }
+  /* el progreso de la derecha ya dice «Acto I · Huida»: el título duplicaba y partía la fila */
+  .mh-title { display: none; }
+  #ev-ped-btn, #ev-menu-btn { width: auto; }
+  #map-header .btn { width: auto; flex: 0 0 auto; margin-top: 0; }
+  #map-progress { flex: 1 1 auto; min-width: 0; }
+  .mh-hint { display: none; }
+  #map-legend { bottom: .4rem; right: .4rem; min-width: 0; padding: .35rem .5rem; font-size: .5rem; }
+  .leg-hint, .leg-title { display: none; }
+  .leg-item { font-size: .5rem; margin-bottom: .15rem; }
+  .leg-sym { font-size: .7rem; min-width: 12px; }
+}
+
+/* Teléfono apaisado (812×375): la narración quedaba en una sola línea porque el panel de
+   decisiones no se encogía. Toda la columna derecha pasa a desplazarse junta (F3-12). */
+@media (max-height: 500px) {
+  #ev-body { overflow-y: auto; }
+  #ev-narr-wrap { flex: 0 0 auto; overflow: visible; }
+}

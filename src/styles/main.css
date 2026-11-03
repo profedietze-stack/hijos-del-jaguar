@@ -18,3 +18,4 @@
 
 @import './components/ui-overlays.css';
 @import './screens/credits.css';
+@import './components/touch.css';   /* último: pisa a las reglas de cada pantalla en móvil */

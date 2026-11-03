@@ -463,5 +463,7 @@ function _syncMuteBtn(): void {
   if (btn) {
     btn.textContent   = _muted ? '🔇' : '🔊'
     btn.style.opacity = _muted ? '0.9' : '0.55'
+    btn.setAttribute('aria-pressed', String(_muted))
+    btn.setAttribute('aria-label', _muted ? 'Activar sonido' : 'Silenciar música')
   }
 }

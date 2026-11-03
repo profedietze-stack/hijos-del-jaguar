@@ -95,7 +95,7 @@
     <div class="sb-act" id="sb-act-label">Acto I · Huida</div>
     <div id="sb-save-indicator" style="font-family:'Cinzel',serif;font-size:.55rem;color:var(--jade3);opacity:0;transition:opacity .4s;margin-left:.5rem;letter-spacing:.1em;">✓ guardado</div>
     <div id="sb-diff-badge" style="margin-left:.6rem;"></div>
-    <button id="btn-mute" title="Silenciar / activar música" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:.55;padding:.1rem .4rem;line-height:1;transition:opacity .2s;" aria-label="Silenciar música">🔊</button>
+    <button id="btn-mute" title="Silenciar / activar música" aria-label="Silenciar música" aria-pressed="false">🔊</button>
   </div>
 
   <!-- ══════════════════════════════════════════════════
@@ -284,8 +284,8 @@
         <span class="mh-title" id="map-act-title">Acto I — La Huida</span>
         <span class="mh-hint" id="map-hint">Elegí el próximo destino de tu pueblo</span>
         <div id="map-progress"></div>
-        <button class="btn btn-sec map-menu-btn-inline" id="map-ped-btn" style="padding:.3rem .75rem;font-size:.65rem;opacity:.5;margin-left:auto;">📚</button>
-        <button class="btn btn-sec map-menu-btn-inline" id="map-menu-btn" style="padding:.3rem .75rem;font-size:.65rem;opacity:.5;margin-left:.3rem;">☰ Menú</button>
+        <button class="btn btn-sec map-menu-btn-inline" id="map-ped-btn" aria-label="Información didáctica" style="padding:.3rem .75rem;font-size:.65rem;opacity:.85;margin-left:auto;">📚</button>
+        <button class="btn btn-sec map-menu-btn-inline" id="map-menu-btn" style="padding:.3rem .75rem;font-size:.65rem;opacity:.85;margin-left:.3rem;">☰ Menú</button>
       </div>
       <div id="map-canvas-wrap">
         <svg id="map-svg"></svg>
@@ -307,8 +307,8 @@
        PANTALLA: EVENTO
   ══════════════════════════════════════════════════ -->
   <div id="event-screen" class="screen">
-    <button class="btn btn-sec ev-menu-btn-inline" id="ev-ped-btn" style="position:absolute;top:.6rem;right:4.8rem;z-index:10;padding:.3rem .75rem;font-size:.65rem;opacity:.45;">📚</button>
-    <button class="btn btn-sec ev-menu-btn-inline" id="ev-menu-btn" style="position:absolute;top:.6rem;right:.6rem;z-index:10;padding:.3rem .75rem;font-size:.65rem;opacity:.45;">☰ Menú</button>
+    <button class="btn btn-sec ev-menu-btn-inline" id="ev-ped-btn" aria-label="Información didáctica" style="position:absolute;top:.6rem;right:6rem;z-index:10;padding:.3rem .75rem;font-size:.65rem;opacity:.85;">📚</button>
+    <button class="btn btn-sec ev-menu-btn-inline" id="ev-menu-btn" style="position:absolute;top:.6rem;right:.6rem;z-index:10;padding:.3rem .75rem;font-size:.65rem;opacity:.85;">☰ Menú</button>
     <div id="event-layout">
       <div id="ev-img-wrap">
         <img id="ev-img" src="" alt="">
@@ -504,7 +504,7 @@
     <div id="modal-box">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
         <div id="modal-title"></div>
-        <button id="modal-close" style="background:none;border:none;color:var(--parch2);font-size:1.1rem;cursor:pointer;opacity:.55;padding:.25rem">✕</button>
+        <button id="modal-close" aria-label="Cerrar" style="background:none;border:none;color:var(--parch2);font-size:1.1rem;cursor:pointer;opacity:.55;padding:.25rem">✕</button>
       </div>
       <div id="modal-body"></div>
     </div>
@@ -547,7 +547,7 @@
           <div id="ped-eyebrow">Contexto Histórico</div>
           <div id="ped-title">Información</div>
         </div>
-        <button id="ped-close">✕</button>
+        <button id="ped-close" aria-label="Cerrar">✕</button>
       </div>
       <div id="ped-tabs"></div>
       <div id="ped-content"></div>
