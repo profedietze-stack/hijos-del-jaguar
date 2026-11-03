@@ -153,7 +153,8 @@ export function sanitizeSave(raw: unknown): GameState | null {
     reorgTurns: Math.floor(num(rc?.reorgTurns, 0)),
   }
 
-  const cur = typeof raw.currentNode === 'string' && nodes[raw.currentNode] ? raw.currentNode : null
+  // Solo vale un nodo desbloqueado y todavía sin jugar: es el evento pendiente.
+  const cur = typeof raw.currentNode === 'string' && nodes[raw.currentNode]?.unlocked && !nodes[raw.currentNode]!.completed ? raw.currentNode : null
 
   return {
     diff,

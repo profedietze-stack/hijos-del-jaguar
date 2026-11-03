@@ -82,6 +82,10 @@ export function applyDecision(gs: GameState, decision: Decision): TurnResult {
   // — Desbloquear hijos
   next.nodes = unlockChildren(next.nodes, nodeId)
 
+  // — El evento ya se resolvió: no queda ningún nodo «en curso». Si currentNode se quedaba
+  //   apuntando al nodo jugado, Continuar reabría el mismo evento una y otra vez.
+  next.currentNode = null
+
   // — ¿Derrota?
   const defeated = isDefeated(next.stats, next.diff)
   if (defeated) {

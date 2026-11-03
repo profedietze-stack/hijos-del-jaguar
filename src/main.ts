@@ -456,7 +456,7 @@ function _afterAftermath(prevAct: number): void {
     gs = {
       ...gs,
       history:     prevHistory,
-      currentNode: prevHistory[prevHistory.length - 1] ?? gs.currentNode,
+      currentNode: null,
       nodes:       Object.fromEntries(
         Object.entries(gs.nodes).filter(([k]) => k !== '_conq_catch_node'),
       ),
@@ -536,9 +536,7 @@ function _afterAftermath(prevAct: number): void {
 function triggerConqCatch(): void {
   // Determinar el acto actual para la narrativa
   const currentAct: ActNumber = (
-    gs.currentNode && gs.nodes[gs.currentNode]?.act
-      ? gs.nodes[gs.currentNode].act
-      : 2
+    gs.nodes[gs.history[gs.history.length - 1] ?? '']?.act ?? 2
   ) as ActNumber
 
   // Inyectar el nodo virtual de captura
