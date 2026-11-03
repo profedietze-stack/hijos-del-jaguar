@@ -1,5 +1,6 @@
 import type { GameState }   from '../core/GameState.js'
 import { personalizeNarr }  from '../core/text.js'
+import { shuffle }          from '../core/shuffle.js'
 import type { GameEvent, Decision } from '../data/types.js'
 import type { ClaseInfo }    from '../data/claseData.js'
 import { showScreen, showLoadingOverlay, hideLoadingOverlay } from '../ui/dom.js'
@@ -133,7 +134,10 @@ export function mountEventScreen(gs: GameState, onDecision: DecisionCallback): v
   const cont = document.getElementById('dec-buttons')
   if (cont) {
     cont.innerHTML = ''
-    ev.decisions.forEach((dec: Decision, i: number) => {
+    // Las opciones se escribieron con la mejor primera (78 % de los eventos): sin barajar, tocar
+    // siempre el primer botón ganaba casi tanto como leer. El índice que recibe main.ts es el
+    // de pantalla; main solo usa el objeto decisión.
+    shuffle(ev.decisions).forEach((dec: Decision, i: number) => {
       const btn = document.createElement('button')
       btn.className = 'dec-btn'
       const hintHtml = gs.diff === 'educativo' ? buildHintHtml(dec.effects) : ''
