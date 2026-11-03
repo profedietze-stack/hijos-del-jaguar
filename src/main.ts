@@ -55,7 +55,7 @@ import {
 
 // ── Audio ─────────────────────────────────────────────
 import {
-  playTrack, sfxClick, toggleMute,
+  playTrack, sfxClick, toggleMute, isMuted,
   sfxNodeSelect, sfxDecision,
   sfxPositive, sfxNegative,
   sfxConqAdvance, sfxConqCatch,
@@ -68,7 +68,7 @@ import { initClaseMode }                                from './ui/claseMode.js'
 import { openDidacticaOverlay }                         from './ui/didacticaOverlay.js'
 
 // ── Settings ──────────────────────────────────────────
-import { initSettings }                                 from './core/SettingsSystem.js'
+import { initSettings, saveSettings, getSettings }      from './core/SettingsSystem.js'
 import { initSettingsModal, openSettings }              from './ui/SettingsModal.js'
 
 // ── Debug (DEV only — tree-shaken en producción) ──────
@@ -99,12 +99,38 @@ let _inCatchEvent = false
 // clic montaba el evento dos veces, y un clic en la cinemática pisaba el estado.
 let _busy = false
 
+
+// Guarda y avisa. Con el almacenamiento lleno o bloqueado (modo privado) mostraba «✓ guardado»
+// igual: el alumno creía tener la partida a salvo.
+let _avisoSinGuardar = false
+function guardar(): void {
+  if (saveGame(gs)) {
+    _avisoSinGuardar = false
+    flashSaveIndicator()
+  } else if (!_avisoSinGuardar) {
+    _avisoSinGuardar = true   // una vez por racha: no spamear cada turno
+    showNotif('⚠️ No se pudo guardar la partida (almacenamiento lleno o bloqueado). Si cerrás, se pierde.', 'loss')
+  }
+}
+
+// Doble requestAnimationFrame para esperar al primer pintado, con respaldo: en una pestaña en
+// segundo plano rAF no corre, y el mapa no se construía hasta volver.
+function trasPintar(fn: () => void): void {
+  let hecho = false
+  const una = () => { if (!hecho) { hecho = true; fn() } }
+  requestAnimationFrame(() => requestAnimationFrame(una))
+  setTimeout(una, 300)
+}
+
 // ══════════════════════════════════════════════════════
 // BOOTSTRAP
 // ══════════════════════════════════════════════════════
 
+// Primera línea del arranque: antes estaba dentro de DOMContentLoaded, después de los imports
+// y de leer el guardado. Los módulos son diferidos, así que document.body ya existe.
+initErrorBanner()
+
 document.addEventListener('DOMContentLoaded', () => {
-  initErrorBanner()
   initErrorBoundary()
   initSettings()
   initSettingsModal()
@@ -176,7 +202,8 @@ function _registerServiceWorker(): void {
 
 function wireAllButtons(): void {
   // ── Menú ─────────────────────────────────────────────
-  on('btn-mute',     () => { toggleMute() })
+  // El silencio del HUD también se guarda en los ajustes: antes volvía el sonido al recargar.
+  on('btn-mute',     () => { toggleMute(); saveSettings({ ...getSettings(), muted: isMuted() }) })
   on('btn-nueva',    () => { sfxClick(); mountIntro() })
   on('btn-credits',         () => { sfxClick(); mountCredits() })
   on('btn-credits-back',    () => { sfxClick(); playTrack('menu'); mountMenu() })
@@ -320,6 +347,7 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   _inCatchEvent = false
   _busy = true          // la cinemática de apertura lo libera (onDone)
   clearSavedGame()
+  guardar()   // cerrar durante la cinemática de apertura ya no pierde la partida
   resetMap()
 
   _selectNodeFn = onSelectNode
@@ -332,7 +360,7 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   // ve la cinematica de apertura (~10s) — estaran listos antes del primer nodo.
   preloadEventData()
 
-  requestAnimationFrame(() => requestAnimationFrame(() => {
+  trasPintar(() => {
     buildMap(gs, _selectNodeFn)
     if (!tutorialSeen()) {
       // Primera partida: mostrar tutorial primero, lanzar cinemática al cerrar
@@ -345,7 +373,7 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
       // Partidas siguientes: cinemática directa
       waitForMapThenCinematic(gs, _selectNodeFn, (updatedGs) => { gs = updatedGs }, () => { _busy = false })
     }
-  }))
+  })
 }
 
 // ══════════════════════════════════════════════════════
@@ -401,8 +429,7 @@ function onSelectNode(nodeId: string): void {
 
   const _launchEvent = () => {
     gs = engineSelectNode(gs, nodeId)
-    saveGame(gs)
-    flashSaveIndicator()
+    guardar()
     mountEventScreen(gs, onDecision)
   }
 
@@ -473,8 +500,7 @@ function _afterAftermath(prevAct: number): void {
       conq: { ...gs.conq, caught: false, reorgTurns: 2 },
     }
     _busy = false
-    saveGame(gs)
-    flashSaveIndicator()
+    guardar()
     drawNodes(gs, _selectNodeFn)
     showScreen('map-screen')
     centerOnNextNodes(gs)
@@ -493,9 +519,8 @@ function _afterAftermath(prevAct: number): void {
   drawNodes(gs, _selectNodeFn)
   drawConquistador(gs)
   updateStatsBar(gs)
-  saveGame(gs)
+  guardar()
   log('SAVE', `auto-save history=${gs.history.length} alliances=${gs.alliances.length}`)
-  flashSaveIndicator()
 
   // Detectar si hubo cambio de acto
   const newAct = gs.history.length > 0

@@ -33,7 +33,8 @@ interface SavePayload {
   startTime:   number
 }
 
-export function saveGame(gs: GameState): void {
+/** Devuelve false si no se pudo escribir (almacenamiento lleno o bloqueado). */
+export function saveGame(gs: GameState): boolean {
   const payload: SavePayload = {
     diff:        gs.diff,
     caciqueName: gs.caciqueName,
@@ -49,7 +50,10 @@ export function saveGame(gs: GameState): void {
   }
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(payload))
-  } catch (_) { /* storage lleno o modo privado */ }
+    return true
+  } catch (_) {
+    return false   // storage lleno o modo privado
+  }
 }
 
 // ── ACCESO SEGURO A localStorage ──────────────────────

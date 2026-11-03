@@ -11,3 +11,25 @@ describe('los botones que main.ts conecta existen en index.html', () => {
     expect(faltan).toEqual([])
   })
 })
+
+/** F3-22: el menú decía «v3.0» a mano y package.json dice otra cosa; MenuScreen escribía la versión en un id que no existía. */
+describe('versión del menú', () => {
+  it('existe el elemento donde MenuScreen escribe la versión y no hay una versión fija a mano', () => {
+    expect(html).toContain('id="menu-ver-num"')
+    expect(html).not.toMatch(/ProfeD · v3\.0/)
+  })
+})
+
+/** F3-20/F3-26 y el patrón error-banner: va primero, y el arranque no depende de DOMContentLoaded. */
+describe('arranque de main.ts', () => {
+  it('initErrorBanner() se llama antes de registrar nada más, fuera de DOMContentLoaded', () => {
+    const i = main.indexOf('initErrorBanner()')
+    const j = main.indexOf("document.addEventListener('DOMContentLoaded'")
+    expect(i).toBeGreaterThan(-1)
+    expect(i).toBeLessThan(j)
+  })
+  it('espera el primer pintado con respaldo (rAF no corre en una pestaña en segundo plano)', () => {
+    expect(main).toMatch(/function trasPintar/)
+    expect(main).not.toMatch(/requestAnimationFrame\(\(\) => requestAnimationFrame\(\(\) => \{\s*\n\s*buildMap/)
+  })
+})

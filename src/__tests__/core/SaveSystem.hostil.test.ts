@@ -115,3 +115,12 @@ describe('localStorage bloqueado', () => {
     expect(loadUnlockedAchievements()).toEqual([])
   })
 })
+
+describe('saveGame avisa si no pudo escribir', () => {
+  it('devuelve true normal y false con el almacenamiento bloqueado', () => {
+    const gs = createInitialState('educativo', 'T')
+    expect(saveGame(gs)).toBe(true)
+    _bloqueado = true
+    expect(saveGame(gs)).toBe(false)
+  })
+})

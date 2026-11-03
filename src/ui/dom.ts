@@ -216,10 +216,15 @@ export function enterFullscreen(): void {
   }
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)) return
   try {
-    if (el.requestFullscreen)            el.requestFullscreen()
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen()
-    else if (el.mozRequestFullScreen)    el.mozRequestFullScreen()
-    else if (el.msRequestFullscreen)     el.msRequestFullscreen()
+    // requestFullscreen devuelve una promesa que se rechaza sin gesto del usuario o si el
+    // navegador lo bloquea: sin catch era un «Uncaught (in promise)» en cada carga.
+    const r: unknown =
+      el.requestFullscreen            ? el.requestFullscreen()
+      : el.webkitRequestFullscreen    ? el.webkitRequestFullscreen()
+      : el.mozRequestFullScreen       ? el.mozRequestFullScreen()
+      : el.msRequestFullscreen        ? el.msRequestFullscreen()
+      : undefined
+    if (r instanceof Promise) r.catch(() => { /* pantalla completa es opcional */ })
   } catch (_) { /* silencioso */ }
 }
 
@@ -242,6 +247,16 @@ export function initGlobalListeners(): void {
   document.getElementById('confirm-cancel')?.addEventListener('click', () => {
     const overlay = document.getElementById('confirm-modal')
     if (overlay) overlay.style.display = 'none'
+  })
+
+  // Escape cierra el diálogo que esté arriba: confirmación, modal de glosario, info didáctica
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return
+    const confirm = document.getElementById('confirm-modal')
+    if (confirm && confirm.style.display !== 'none') { confirm.style.display = 'none'; return }
+    const modal = document.getElementById('modal-overlay')
+    if (modal && modal.style.display !== 'none' && modal.style.display !== '') { hideModal(); return }
+    document.getElementById('ped-overlay')?.classList.remove('open')
   })
 }
 

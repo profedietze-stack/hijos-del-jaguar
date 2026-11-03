@@ -102,12 +102,15 @@ export function showAftermath(notifs: Notif[], onContinue: () => void): void {
 
   btn.addEventListener('click', dismiss, { once: true })
 
-  // Auto-dismiss: 3.5s si hay solo stats, 2s si son solo decay sin alianzas
+  // Las consecuencias de una decisión se leen a su ritmo: con alianza o cambios de stat solo
+  // se cierra con el botón o Enter (un temporizador de 3 s las sacaba antes de leerlas, y es
+  // un problema de accesibilidad). Si no hay nada que leer, se cierra solo.
   const hasAlliance = infoNotifs.some(n => n.msg.includes('Alianza'))
-  const autoMs = hasAlliance ? 5000 : statNotifs.length > 0 ? 3200 : 2000
-  setTimeout(() => {
-    if (!dismissed) dismiss()
-  }, autoMs)
+  if (!hasAlliance && statNotifs.length === 0) {
+    setTimeout(() => {
+      if (!dismissed) dismiss()
+    }, 2000)
+  }
 }
 
 // ── 2. ACT TRANSITION — cinemática de cambio de acto ──
