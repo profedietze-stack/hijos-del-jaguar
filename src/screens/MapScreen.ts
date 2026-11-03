@@ -2,6 +2,7 @@ import type { GameState } from '../core/GameState.js'
 import { NODES_DEF, EDGES, CONQ_BRIDGE } from '../data/nodes.js'
 import { showNotif } from '../ui/dom.js'
 import { escapeHtml } from '../core/text.js'
+import { tribeTrailSegments } from '../core/trail.js'
 import { sfxCinematic, sfxNodeHover } from '../ui/audio.js'
 import * as d3Lib from 'd3'
 import * as topojson from 'topojson-client'
@@ -156,11 +157,7 @@ export function drawTribePath(gs: GameState): void {
   if (!mapG || !mapProj) return
   mapG.selectAll('.tribe-trail').remove()
   const tg = mapG.insert('g', '.ng').attr('class', 'tribe-trail').attr('pointer-events', 'none')
-  const hist = gs.history.filter(id => id !== '_conq_catch_node')
-  if (hist.length < 2) return
-  for (let i = 0; i < hist.length - 1; i++) {
-    const a = gs.nodes[hist[i]], b = gs.nodes[hist[i + 1]]
-    if (!a || !b) continue
+  for (const [a, b] of tribeTrailSegments(gs)) {
     const [ax, ay] = mapProj([a.lon, a.lat]) as [number, number]
     const [bx, by] = mapProj([b.lon, b.lat]) as [number, number]
     tg.append('line').attr('x1', ax).attr('y1', ay).attr('x2', bx).attr('y2', by)
