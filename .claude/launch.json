@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "hijos-del-jaguar",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "3002", "--strictPort", "--host", "127.0.0.1", "--no-open"],
       "port": 3002
     }
   ]
