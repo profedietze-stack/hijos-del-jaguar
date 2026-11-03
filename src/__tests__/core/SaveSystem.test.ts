@@ -76,12 +76,12 @@ describe('saveGame + loadGame', () => {
   it('preserva el historial y alianzas', () => {
     const gs = {
       ...createInitialState('educativo', 'Kaan'),
-      history:   ['n00', 'n01'],
+      history:   ['n00', 'n01a'],
       alliances: ['al_test'],
     }
     saveGame(gs)
     const loaded = loadGame()
-    expect(loaded?.history).toEqual(['n00', 'n01'])
+    expect(loaded?.history).toEqual(['n00', 'n01a'])
     expect(loaded?.alliances).toContain('al_test')
   })
 

@@ -22,7 +22,7 @@ import {
 // ── Save ──────────────────────────────────────────────
 import {
   saveGame, loadGame, clearSavedGame, clearAllProgress,
-  pushToHistory, unlockAchievements, loadUnlockedAchievements,
+  pushToHistory, unlockAchievements, loadUnlockedAchievements, takeSaveProblem,
 } from './core/SaveSystem.js'
 
 // ── Screens ───────────────────────────────────────────
@@ -49,7 +49,7 @@ import {
 import {
   initGlobalListeners, showScreen,
   showStatsBar, hideStatsBar, updateStatsBar,
-  showNotifs, flashSaveIndicator, showConfirmModal,
+  showNotifs, showNotif, flashSaveIndicator, showConfirmModal,
   showAchievementToasts, showTutorial, tutorialSeen,
 } from './ui/dom.js'
 
@@ -349,6 +349,8 @@ function continueGame(): void {
   const loaded = loadGame()
   if (!loaded) {
     mountMenu()
+    const problema = takeSaveProblem()
+    if (problema) showNotif(problema, 'loss')
     return
   }
   gs = normalizeConqState(loaded)
