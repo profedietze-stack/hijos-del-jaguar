@@ -75,8 +75,8 @@ export const DIFF_CONFIG: Record<string, DifficultyConfig> = {
     alliancePenaltyActFrom:  2,
     alliancePenaltyIfNone:   { food: -8, moral: -12 },
     defeatThreshold:     15,
-    conqJumpProb:        0.20,
-    catchLossMult:       0.6,
+    conqJumpProb:        0.28,
+    catchLossMult:       0.4,
     endingThresholds: {
       epic: { m: 34, a: 4 },
       good: { m: 24 },

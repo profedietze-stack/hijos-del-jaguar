@@ -148,7 +148,7 @@ export function advanceConquistador(gs: GameState): ConqMoveResult {
   const playerPos  = CONQ_BRIDGE.length + histLen - 1
   const ri         = conq.routeIdx
 
-  // La probabilidad de salto vive en DIFF_CONFIG (educativo 12 %, histórico 32 %, legendario 48 %).
+  // La probabilidad de salto vive en DIFF_CONFIG (educativo 12 %, histórico 22 %, legendario 28 %).
   const jumpProb = DIFF_CONFIG[gs.diff].conqJumpProb
   const doJump   = Math.random() < jumpProb
 

@@ -400,10 +400,10 @@ describe('captura del conquistador por dificultad', () => {
     const r = applyDecision(gs, { text: 'x', effects: { warriors: -8, civilians: -6, shamans: -2 } })
     return antes - (r.state.stats.warriors + r.state.stats.civilians + r.state.stats.shamans)
   }
-  it('educativo paga la captura completa; histórico y legendario, el 60 %', () => {
+  it('educativo paga la captura completa; histórico, el 60 %; legendario, el 40 %', () => {
     expect(perdidas('educativo')).toBe(16)
     expect(perdidas('historico')).toBe(5 + 4 + 1)   // round(8*.6)+round(6*.6)+round(2*.6)
-    expect(perdidas('legendario')).toBe(10)
+    expect(perdidas('legendario')).toBe(3 + 2 + 1)   // round(8*.4)+round(6*.4)+round(2*.4)
   })
   it('un evento común no se escala', () => {
     let gs = createInitialState('historico', 'T')

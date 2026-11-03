@@ -6,6 +6,9 @@ import { enterFullscreen }        from '../ui/dom.js'
 // INTRO SCREEN — selección de dificultad
 // ══════════════════════════════════════════════════════
 
+/** Porcentaje entero para mostrar en pantalla, siempre desde DIFF_CONFIG (no a mano). */
+const pct = (p: number): number => Math.round(p * 100)
+
 type Difficulty = 'educativo' | 'historico' | 'legendario' | ''
 
 let _selectedDiff: Difficulty = ''
@@ -65,7 +68,7 @@ export function selectDiff(diff: 'educativo' | 'historico' | 'legendario'): void
           <li>Efectos negativos amplificados ×1.25</li>
           <li>Umbrales de muerte más altos</li>
           <li>Penalidad por falta de alianzas en Acto III</li>
-          <li>Conquistador más agresivo (32% de salto)</li>
+          <li>Conquistador más agresivo (${pct(DIFF_CONFIG.historico.conqJumpProb)}% de salto por turno)</li>
         </ul>`
     } else if (diff === 'legendario') {
       detailEl.innerHTML = `
@@ -74,7 +77,7 @@ export function selectDiff(diff: 'educativo' | 'historico' | 'legendario'): void
           <li>Efectos negativos amplificados ×1.55</li>
           <li>Efectos positivos reducidos ×0.65</li>
           <li>Penalidad por falta de alianzas desde el Acto II</li>
-          <li>Conquistador brutal: 48% de salto directo</li>
+          <li>Conquistador brutal: ${pct(DIFF_CONFIG.legendario.conqJumpProb)}% de salto por turno</li>
           <li>Umbrales de muerte extremos — un error puede ser fatal</li>
         </ul>`
     } else {

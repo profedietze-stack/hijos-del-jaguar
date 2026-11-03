@@ -17,7 +17,7 @@ Cinco hallazgos más importantes:
 | Área | Semáforo | Nota |
 |---|---|---|
 | Jugabilidad | 🟡 | Bloqueantes corregidos; falta bloqueo de entrada en más pantallas |
-| Balance | 🔴 | Histórico/Legendario inalcanzables; sesgo a la primera opción |
+| Balance | 🟡 | Histórico/Legendario ganables (31 % / 11 % jugando bien); DESGARRO y alianzas duplicadas pendientes |
 | Contenido | 🟡 | Hechos a revisar con fuente; anacronismos; alianzas duplicadas |
 | UI/UX | 🟡 | Mute fuera de pantalla ≤ 812 px, mapa ilegible a 360 px |
 | Rendimiento | 🟡 | Rápido en escritorio; 40 fps a CPU ×4; memoria en reposo por confirmar |
@@ -75,6 +75,28 @@ Victoria % (llegar a un final sin derrota). Total sobre 9 rutas.
 - **Rangos:** 0 anomalías (sin NaN, negativos ni valores sobre el tope) en las partidas simuladas.
 - **Finales nunca alcanzados:** los 3 DESGARRO (`m ≥ 15 && moral < 35`) no aparecieron en ninguna partida, ni con una política que minimiza la moral (450 partidas × 3 dificultades). Los eventos finales suman +25 a +40 de moral en toda opción. No es una prueba formal.
 - **Duración esperada en minutos:** no medida. Cada partida son 28 eventos; sin telemetría de lectura no doy un número.
+
+### Cambios de balance aplicados (`fdb87dc`, `e69c08d`, `d7c2dc6` y el ajuste de Legendario)
+
+| Qué | Antes | Ahora |
+|---|---|---|
+| Orden de las decisiones | el escrito (la mejor primera en el 78 % de los eventos) | barajado Fisher-Yates al mostrar |
+| Salto del conquistador (captura) | 12 / 32 / 48 % | 12 / 22 / 28 % |
+| Pérdidas del evento de captura (`catchLossMult`) | 100 % en todas | 100 / 60 / 40 % |
+| Legendario: decay por acto | −8/−12/−15/−11 (alimentos) | −7/−11/−14/−10 (y salud −1) |
+| Legendario: umbrales de muerte (alimentos/salud) | 42 / 40 | 36 / 34 |
+
+Resultado (150 partidas × 9 rutas por celda, opciones barajadas, mismo simulador):
+
+| Dificultad | azar | codiciosa | óptima aprox. | antes (azar / codiciosa) |
+|---|---|---|---|---|
+| Educativo | 44 % | 88 % | 70 % | 45 % / 89 % (sin cambio) |
+| Histórico | 4 % | 31 % | 21 % | 0 % / 3 % |
+| Legendario | 2 % | 11 % | 11 % | 0 % / 0 % |
+
+Criterio (supuesto mío, a confirmar): Histórico y Legendario son difíciles pero ganables jugando bien (30 % y 10 %), y jugar sin pensar casi nunca gana (< 5 %). Educativo no se tocó. El «siempre la primera» dejó de funcionar porque las opciones se barajan. Las pantallas de dificultad leen el % de salto desde `DIFF_CONFIG` (antes el texto decía 32 % y 48 % a mano). Sigue habiendo 31 eventos con una opción dominante y 120 pares dominados: es contenido, no se tocó.
+
+**Sin resolver en balance:** los 3 finales DESGARRO siguen sin aparecer; la economía de alimentos sigue en ≈ 0 hacia el turno 7; las claves de alianza duplicadas (`tehuelches` ×5, `kawesqar` ×4, `ranquel`/`ranqueles`) siguen inflando el conteo.
 
 ## 5. Contenido
 
@@ -174,3 +196,7 @@ Todos en `qa/auditoria-completa`. Revertir uno: `git revert <hash>`.
 | `59346a1` | bloqueo de entrada `_busy` |
 | `6abf1d6` | botón de Créditos |
 | `5ca5638` | SW: HTML red primero, `jaguar-v5`, sin SW en dev |
+| `c062bd4` | UI móvil (HUD, dificultad, mapa, apaisado, aria) |
+| `fdb87dc` | `conqJumpProb` pasa a DIFF_CONFIG (sin cambio de valores) |
+| `e69c08d` | decisiones barajadas |
+| `d7c2dc6` + siguiente | balance de Histórico y Legendario |
