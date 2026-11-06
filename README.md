@@ -93,7 +93,7 @@ El juego incluye **9 logros** desbloqueables que persisten entre partidas:
 - **PWA** — instalable en celular (Android/iOS), funciona offline
 - **Guardado automático** — la partida se guarda en cada decisión
 - **Historial** — las últimas 20 partidas quedan registradas con su final y estadísticas
-- **Audio generativo** — música ambiental con Tone.js (flauta, drones, percusión), efectos Web Audio API
+- **Música real** — flautas y ambiente grabados (Freesound, CC0 y CC-BY), una pista por acto con viento de fondo; efectos de Kenney (CC0)
 - **Mapa SVG interactivo** con D3.js + TopoJSON y cinematográficas de apertura/acto
 - **Modo Clase** — overlay pedagógico para uso en aula con fichas didácticas por evento
 - **Configuración persistente** — volumen, accesibilidad, rendimiento (partículas, movimiento reducido)
@@ -107,7 +107,7 @@ El juego incluye **9 logros** desbloqueables que persisten entre partidas:
 |------|------------|
 | Frontend | TypeScript + Vite |
 | Mapa | D3.js + TopoJSON |
-| Audio | Tone.js + Web Audio API |
+| Audio | Howler.js |
 | Estilos | CSS puro (custom properties, sin frameworks) |
 | Tests | Vitest (motor puro) |
 | Deploy | Vercel (CI/CD automático desde `main`) |

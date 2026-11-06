@@ -7,7 +7,7 @@
 //   - Otros fetch: stale-while-revalidate
 // ══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'jaguar-v5'
+const CACHE_NAME = 'jaguar-v6'
 
 // Activos estaticos sin hash: fuentes, iconos, manifest.
 //
@@ -34,6 +34,21 @@ const STATIC_PRECACHE = [
   './fonts/crimson-text-600-ext.woff2',
   './fonts/crimson-text-600i.woff2',
   './fonts/crimson-text-600i-ext.woff2',
+  // Música y efectos: sin esto "anda sin internet" seria mentira, el juego quedaria mudo.
+  './audio/musica/kerriflute.ogg',
+  './audio/musica/canyon_quena_solo1.ogg',
+  './audio/musica/amazon_bamboo_loop.ogg',
+  './audio/musica/ethno_native_atmosphere.ogg',
+  './audio/musica/old_flutist.ogg',
+  './audio/musica/desert_wind.ogg',
+  './audio/sfx/click_003.ogg',
+  './audio/sfx/tick_002.ogg',
+  './audio/sfx/select_002.ogg',
+  './audio/sfx/confirmation_001.ogg',
+  './audio/sfx/confirmation_004.ogg',
+  './audio/sfx/error_003.ogg',
+  './audio/sfx/bong_001.ogg',
+  './audio/sfx/open_003.ogg',
 ]
 
 // ── Install: pre-cachear shell estático ──────────────

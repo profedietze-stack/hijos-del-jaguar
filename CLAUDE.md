@@ -55,7 +55,7 @@ src/data/        →  src/core/        →  src/screens/ + src/ui/
 
 **`src/ui/`** — cross-screen UI utilities:
 - `dom.ts` — `showScreen()`, `showTutorial()`, `showConfirmModal()`, `initGlobalListeners()`
-- `audio.ts` — Tone.js music (`playTrack('menu'|'game')`) + raw Web Audio SFX. Only 3 `MembraneSynth` instances persist; all SFX use auto-GC `OscillatorNode`. Volume controlled via `setMusicVolume/setSfxVolume/setMuted`.
+- `audio.ts` — Howler.js: música real por acto (`playTrack('menu'|'game', acto)`, loops con cruce y viento debajo, streaming `html5`) + efectos Kenney. Qué suena lo decide `audioLogic.ts` (puro, con tests). Créditos en `data/creditosAudio.ts`. Volumen con `setMusicVolume/setSfxVolume/setMuted`.
 - `SettingsModal.ts` — modal open/close, wires all `#cfg-*` controls to `SettingsSystem`
 
 **`src/fx/`** — visual effects:

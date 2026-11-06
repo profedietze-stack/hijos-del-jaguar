@@ -28,7 +28,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'd3-vendor': ['d3', 'topojson-client'],
-          'audio-vendor': ['tone'],
+          'audio-vendor': ['howler'],
         },
       },
     },

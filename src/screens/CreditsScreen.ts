@@ -3,6 +3,7 @@
 // ══════════════════════════════════════════════════════
 
 import { CREDITOS_IMAGENES } from '../data/creditos.js'
+import { CREDITOS_AUDIO } from '../data/creditosAudio.js'
 import { showScreen } from '../ui/dom.js'
 
 /**
@@ -39,7 +40,32 @@ function pintarImagenes(): void {
   }
 }
 
+/** La lista de música y efectos. Misma forma que la de imágenes: nodos y `textContent`. */
+function pintarAudio(): void {
+  const lista = document.getElementById('cr-audio')
+  if (!lista || lista.childElementCount > 0) return
+
+  for (const c of CREDITOS_AUDIO) {
+    const li = document.createElement('li')
+    li.className = 'cr-img-item'
+
+    const a = document.createElement('a')
+    a.href = c.enlace
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    a.textContent = c.titulo
+
+    const meta = document.createElement('span')
+    meta.className = 'cr-img-meta'
+    meta.textContent = ` — ${c.autor} · ${c.licencia} · ${c.uso}`
+
+    li.append(a, meta)
+    lista.append(li)
+  }
+}
+
 export function mountCredits(): void {
   pintarImagenes()
+  pintarAudio()
   showScreen('credits-screen')
 }

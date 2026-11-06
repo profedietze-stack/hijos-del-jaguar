@@ -216,3 +216,14 @@ Todos en `qa/auditoria-completa`. Revertir uno: `git revert <hash>`.
 | `e69c08d` | decisiones barajadas |
 | `d7c2dc6`, `7cff670` | balance de Histórico y Legendario |
 | segunda pasada | alianzas por pueblo, Desgarro, `88d9739` (hallazgos menores), accesibilidad, movimiento reducido, mapa en móvil y al continuar (ver `git log`) |
+
+## Audio nuevo (2026-11-06)
+
+Se reemplazó Tone.js por Howler.js y la música sintetizada por grabaciones reales.
+
+- **Música:** una pista por acto (el juego tiene 4) y una para el menú, con el viento del desierto debajo. Loops con cruce entre vueltas. Streaming (`html5`) para no decodificar KerriFlute entera en memoria (más de 50 MB).
+- **Efectos:** Kenney Interface Sounds (CC0), decodificados. La tabla `SFX` de `src/ui/audioLogic.ts` asigna cada archivo a cada acción; cambiar un sonido es cambiar una línea.
+- **Licencias:** CC0 y CC-BY 4.0. Créditos en `src/data/creditosAudio.ts` y en la pantalla de créditos. Un test rechaza cualquier licencia NC, SA o ND.
+- **Peso:** el chunk de audio bajó de ≈ 65 KB a 9,9 KB gzip. Los archivos suman ≈ 3,3 MB y van en el pre-cacheo (`jaguar-v6`).
+- **Cierra:** F3-21 (aviso de Tone.js en consola) y la sospecha de crecimiento de memoria en reposo, que era de Tone.js.
+- **No verificado:** que suene bien (no se puede oír desde acá), el cambio de pista al cruzar de acto en una partida real, y el comportamiento en tablets lentas y en Safari.

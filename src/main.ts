@@ -60,6 +60,7 @@ import {
   sfxPositive, sfxNegative,
   sfxConqAdvance, sfxConqCatch,
 } from './ui/audio.js'
+import { actoValido } from './ui/audioLogic.js'
 
 // ── Modo Clase ────────────────────────────────────────
 import { initClaseMode }                                from './ui/claseMode.js'
@@ -160,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // El splash es el primer gesto del usuario.
-  // Tone.js requiere un gesto para iniciar el AudioContext,
+  // El navegador exige un gesto para iniciar el audio (Howler lo desbloquea solo),
   // así que arrancamos el audio DESPUÉS de que el usuario hace click en el splash.
   mountSplash().then(() => {
     log('SCREEN', 'splash → menu')
@@ -351,7 +352,7 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   resetMap()
 
   _selectNodeFn = onSelectNode
-  playTrack('game')
+  playTrack('game', actoDeMusica())
   showStatsBar()
   updateStatsBar(gs)
 
@@ -397,7 +398,7 @@ function continueGame(): void {
   _selectNodeFn = onSelectNode
 
   resetMap()
-  playTrack('game')
+  playTrack('game', actoDeMusica())
   showStatsBar()
   updateStatsBar(gs)
 
@@ -425,10 +426,18 @@ function continueGame(): void {
 // FLUJO: SELECCIÓN DE NODO EN EL MAPA
 // ══════════════════════════════════════════════════════
 
+/** Acto del último nodo recorrido; 1 si la partida recién empieza. */
+function actoDeMusica(): ActNumber {
+  const ultimo = gs.history[gs.history.length - 1]
+  return actoValido(ultimo ? gs.nodes[ultimo]?.act : undefined)
+}
+
 function onSelectNode(nodeId: string): void {
   if (_busy || gs.currentNode) return
   _busy = true
   sfxNodeSelect()
+  // La música sigue al acto del nodo que se elige: al cruzar de acto cambia la pista.
+  playTrack('game', actoValido(gs.nodes[nodeId]?.act))
 
   // Posición actual del token: último nodo completado, o n00 al inicio
   const fromId = gs.history.length > 0 ? gs.history[gs.history.length - 1] : null
