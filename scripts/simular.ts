@@ -22,7 +22,8 @@ const DIFFS: Difficulty[] = process.env.DIF ? (process.env.DIF.split(',') as Dif
 // ── Variantes de balance, sin tocar el repo ─────────
 // OVR='{"historico":{"conqJumpProb":0.2,"decay":{"1":{"food":-4,"salud":-2}}}}'  mezcla sobre DIFF_CONFIG
 // CATCH_SCALE=0.5  multiplica las perdidas del evento _conq_catch
-function mezclar(dst: any, src: any) { for (const k of Object.keys(src)) { if (src[k] && typeof src[k] === 'object' && !Array.isArray(src[k])) mezclar(dst[k] ??= {}, src[k]); else dst[k] = src[k] } }
+type Obj = Record<string, unknown>
+function mezclar(dst: Obj, src: Obj) { for (const k of Object.keys(src)) { const v = src[k]; if (v && typeof v === 'object' && !Array.isArray(v)) mezclar((dst[k] ??= {}) as Obj, v as Obj); else dst[k] = v } }
 if (process.env.OVR) mezclar(DIFF_CONFIG, JSON.parse(process.env.OVR))
 if (process.env.CATCH_SCALE) {
   const f = Number(process.env.CATCH_SCALE)
@@ -88,7 +89,7 @@ function chequear(gs: GameState, donde: string, an: string[]) {
   }
 }
 
-function jugar(diff: Difficulty, ruta: string[] | null, pol: Politica, profundidad = 0): Resultado {
+function jugar(diff: Difficulty, ruta: string[] | null, pol: Politica): Resultado {
   let gs = createInitialState(diff, 'Sim')
   const an: string[] = []
   const curva: Resultado['curva'] = []

@@ -101,7 +101,8 @@ function _buildPanel(): void {
 function _open():  void { document.getElementById('dev-panel')?.classList.add('open');    _refresh() }
 function _close(): void { document.getElementById('dev-panel')?.classList.remove('open') }
 function _toggle(): void {
-  document.getElementById('dev-panel')?.classList.contains('open') ? _close() : _open()
+  if (document.getElementById('dev-panel')?.classList.contains('open')) _close()
+  else _open()
 }
 
 // ── Refresh — sincroniza panel con gs actual ───────────

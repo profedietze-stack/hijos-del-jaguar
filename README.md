@@ -121,6 +121,8 @@ npm install
 npm run dev        # http://localhost:3000/hijos-del-jaguar/
 npm run typecheck  # verificar tipos
 npm run test       # tests del motor de juego
+npm run lint       # ESLint
+npm run e2e        # Playwright: arranque, audio por acto, sin internet
 npm run build      # build de producción → dist/
 ```
 

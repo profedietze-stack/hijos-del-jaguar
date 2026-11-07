@@ -46,6 +46,7 @@ function makeEmber(canvasW: number, canvasH: number): Ember {
 
 let _raf: number | null = null
 let _canvas: HTMLCanvasElement | null = null
+let _limpiarResize: (() => void) | null = null
 
 export function startMenuEmbers(containerId: string): void {
   stopMenuEmbers()
@@ -172,7 +173,7 @@ export function startMenuEmbers(containerId: string): void {
   }
 
   tick()
-  ;(canvas as any)._resizeCleanup = () => window.removeEventListener('resize', resize)
+  _limpiarResize = () => window.removeEventListener('resize', resize)
 }
 
 export function stopMenuEmbers(): void {
@@ -181,7 +182,8 @@ export function stopMenuEmbers(): void {
     _raf = null
   }
   if (_canvas) {
-    ;(_canvas as any)._resizeCleanup?.()
+    _limpiarResize?.()
+    _limpiarResize = null
     _canvas.remove()
     _canvas = null
   }

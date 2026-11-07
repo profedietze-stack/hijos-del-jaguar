@@ -11,6 +11,8 @@ npm run typecheck    # tsc --noEmit (no emit, just check)
 npm run test         # vitest run (single pass)
 npm run test:watch   # vitest watch
 npm run test:coverage
+npm run lint        # eslint . (cero errores; public/vendor excluido)
+npm run e2e         # Playwright sobre el BUILD (reconstruye solo): arranque, audio por acto, offline. Chromium 1.62.1 ya instalado
 ```
 
 Run single test file:

@@ -59,7 +59,7 @@ export function showAftermath(notifs: Notif[], onContinue: () => void): void {
       const icon  = _iconFor(n.msg)
       const cls   = n.kind === 'gain' ? 'am-gain' : 'am-loss'
       // Formatear el msg: "+10 alimentos" → mostrar el número grande
-      const match = n.msg.match(/^([+\-]?\d+)\s+(.+)$/)
+      const match = n.msg.match(/^([+-]?\d+)\s+(.+)$/)
       if (match) {
         return `<div class="am-stat-item ${cls}">
           <span class="am-stat-icon">${icon}</span>

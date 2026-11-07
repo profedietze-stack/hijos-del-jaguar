@@ -219,8 +219,9 @@ describe('pushToHistory', () => {
 
   it('no falla con conqCaught/conqRouteIdx ausentes (backward compat)', () => {
     const oldGame = makeFinishedGame()
-    delete (oldGame as any).conqCaught
-    delete (oldGame as any).conqRouteIdx
+    const viejo = oldGame as unknown as Record<string, unknown>
+    delete viejo.conqCaught
+    delete viejo.conqRouteIdx
     expect(() => pushToHistory(oldGame)).not.toThrow()
     const h = loadHistory()
     expect(h[0].conqCaught).toBeUndefined()
