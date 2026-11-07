@@ -12,8 +12,19 @@ npm run test         # vitest run (single pass)
 npm run test:watch   # vitest watch
 npm run test:coverage
 npm run lint        # eslint . (cero errores; public/vendor excluido)
-npm run e2e         # Playwright sobre el BUILD (reconstruye solo): arranque, audio por acto, offline. Chromium 1.62.1 ya instalado
+npm run e2e         # Playwright sobre el BUILD (reconstruye solo), escritorio + tablet, sin la partida completa. Chromium 1.62.1 ya instalado
+npm run e2e:largo   # la partida completa con un bot, en las 3 dificultades (~15 min); en CI solo de noche o a mano
+npm run presupuesto # topes de peso del build (presupuesto.json); correr después de `npm run build`
 ```
+
+**Antes de dar algo por terminado:** `lint`, `typecheck`, `test`, `build`, `presupuesto` y `e2e` en verde (el CI corre los seis). Un test nuevo se comprueba fallando con el código roto.
+
+### Robustez (qué cubre cada capa)
+- `src/__tests__/data/banco.test.ts`: términos tocables, HTML de la narración, decisiones, acto de cada evento, fichas del modo clase.
+- `src/__tests__/data/privacidad.test.ts`: barre todo `src/` (el nombre se escapa, nada sale del sitio). El e2e comprueba en vivo que ningún pedido sale a otro servidor.
+- `src/core/SaveSystem.ts`: guardado versionado (`SAVE_VERSION`, `MIGRACIONES`); al cambiar el formato, subir la versión y agregar la migración. El juego también guarda al ocultarse la página (`guardarAlSalir`).
+- `public/sw.js`: caché de código (`CACHE_NAME`, sube con cada cambio de lo precacheado) y caché de imágenes de eventos (`CACHE_IMG`, no sube). La página pide la precarga 20 s después de empezar (`core/precarga.ts`).
+- `e2e/`: `audio-y-arranque` (arranque, pista por acto, offline, imágenes), `robustez` (banner, XSS, guardar al salir, tocar la cinemática, partida completa), `accesibilidad` (44 px, foco).
 
 Run single test file:
 ```bash

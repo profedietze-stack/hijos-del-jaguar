@@ -227,3 +227,17 @@ Se reemplazó Tone.js por Howler.js y la música sintetizada por grabaciones rea
 - **Peso:** el chunk de audio bajó de ≈ 65 KB a 9,9 KB gzip. Los archivos suman ≈ 3,3 MB y van en el pre-cacheo (`jaguar-v6`).
 - **Cierra:** F3-21 (aviso de Tone.js en consola) y la sospecha de crecimiento de memoria en reposo, que era de Tone.js.
 - **No verificado:** que suene bien (no se puede oír desde acá), el cambio de pista al cruzar de acto en una partida real, y el comportamiento en tablets lentas y en Safari.
+
+## Robustez: lint, e2e y lo que encontraron (2026-11-07)
+
+Se sumó ESLint 9, Playwright (5 pruebas cortas en escritorio y tablet + 3 partidas completas con un bot), CI, un presupuesto de peso y tests de contenido, privacidad y guardado.
+
+**Un bug real que apareció al armar el bot:** tocar el mapa mientras corría la cinemática de apertura la colgaba para siempre. `d3-zoom` interrumpe toda transición sobre el mapa en cuanto el jugador toca, y una transición interrumpida dispara `interrupt`, nunca `end`; las secuencias seguían con `.on('end')`. El mapa quedaba alejado, `_busy` seguía en `true` y la partida era inutilizable. Un alumno impaciente lo encuentra en el primer minuto. Arreglo: las cuatro transiciones del mapa que gatean el avance escuchan `end interrupt` (`FIN_O_CORTE`), y si el toque corta el último paneo, la cámara se pone en Guatemala. Test: `e2e/robustez.spec.ts`, rojo con el código anterior.
+
+**Mejoras de robustez:**
+- Guardado versionado y guardado también al ocultarse la página (la decisión recién tomada se perdía si se cerraba durante el cartel de consecuencias).
+- Imágenes de eventos (~12 MB) en su propia caché, bajadas de a una en segundo plano, con conexión buena y sin ahorro de datos. Sube el pre-cacheo a `jaguar-v7`.
+- Presupuesto de peso (`presupuesto.json`): JS+CSS 243 KB gzip, audio 3,3 MB, imágenes 12 MB, dist 16,7 MB; topes con ~15 % de margen.
+- CI en GitHub Actions: lint, tipos, tests, build, peso y e2e en cada push; la partida completa, de noche. **No se corrió en GitHub** (la rama nunca se pushó): solo se comprobó que el workflow llama a scripts que existen.
+
+**No cubierto:** cómo suena el audio, Safari, tablets lentas reales, y la cuenta de ancho de banda de 30 tablets bajando 12 MB en el mismo wifi (la precarga es secuencial y salta con datos lentos, pero no se midió en un aula).
