@@ -1,0 +1,20 @@
+{
+  "_nota": "Topes de peso del build (scripts/presupuesto.mjs). Margen de ~15 % sobre lo medido el 2026-11-07: JS+CSS 248 KB gzip, audio 3,3 MB, imágenes 13 MB, dist 19 MB. Subir un tope es una decisión: se escribe el motivo en el commit.",
+  "codigoGzipTotalKB": 290,
+  "cssGzipKB": 18,
+  "codigoGzipPorArchivoKB": {
+    "d3-vendor": 110,
+    "index-": 75,
+    "events-": 66,
+    "audio-vendor": 12
+  },
+  "carpetasMB": {
+    "assets": 0.9,
+    "audio": 3.8,
+    "images": 15,
+    "fonts": 0.4,
+    "geo": 0.15
+  },
+  "imagenMaxKB": 700,
+  "distTotalMB": 19.5
+}

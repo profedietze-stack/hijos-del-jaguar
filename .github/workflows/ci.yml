@@ -1,0 +1,72 @@
+name: CI
+
+# Lo que tiene que estar en verde antes de dar algo por terminado (ver CLAUDE.md).
+# Corre en cada push y en cada pull request. La partida completa con el bot (lenta) va en su
+# propio trabajo, solo a mano o de noche, para no frenar cada commit.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC: la partida completa de punta a punta
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rapido:
+    name: Lint, tipos, tests, build, peso y e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run presupuesto
+      - name: Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+      # El e2e reconstruye el build solo (playwright.config.ts): no se confía en un dist viejo.
+      - run: npm run e2e
+      - name: Evidencia si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-evidencia
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  partida-completa:
+    name: Partida completa con el bot (3 dificultades)
+    # Lenta (~15 min): solo a mano o en la corrida de la noche, nunca en cada push.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e:largo
+      - name: Evidencia si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: partida-completa-evidencia
+          path: test-results/
+          retention-days: 7

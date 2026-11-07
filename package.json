@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
-    "e2e": "playwright test"
+    "e2e": "playwright test --grep-invert @largo",
+    "e2e:largo": "playwright test --grep @largo --project=chromium",
+    "presupuesto": "node scripts/presupuesto.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
