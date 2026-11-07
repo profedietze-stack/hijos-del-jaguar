@@ -14,6 +14,13 @@ test.beforeEach(async ({ page }) => { await guardadoLimpio(page) })
 // ── Banner de errores ──────────────────────────────────────────────────────────
 
 test.describe('banner global de errores', () => {
+  // En corridas largas en Windows, el navegador de pruebas a veces muere ENTRE un test y el
+  // siguiente («browser.newContext: Target page, context or browser has been closed», a los
+  // 7 ms, antes de tocar el juego). No se reprodujo en 38 corridas cortas seguidas; se vio en 2
+  // de 6 corridas completas, siempre en estas tres. Se reintenta SOLO acá y solo una vez: un
+  // reintento global enseñaría a ignorar los rojos del bot y de los demás.
+  test.describe.configure({ retries: 1 })
+
   test('un error no atrapado se ve en pantalla', async ({ page }) => {
     await page.goto('./')
     await expect(page.locator('#__err_banner__')).toHaveCount(0)
