@@ -28,6 +28,14 @@ let mapSvg:  ReturnType<D3Lib['select']> | null = null
 let mapG:    ReturnType<D3Lib['select']> | null = null
 let mapProj: ReturnType<D3Lib['geoMercator']> | null = null
 let mapZoom: ReturnType<D3Lib['zoom']> | null = null
+
+/**
+ * d3-zoom interrumpe toda transición sobre el mapa en cuanto el jugador toca, arrastra o gira
+ * la rueda. Una transición interrumpida dispara 'interrupt' y NUNCA 'end': las secuencias que
+ * seguían con `.on('end', …)` quedaban colgadas para siempre, y con ellas el flag que bloquea
+ * los clics (`_busy`): la partida se volvía inutilizable. Se escuchan los dos.
+ */
+const FIN_O_CORTE = 'end interrupt'
 let _mapInitialized = false
 let _topoCache: unknown = null
 let _topoFetchPromise: Promise<unknown> | null = null
@@ -625,7 +633,7 @@ function _animateConqAdvance(
     const tx = W / 2 - scale * px, ty = H / 2 - scale * py
     mapSvg!.transition().duration(dur).ease(d3Lib.easeCubicInOut)
       .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
-      .on('end', cb)
+      .on(FIN_O_CORTE, cb)
   }
 
   function slideToken(fromWp: typeof from, toWp: typeof to, dur: number, cb: () => void) {
@@ -1378,7 +1386,7 @@ export function runOpeningCinematic(
 
   mapSvg.transition().duration(2400).ease(d3Lib.easeCubicInOut)
     .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(tx, ty).scale(scale))
-    .on('end', () => {
+    .on(FIN_O_CORTE, () => {
       // PASO 2: Llamas y humo
       _addFireEffect()
       setTimeout(() => {
@@ -1461,7 +1469,7 @@ function _animConqCinematic(
       const ptx = W / 2 - scale * tx, pty = H / 2 - scale * ty
       mapSvg!.transition().duration(800).ease(d3Lib.easeCubicInOut)
         .call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(ptx, pty).scale(scale))
-        .on('end', () => {
+        .on(FIN_O_CORTE, () => {
           drawNodes(gs, onSelectNode)
           drawConquistador(gs)
           setTimeout(onDone, 400)
@@ -1481,7 +1489,10 @@ function _panToGuatemala(gs: GameState, onSelectNode?: (id: string) => void, onD
   const gtx = W / 2 - s2 * gx, gty = H / 2 - s2 * gy
   mapSvg.transition().duration(2000).ease(d3Lib.easeCubicInOut)
     .call(mapZoom.transform as never, d3Lib.zoomIdentity.translate(gtx, gty).scale(s2))
-    .on('end', () => {
+    .on(FIN_O_CORTE, () => {
+      // Si el jugador tocó el mapa a mitad del paneo, la cámara quedó donde lo cortó: se la
+      // pone en el destino (sin animación; si la transición terminó sola ya está ahí).
+      mapSvg!.call(mapZoom!.transform as never, d3Lib.zoomIdentity.translate(gtx, gty).scale(s2))
       drawNodes(gs, onSelectNode)
       drawConquistador(gs)
       // Listo — el jugador puede interactuar
