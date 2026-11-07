@@ -103,8 +103,9 @@ describe('el pre-cacheo del service worker', () => {
     // El número va fijo a propósito: obliga a subirlo a conciencia cada vez que
     // cambia lo precacheado. v3 fue el arreglo de las rutas; v4, sacar las ramas
     // de terceros y meter el GeoJSON del mapa en el pre-cacheo; v5, HTML red primero;
-    // v6, música y efectos reales en el pre-cacheo.
-    expect(sw).toMatch(/const CACHE_NAME = 'jaguar-v6'/)
+    // v6, música y efectos reales en el pre-cacheo; v7, las imágenes de eventos pasan a su
+    // propia caché (CACHE_IMG) y el fetch same-origin deja de usar solo CACHE_NAME.
+    expect(sw).toMatch(/const CACHE_NAME = 'jaguar-v7'/)
   })
 })
 
@@ -118,5 +119,45 @@ describe('actualizaciones del service worker', () => {
   })
   it('no se registra en desarrollo', () => {
     expect(mainTs).toMatch(/import\.meta\.env\.DEV\)\s*return/)
+  })
+})
+
+/**
+ * Las 50 imágenes de eventos (~12 MB) para el modo sin internet. Viven en su propia caché para
+ * que un cambio de código (que sube CACHE_NAME) no obligue a bajarlas de nuevo, y se llenan de
+ * a una en segundo plano: `addAll` es todo o nada, y una imagen caída tiraría el install entero.
+ */
+describe('caché de imágenes de eventos', () => {
+  const codigo = sinComentarios(sw)
+
+  it('tiene su propia caché, con un nombre que NO acompaña a la del código', () => {
+    expect(codigo).toMatch(/const CACHE_IMG = 'jaguar-img-v\d+'/)
+    expect(codigo.match(/const CACHE_NAME = '([^']+)'/)![1]).not.toBe(codigo.match(/const CACHE_IMG = '([^']+)'/)![1])
+  })
+
+  it('al activarse, el worker NO borra la caché de imágenes (sí las de versiones viejas del código)', () => {
+    expect(codigo).toMatch(/k !== CACHE_NAME && k !== CACHE_IMG/)
+  })
+
+  it('las imágenes no entran en el pre-cacheo del install (sería todo o nada)', () => {
+    const desde = codigo.indexOf('const STATIC_PRECACHE')
+    const precache = codigo.slice(desde, codigo.indexOf(']', desde) + 1)
+    expect(precache).not.toMatch(/images\/events/)
+  })
+
+  it('la precarga solo baja imágenes propias de eventos y se rinde sin red', () => {
+    expect(codigo).toMatch(/if \(!esImagenDeEvento\(url\)\) continue/)
+    expect(codigo).toMatch(/fallosSeguidos >= 3\) break/)
+  })
+
+  it('baja de a una (un await por imagen), no en paralelo: treinta tablets en un mismo wifi', () => {
+    const f = codigo.slice(codigo.indexOf('async function precargarImagenes'), codigo.indexOf("self.addEventListener('message'"))
+    expect(f).toMatch(/await fetch\(/)
+    expect(f).not.toMatch(/Promise\.all|\.map\(\s*u\s*=>\s*fetch/)
+  })
+
+  it('el worker escucha el mensaje que manda la página, y la página lo manda', () => {
+    expect(codigo).toMatch(/d\.tipo === 'precargar-imagenes'/)
+    expect(mainTs).toMatch(/tipo: 'precargar-imagenes'/)
   })
 })

@@ -32,6 +32,7 @@ import { mountCredits }                                 from './screens/CreditsS
 import { mountIntro, selectDiff, getSelectedDiff }      from './screens/IntroScreen.js'
 import { mountNameScreen, randomCaciqueName, getEnteredName, getSelectedToken } from './screens/NameScreen.js'
 import { mountEventScreen, preloadEventData }            from './screens/EventScreen.js'
+import { imagenesPorActo, conexionPermitePrecarga, type Conexion } from './core/precarga.js'
 import { showAftermath, showActTransition }           from './screens/AftermathScreen.js'
 import { mountEndingScreen, captureEnding, setTopoCache, getTopoCache, showCaptureOverlay } from './screens/EndingScreen.js'
 import { mountHistoryScreen, hsTab }                    from './screens/HistoryScreen.js'
@@ -112,6 +113,33 @@ function guardar(): void {
     _avisoSinGuardar = true   // una vez por racha: no spamear cada turno
     showNotif('⚠️ No se pudo guardar la partida (almacenamiento lleno o bloqueado). Si cerrás, se pierde.', 'loss')
   }
+}
+
+// Guardar al salir. En un aula lo normal es cerrar la pestaña o bloquear la tablet a mitad de
+// camino: lo hecho hasta ahí se guarda también al ocultarse la página, no solo en cada paso.
+// `_partidaViva` evita resucitar una partida que ya terminó (su save se borró al llegar al final).
+let _partidaViva = false
+function guardarAlSalir(): void {
+  if (_partidaViva && gs) guardar()
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') guardarAlSalir() })
+window.addEventListener('pagehide', guardarAlSalir)
+
+// Imágenes de los eventos para el modo sin internet (~12 MB). Se piden UNA vez por sesión, 20 s
+// después de empezar a jugar —para no competir con la carga del juego— y el service worker las
+// baja de a una. Con ahorro de datos o conexión lenta no se hace nada: el juego anda igual y las
+// imágenes se guardan al verlas.
+let _precargaProgramada = false
+function programarPrecargaDeImagenes(): void {
+  if (_precargaProgramada || !('serviceWorker' in navigator) || import.meta.env.DEV) return
+  _precargaProgramada = true
+  setTimeout(() => {
+    if (!conexionPermitePrecarga((navigator as Navigator & { connection?: Conexion }).connection)) return
+    void Promise.all([navigator.serviceWorker.ready, import('./data/events.js')]).then(([reg, ev]) => {
+      const urls = imagenesPorActo(gs.nodes, ev.EVENTS_DEF)
+      reg.active?.postMessage({ tipo: 'precargar-imagenes', urls })
+    }).catch((err) => console.warn('[sw] no se pudo programar la precarga de imágenes', err))
+  }, 20_000)
 }
 
 // Doble requestAnimationFrame para esperar al primer pintado, con respaldo: en una pestaña en
@@ -216,6 +244,7 @@ function wireAllButtons(): void {
       'Se eliminarán <strong>todas las partidas guardadas, el historial y los logros</strong> desbloqueados. Esta acción no se puede deshacer.',
       () => {
         clearAllProgress()
+        _partidaViva = false
         gs = null!
         _inCatchEvent = false
         _selectNodeFn = undefined
@@ -348,7 +377,9 @@ function startNewGame(diff: 'educativo' | 'historico' | 'legendario', name: stri
   _inCatchEvent = false
   _busy = true          // la cinemática de apertura lo libera (onDone)
   clearSavedGame()
+  _partidaViva = true
   guardar()   // cerrar durante la cinemática de apertura ya no pierde la partida
+  programarPrecargaDeImagenes()
   resetMap()
 
   _selectNodeFn = onSelectNode
@@ -395,6 +426,8 @@ function continueGame(): void {
   if (!gs.tribeToken)  gs = { ...gs, tribeToken: '🦅' }
   _inCatchEvent = false
   _busy = false
+  _partidaViva = true
+  programarPrecargaDeImagenes()
   _selectNodeFn = onSelectNode
 
   resetMap()
@@ -634,6 +667,7 @@ function showEnding(ending: import('./data/types.js').EndingDef): void {
     pushToHistory(gs.pendingGame)
   }
   clearSavedGame()
+  _partidaViva = false   // terminó: salir ya no debe volver a guardarla
 
   // Compartir el topo-cache con EndingScreen para evitar un segundo fetch del GeoJSON
   const cached = getMapTopoCache()

@@ -7,7 +7,15 @@
 //   - Otros fetch: stale-while-revalidate
 // ══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'jaguar-v6'
+const CACHE_NAME = 'jaguar-v7'
+
+// Las imagenes de los eventos (50 archivos, ~12 MB) viven en su propia cache: pesan casi todo lo
+// que hay que guardar y casi nunca cambian, asi que no tienen que bajarse otra vez cada vez que
+// se sube CACHE_NAME por un cambio de codigo. Se llenan de a una, en segundo plano, cuando la
+// pagina lo pide (mensaje `precargar-imagenes`); no entran en el pre-cacheo de arriba porque
+// `addAll` es todo o nada y una sola imagen caida tiraria el install entero.
+const CACHE_IMG = 'jaguar-img-v1'
+const esImagenDeEvento = (url) => url.origin === self.location.origin && /\/images\/events\/[^/]+$/.test(url.pathname)
 
 // Activos estaticos sin hash: fuentes, iconos, manifest.
 //
@@ -65,7 +73,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && k !== CACHE_IMG).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   )
@@ -109,11 +117,14 @@ self.addEventListener('fetch', (event) => {
   // Same-origin: cache-first (Vite hashea assets, son inmutables)
   if (url.origin === self.location.origin) {
     event.respondWith(
-      caches.open(CACHE_NAME).then(cache =>
-        cache.match(request).then(cached => {
+      // `caches.match` mira todas las caches: la imagen puede estar en la propia o en la de codigo.
+      caches.match(request).then(cached => {
           if (cached) return cached
           return fetch(request).then(response => {
-            if (response.ok) cache.put(request, response.clone())
+            if (response.ok) {
+              const copia = response.clone()
+              event.waitUntil(caches.open(esImagenDeEvento(url) ? CACHE_IMG : CACHE_NAME).then(c => c.put(request, copia)))
+            }
             return response
           }).catch(() =>
             // Sin red y sin cache: HTML de fallback offline
@@ -122,8 +133,7 @@ self.addEventListener('fetch', (event) => {
               { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
             )
           )
-        })
-      )
+      })
     )
     return
   }
@@ -144,4 +154,30 @@ self.addEventListener('fetch', (event) => {
       })
     )
   )
+})
+
+// ── Precarga de imágenes en segundo plano ─────────────
+// La pagina manda la lista (`urls`); el worker baja de a UNA para no ahogar el wifi del aula
+// (treinta tablets pidiendo a la vez) y se rinde tras tres fallos seguidos (sin red).
+async function precargarImagenes(urls) {
+  const cache = await caches.open(CACHE_IMG)
+  let fallosSeguidos = 0
+  for (const u of urls) {
+    if (fallosSeguidos >= 3) break
+    let url
+    try { url = new URL(u, self.location.origin) } catch { continue }
+    if (!esImagenDeEvento(url)) continue            // solo imagenes propias de eventos
+    if (await cache.match(url.href)) continue       // ya esta
+    try {
+      const r = await fetch(url.href)
+      if (r.ok) { await cache.put(url.href, r); fallosSeguidos = 0 } else fallosSeguidos++
+    } catch { fallosSeguidos++ }
+  }
+}
+
+self.addEventListener('message', (event) => {
+  const d = event.data
+  if (d && d.tipo === 'precargar-imagenes' && Array.isArray(d.urls)) {
+    event.waitUntil(precargarImagenes(d.urls.slice(0, 200)))
+  }
 })

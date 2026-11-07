@@ -18,8 +18,40 @@ export const LOGROS_KEY   = 'jaguar_logros'
 
 // ── PARTIDA EN CURSO ──────────────────────────────────
 
+/**
+ * Versión del formato del guardado. Cuando cambie la forma de `SavePayload`: subirla y agregar al
+ * final de MIGRACIONES la función que lleva el guardado de la versión anterior a la nueva. Un
+ * guardado sin `version` es el formato original (0).
+ */
+export const SAVE_VERSION = 1
+
+type Crudo = Record<string, unknown>
+
+/** MIGRACIONES[v] lleva un guardado de la versión v a la v+1. */
+const MIGRACIONES: ((raw: Crudo) => Crudo)[] = [
+  // 0 → 1: se estampa la versión. El resto lo normaliza sanitizeSave campo por campo.
+  (raw) => ({ ...raw, version: 1 }),
+]
+
+/**
+ * Lleva un guardado de cualquier versión a la actual. Uno de una versión FUTURA (por ejemplo,
+ * el alumno volvió a una pestaña con el juego viejo) se deja como está: sanitizeSave toma los
+ * campos que conoce y descarta el resto, en vez de perder la partida.
+ */
+export function migrarGuardado(raw: unknown): unknown {
+  if (!isObj(raw)) return raw
+  let v = Number.isInteger(raw.version) && (raw.version as number) >= 0 ? (raw.version as number) : 0
+  let actual: Crudo = raw
+  while (v < SAVE_VERSION) {
+    actual = MIGRACIONES[v]!(actual)
+    v++
+  }
+  return actual
+}
+
 /** Serialización mínima del estado para localStorage */
 interface SavePayload {
+  version:     number
   diff:        string
   caciqueName: string
   tribeToken?: string
@@ -36,6 +68,7 @@ interface SavePayload {
 /** Devuelve false si no se pudo escribir (almacenamiento lleno o bloqueado). */
 export function saveGame(gs: GameState): boolean {
   const payload: SavePayload = {
+    version:     SAVE_VERSION,
     diff:        gs.diff,
     caciqueName: gs.caciqueName,
     tribeToken:  gs.tribeToken,
@@ -191,7 +224,7 @@ export function loadGame(): GameState | null {
   } catch (_) {
     parsed = null
   }
-  const gs = sanitizeSave(parsed)
+  const gs = sanitizeSave(migrarGuardado(parsed))
   if (!gs) {
     lsRemove(SAVE_KEY)
     _saveProblem = 'La partida guardada estaba dañada y no se pudo recuperar. Podés empezar una nueva.'
